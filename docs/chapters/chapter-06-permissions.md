@@ -1,9 +1,3 @@
----
-layout: book
-order: 8
-title: "第6章：権限管理 - セキュリティの第一歩"
----
-
 # 第6章：権限管理 - セキュリティの第一歩
 
 ## 6.1 はじめに：なぜ権限管理が必要なのか
@@ -364,27 +358,21 @@ sudo ausearch -k passwd_changes
 sudo aureport --summary
 ```
 
-#### 4. ファイアウォール設定の実践 - Default Deny原則の適用
-
-**セキュリティ原則**: 「デフォルトで全て拒否し、必要なものだけを許可する」  
-この原則により、想定外の攻撃経路を大幅に削減できます。
+#### 4. ファイアウォール設定の実践
 
 ```bash
 # iptablesによる基本設定
-# 【重要】デフォルトポリシーを拒否に設定（Default Deny）
-sudo iptables -P INPUT DROP     # 外部からの接続は基本的に拒否
-sudo iptables -P FORWARD DROP   # 転送も拒否
-sudo iptables -P OUTPUT ACCEPT  # 内部からの発信は許可
+# デフォルトポリシーを拒否に設定
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT ACCEPT
 
-# 必要最小限のサービスのみ許可（最小権限の原則）
+# 必要なサービスのみ許可
 sudo iptables -A INPUT -i lo -j ACCEPT                    # ローカルループバック
 sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT  # 確立済み接続
 sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT        # SSH
 sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT        # HTTP
 sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT       # HTTPS
-
-# 注意: この設定により、指定していないポート（例: ポート3306 (MySQL), ポート5432 (PostgreSQL)）
-# への外部アクセスは自動的にブロックされます。
 
 # 設定を保存
 sudo iptables-save > /etc/iptables/rules.v4
@@ -409,12 +397,7 @@ cat >> /etc/ssh/sshd_config << 'EOF'
 # セキュリティ強化設定
 Protocol 2
 PermitRootLogin no
-
-# 【重要】パスワード認証の無効化
-# 学習環境では PasswordAuthentication yes も許容されるが、
-# 本番環境では必ず no に設定する（ブルートフォース攻撃対策）
 PasswordAuthentication no
-
 PubkeyAuthentication yes
 ChallengeResponseAuthentication no
 UsePAM no

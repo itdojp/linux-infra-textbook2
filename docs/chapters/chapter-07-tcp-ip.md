@@ -1,9 +1,3 @@
----
-layout: book
-order: 9
-title: "第7章：TCP/IPスタックとLinux"
----
-
 # 第7章：TCP/IPスタックとLinux
 
 ## 7.1 はじめに：インターネットという奇跡
@@ -30,13 +24,63 @@ title: "第7章：TCP/IPスタックとLinux"
 
 複雑なネットワーク通信を理解するため、OSI（Open Systems Interconnection）参照モデルが作られました：
 
-<img src="{{ '/assets/images/diagrams/chapter-07/osi-model.svg' | relative_url }}" alt="OSI参照モデル" style="width: 100%; max-width: 600px; height: auto;">
+![OSI参照モデル]({{ '/assets/images/diagrams/chapter-07/osi-reference-model.svg' | relative_url }})
 
 ### TCP/IPモデル：実用的な4層構造
 
 実際のインターネットでは、よりシンプルなTCP/IPモデルが使われています：
 
-<img src="{{ '/assets/images/diagrams/chapter-07/osi-vs-tcpip.svg' | relative_url }}" alt="OSI参照モデル vs TCP/IPモデル" style="width: 100%; max-width: 800px; height: auto;">
+```mermaid
+graph LR
+    subgraph "OSI参照モデル"
+        O7["アプリケーション"]
+        O6["プレゼンテーション"]
+        O5["セッション"]
+        O4["トランスポート"]
+        O3["ネットワーク"]
+        O2["データリンク"]
+        O1["物理"]
+    end
+    
+    subgraph "TCP/IPモデル"
+        T4["アプリケーション<br/>層"]
+        T3["トランスポート<br/>層"]
+        T2["インターネット<br/>層"]
+        T1["ネットワーク<br/>インターフェース層"]
+    end
+    
+    subgraph "Linuxでの実装"
+        L4["ユーザー空間<br/>nginx, sshd"]
+        L3["カーネル空間<br/>TCP/UDPスタック"]
+        L2["カーネル空間<br/>IPスタック"]
+        L1["カーネル空間<br/>デバイスドライバ/NIC"]
+    end
+    
+    O7 --> T4
+    O6 --> T4
+    O5 --> T4
+    O4 --> T3
+    O3 --> T2
+    O2 --> T1
+    O1 --> T1
+    
+    T4 --> L4
+    T3 --> L3
+    T2 --> L2
+    T1 --> L1
+    
+    style O7 fill:#e1f5fe
+    style O6 fill:#e1f5fe
+    style O5 fill:#e1f5fe
+    style T4 fill:#e8f5e8
+    style T3 fill:#fff3e0
+    style T2 fill:#f3e5f5
+    style T1 fill:#fce4ec
+    style L4 fill:#e8f5e8
+    style L3 fill:#fff3e0
+    style L2 fill:#f3e5f5
+    style L1 fill:#fce4ec
+```
 
 ## 7.3 各層の役割と相互作用
 
@@ -108,7 +152,7 @@ traceroute to google.com (172.217.175.110), 30 hops max
 
 ### カーネル空間でのパケット処理フロー
 
-<img src="{{ '/assets/images/diagrams/chapter-07/linux-network-stack.svg' | relative_url }}" alt="Linuxカーネル空間でのパケット処理フロー" style="width: 100%; max-width: 700px; height: auto;">
+![LinuxのTCP/IPスタック]({{ '/assets/images/diagrams/chapter-07/linux-tcp-ip-stack.svg' | relative_url }})
 
 ### パケット処理の詳細フロー
 
@@ -174,39 +218,7 @@ ps aux | grep nginx
 
 ### ネットワーク構成図
 
-```mermaid
-graph TB
-    subgraph "クライアント側"
-        C1["アプリケーション<br/>curl, browser"]
-        C2["TCP/UDP層<br/>ポート管理"]
-        C3["IP層<br/>ルーティング"]
-        C4["リンク層<br/>Ethernet"]
-        C5["物理層<br/>NIC"]
-    end
-    
-    subgraph "ネットワーク"
-        N1["ローカルスイッチ"]
-        N2["ルーター/ゲートウェイ"]
-        N3[ISP]
-        N4["インターネット"]
-    end
-    
-    subgraph "サーバー側"
-        S1["物理層<br/>NIC"]
-        S2["リンク層<br/>Ethernet"]
-        S3["IP層<br/>ルーティング"]
-        S4["TCP/UDP層<br/>ポート管理"]
-        S5[アプリケーション<br/>nginx, apache]
-    end
-    
-    C1 --> C2 --> C3 --> C4 --> C5
-    C5 --> N1 --> N2 --> N3 --> N4
-    N4 --> S1 --> S2 --> S3 --> S4 --> S5
-    
-    style C1 fill:#e1f5fe
-    style S5 fill:#e8f5e8
-    style N4 fill:#fff3e0
-```
+![ネットワーク通信フロー]({{ '/assets/images/diagrams/chapter-07/network-communication-flow.svg' | relative_url }})
 
 ### レイヤー3：トランスポート層（TCP/UDP）
 
@@ -225,26 +237,7 @@ ESTAB  0      0      192.168.1.10:45678  93.184.216.34:80
 
 #### TCPの3ウェイハンドシェイク
 
-```mermaid
-sequenceDiagram
-    participant C as "クライアント"
-    participant S as "サーバー"
-    
-    Note over C, S: "TCP 3ウェイハンドシェイク"
-    
-    C->>S: "1. SYN<br/>seq=1000<br/>「接続要求」"
-    S->>C: "2. SYN+ACK<br/>seq=2000, ack=1001<br/>「接続許可」"
-    C->>S: "3. ACK<br/>ack=2001<br/>「確認」"
-    
-    Note over C, S: "接続確立"
-    
-    C<<->>S: "データ通信"
-    
-    rect rgb(240, 248, 255)
-        Note right of C: "ESTABLISHED状態"
-        Note left of S: "ESTABLISHED状態"
-    end
-```
+![TCP 3ウェイハンドシェイク]({{ '/assets/images/diagrams/chapter-07/tcp-handshake-sequence.svg' | relative_url }})
 
 ### レイヤー4：アプリケーション層
 

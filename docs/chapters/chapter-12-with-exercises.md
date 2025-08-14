@@ -1,9 +1,3 @@
----
-layout: book
-order: 14
-title: "第12章：AWSという巨大なデータセンター"
----
-
 # 第12章：AWSという巨大なデータセンター
 
 ## 12.1 はじめに：コンピューティングの民主化
@@ -69,51 +63,7 @@ aws ec2 run-instances \
 
 物理的なハードウェアを意識することなく、必要な計算資源を利用できるサービスモデルです。
 
-```mermaid
-graph TD
-    subgraph "従来のインフラ（全て管理が必要）"
-        direction TB
-        APP1["アプリケーション"]
-        OS1["OS"]
-        VIR1["仮想化層"]
-        SRV1["サーバー"]
-        STR1["ストレージ"]
-        NET1["ネットワーク"]
-        
-        APP1 --> OS1 --> VIR1 --> SRV1 --> STR1 --> NET1
-    end
-    
-    subgraph "IaaS (AWS) - 責任分界点あり"
-        direction TB
-        subgraph "ユーザー管理"
-            APP2["アプリケーション"]
-            OS2["OS"]
-        end
-        
-        subgraph "AWS管理"
-            VIR2["仮想化層"]
-            SRV2["サーバー"]
-            STR2["ストレージ"]
-            NET2["ネットワーク"]
-        end
-        
-        APP2 --> OS2 --> VIR2 --> SRV2 --> STR2 --> NET2
-    end
-    
-    style APP1 fill:#ffcccc,stroke:#ff0000
-    style OS1 fill:#ffcccc,stroke:#ff0000
-    style VIR1 fill:#ffcccc,stroke:#ff0000
-    style SRV1 fill:#ffcccc,stroke:#ff0000
-    style STR1 fill:#ffcccc,stroke:#ff0000
-    style NET1 fill:#ffcccc,stroke:#ff0000
-    
-    style APP2 fill:#ffcccc,stroke:#ff0000
-    style OS2 fill:#ffcccc,stroke:#ff0000
-    style VIR2 fill:#e1f5fe,stroke:#0066cc
-    style SRV2 fill:#e1f5fe,stroke:#0066cc
-    style STR2 fill:#e1f5fe,stroke:#0066cc
-    style NET2 fill:#e1f5fe,stroke:#0066cc
-```
+![従来インフラ vs クラウド(IaaS)比較]({{ '/assets/images/diagrams/chapter-12/cloud-infrastructure-comparison.svg' | relative_url }})
 
 ### EC2（Elastic Compute Cloud）の仕組み
 
@@ -315,39 +265,24 @@ for inst in underutilized:
 
 AWSとユーザーの責任範囲は明確に分かれています：
 
-```mermaid
-graph TD
-    subgraph "AWS責任共有モデル"
-        subgraph "AWSの責任範囲 (クラウドのセキュリティ)"
-            direction TB
-            A1["物理的セキュリティ<br/>・データセンターのアクセス制御<br/>・監視システム"]
-            A2["ハードウェア保守<br/>・サーバー機器の管理<br/>・故障対応・交換"]
-            A3["ネットワークインフラ<br/>・物理ネットワーク機器<br/>・ハイパーバイザー"]
-            A4["仮想化層<br/>・Hypervisor<br/>・インスタンス分離"]
-            A5["AWSサービス<br/>・EC2、S3、RDS等<br/>・サービスの可用性"]
-        end
-        
-        subgraph "ユーザーの責任範囲 (クラウド内のセキュリティ)"
-            direction TB
-            U1["OSのパッチ適用<br/>・セキュリティアップデート<br/>・設定管理"]
-            U2["アプリケーション管理<br/>・アプリケーションコード<br/>・設定・監視"]
-            U3["データ暗号化<br/>・保存データの暗号化<br/>・転送データの暗号化"]
-            U4["ネットワーク保護<br/>・セキュリティグループ<br/>・NACLの設定"]
-            U5["アクセス管理<br/>・IAMユーザー・ロール<br/>・認証・認可"]
-        end
-    end
-    
-    style A1 fill:#e1f5fe,stroke:#0066cc
-    style A2 fill:#e1f5fe,stroke:#0066cc
-    style A3 fill:#e1f5fe,stroke:#0066cc
-    style A4 fill:#e1f5fe,stroke:#0066cc
-    style A5 fill:#e1f5fe,stroke:#0066cc
-    
-    style U1 fill:#fff3e0,stroke:#ff9900
-    style U2 fill:#fff3e0,stroke:#ff9900
-    style U3 fill:#fff3e0,stroke:#ff9900
-    style U4 fill:#fff3e0,stroke:#ff9900
-    style U5 fill:#fff3e0,stroke:#ff9900
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         AWSの責任範囲
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+│ ・物理的セキュリティ                    │
+│ ・ハードウェアの保守                    │
+│ ・ネットワークインフラ                  │
+│ ・仮想化層                              │
+│ ・AWSサービスのソフトウェア             │
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         ユーザーの責任範囲
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+│ ・OSのパッチ適用                        │
+│ ・アプリケーションの管理                │
+│ ・データの暗号化                        │
+│ ・ネットワークトラフィックの保護        │
+│ ・アクセス管理                          │
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### 実践的な責任分担

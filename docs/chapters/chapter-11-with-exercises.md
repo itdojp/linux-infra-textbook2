@@ -1,9 +1,3 @@
----
-layout: book
-order: 13
-title: "第11章：イメージとレジストリ - 配布可能な実行環境"
----
-
 # 第11章：イメージとレジストリ - 配布可能な実行環境
 
 ## 11.1 はじめに：「環境ごと配布する」という発想の革新性
@@ -92,28 +86,7 @@ $ podman run registry.example.com/myapp:v1.0
 
 コンテナイメージは、複数の読み取り専用レイヤーを重ねた構造になっています：
 
-```mermaid
-graph TB
-    subgraph "コンテナイメージ"
-        L4["レイヤー4: アプリケーション<br/>50MB"]
-        L3["レイヤー3: 言語ランタイム<br/>100MB"]
-        L2["レイヤー2: システムツール<br/>30MB"]
-        L1["レイヤー1: ベースOS<br/>70MB"]
-    end
-    
-    L4 -.->|積み重ね| L3
-    L3 -.->|積み重ね| L2
-    L2 -.->|積み重ね| L1
-    
-    TOTAL["合計: 250MB"]
-    L1 -.-> TOTAL
-    
-    style L4 fill:#ff9999,stroke:#ff0000
-    style L3 fill:#99ccff,stroke:#0066cc
-    style L2 fill:#99ff99,stroke:#00cc00
-    style L1 fill:#ffcc99,stroke:#ff9900
-    style TOTAL fill:#e6e6e6,stroke:#333333
-```
+![コンテナイメージの層構造]({{ '/assets/images/diagrams/chapter-11/container-image-layers.svg' | relative_url }})
 
 ### レイヤーの詳細な仕組み
 
@@ -150,24 +123,8 @@ deb46925e5ca   2 weeks ago   /bin/sh -c #(nop)  CMD ["nginx" "-g" "daem...  0B
 ### Copy-on-Write（CoW）メカニズム
 
 #### 読み取り専用レイヤーと書き込み可能レイヤー
-```mermaid
-graph TB
-    subgraph "実行時のコンテナ"
-        RW["書き込み可能レイヤー<br/>コンテナ固有の変更"]
-        R1["イメージレイヤー（読専）<br/>共有される"]
-        R2["イメージレイヤー（読専）<br/>共有される"]
-        R3["イメージレイヤー（読専）<br/>共有される"]
-    end
-    
-    RW -->|Copy-on-Write| R1
-    R1 -.->|読み取り専用| R2
-    R2 -.->|読み取り専用| R3
-    
-    style RW fill:#ffcccc,stroke:#ff0000
-    style R1 fill:#e6f3ff,stroke:#0066cc
-    style R2 fill:#e6f3ff,stroke:#0066cc
-    style R3 fill:#e6f3ff,stroke:#0066cc
-```
+
+![実行時のコンテナ層構造]({{ '/assets/images/diagrams/chapter-11/container-runtime-layers.svg' | relative_url }})
 
 #### OverlayFSの動作
 ```bash

@@ -1,9 +1,3 @@
----
-layout: book
-order: 16
-title: "第14章：監視とログ - システムの可観測性"
----
-
 # 第14章：監視とログ - システムの可観測性
 
 ## 14.1 はじめに：見えないものは管理できない
@@ -206,8 +200,7 @@ def process_order(order_id, user_id):
 #### ログ集約システム（ELK Stack）
 ```yaml
 # docker-compose-elk.yml
-# Docker Compose V2対応（docker compose推奨）
-version: '3.8'
+version: '3.7'
 
 services:
   elasticsearch:
@@ -662,7 +655,6 @@ cat > dashboard.json << 'DASHBOARD'
 DASHBOARD
 
 # Docker Composeファイル
-# Docker Compose V2対応 - docker composeコマンドを使用
 cat > docker-compose-monitoring.yml << 'COMPOSE'
 version: '3.8'
 
@@ -729,13 +721,7 @@ COMPOSE
 # 起動スクリプト
 cat > start_monitoring.sh << 'START'
 #!/bin/bash
-# Docker Compose V2を使用（推奨）
-# V1のdocker-composeではなく、docker composeコマンドを使用
-docker compose -f docker-compose-monitoring.yml up -d
-
-# 旧形式（docker-compose）も動作するが、V2への移行を推奨
-# docker-compose -f docker-compose-monitoring.yml up -d
-
+docker-compose -f docker-compose-monitoring.yml up -d
 echo "Monitoring stack is starting..."
 echo "Prometheus: http://localhost:9090"
 echo "Grafana: http://localhost:3000 (admin/admin)"

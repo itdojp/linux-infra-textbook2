@@ -1,9 +1,3 @@
----
-layout: book
-order: 7
-title: "第5章：プロセスとシグナル - 並行処理の制御"
----
-
 # 第5章：プロセスとシグナル - 並行処理の制御
 
 ## 5.1 はじめに：見えない世界で起きていること
@@ -77,7 +71,7 @@ user1    3456  0.0  0.1  23456  4096 pts/2    Ss   10:00   0:00 -bash
 
 Linuxでは、新しいプロセスは既存のプロセスから「分裂」して生まれます：
 
-<img src="{{ '/assets/images/diagrams/chapter-05/process-fork-exec.svg' | relative_url }}" alt="プロセスの誕生：fork()とexec()" style="width: 100%; max-width: 700px; height: auto;">
+![プロセスの誕生：fork()とexec()]({{ '/assets/images/diagrams/chapter-05/process-fork-exec-flow.svg' | relative_url }})
 
 ```c
 // プロセス生成の基本的な流れ（C言語）
@@ -108,7 +102,7 @@ init(1)─┬─systemd(100)─┬─systemd-journald(150)
 
 プロセスは以下の状態を遷移します：
 
-<img src="{{ '/assets/images/diagrams/chapter-05/process-state-diagram.svg' | relative_url }}" alt="プロセス状態遷移図" style="width: 100%; max-width: 800px; height: auto;">
+![プロセス状態遷移図]({{ '/assets/images/diagrams/chapter-05/process-state-transitions.svg' | relative_url }})
 
 状態の確認：
 

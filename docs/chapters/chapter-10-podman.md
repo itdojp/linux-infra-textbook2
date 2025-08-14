@@ -1,34 +1,12 @@
----
-layout: book
-order: 12
-title: "第10章：Podmanという選択 - エンタープライズ向けコンテナ"
----
-
 # 第10章：Podmanという選択 - エンタープライズ向けコンテナ
-
-## 📚 この章の前提知識
-- ✅ **必要**: 第9章のコンテナ技術の基本概念
-- ✅ **必要**: Linuxのプロセスと名前空間の理解
-- ✅ **推奨**: Dockerの基本的な使用経験
-- ❌ **不要**: コンテナオーケストレーションの経験
-
-## 🎯 この章の目標
-- Dockerの課題とPodmanの優位性を理解する
-- Rootlessコンテナのセキュリティメリットを学ぶ
-- Podmanの基本操作をマスターする
-
-## 🚀 この章でできるようになること
-- Podmanでコンテナイメージをビルド・実行できる
-- systemdと統合したコンテナサービスを構築できる
-- エンタープライズ環境でのコンテナ運用を計画できる
 
 ## 10.1 はじめに：なぜ新しいコンテナランタイムが必要だったのか
 
-2013年、**Docker**（ドッカー: コンテナ技術を普及させた代表的ツール）の登場により**コンテナ技術**（Container Technology: アプリケーションを分離・可搬化する技術）は爆発的に普及しました。しかし、**エンタープライズ環境**（Enterprise Environment: 企業の本格的な業務システム環境）での利用が進むにつれ、いくつかの課題が明らかになってきました。
+2013年、Dockerの登場によりコンテナ技術は爆発的に普及しました。しかし、エンタープライズ環境での利用が進むにつれ、いくつかの課題が明らかになってきました。
 
 「なぜroot権限が必要なのか？」「なぜデーモンが常に動いている必要があるのか？」「もっとセキュアな方法はないのか？」
 
-これらの問いに対する答えが、**Red Hat**（レッドハット: エンタープライズ向けLinuxの大手企業）が中心となって開発した「**Podman**（ポッドマン: Pod Managerの略）」です。
+これらの問いに対する答えが、Red Hatが中心となって開発した「Podman」です。
 
 ## 10.2 DockerからPodmanへ - なぜ新しい選択肢が必要だったか
 
@@ -36,31 +14,11 @@ title: "第10章：Podmanという選択 - エンタープライズ向けコン�
 
 #### Dockerのアーキテクチャ
 
-```mermaid
-graph LR
-    CLI["Docker CLI<br/>docker run<br/>docker build"]
-    DAEMON["Docker Daemon<br/>dockerd<br/>root権限で常時稼働"]
-    CONTAINERD["containerd<br/>コンテナライフサイクル管理"]
-    RUNC["runc<br/>OCI Runtime<br/>実際のコンテナ実行"]
-    
-    USER["ユーザー<br/>dockerグループ必要"]
-    
-    USER --> CLI
-    CLI -->|"REST API"| DAEMON
-    DAEMON --> CONTAINERD
-    CONTAINERD --> RUNC
-    
-    style DAEMON fill:#ffcdd2
-    style USER fill:#e3f2fd
-    style CLI fill:#e8f5e8
-    style CONTAINERD fill:#fff3e0
-    style RUNC fill:#f3e5f5
-```
+![Dockerのアーキテクチャ]({{ '/assets/images/diagrams/chapter-10/docker-architecture.svg' | relative_url }})
 
 #### 主な課題
 
 1. **セキュリティリスク**
-
 ```bash
 # Dockerデーモンは常にroot権限で動作
 $ ps aux | grep dockerd
@@ -87,22 +45,7 @@ $ sudo systemctl stop docker
 
 #### Podmanのアーキテクチャ
 
-```mermaid
-graph LR
-    USER["ユーザー<br/>一般権限のまま"]
-    CLI["Podman CLI<br/>podman run<br/>podman build"]
-    LIBPOD["libpod<br/>ライブラリ<br/>プロセス内実行"]
-    RUNTIME["OCI Runtime<br/>crun/runc<br/>実際のコンテナ実行"]
-    
-    USER --> CLI
-    CLI -->|"直接呼び出し"| LIBPOD
-    LIBPOD -->|"fork/exec"| RUNTIME
-    
-    style USER fill:#c8e6c9
-    style CLI fill:#e8f5e8
-    style LIBPOD fill:#e1f5fe
-    style RUNTIME fill:#f3e5f5
-```
+![Podmanのアーキテクチャ]({{ '/assets/images/diagrams/chapter-10/podman-architecture.svg' | relative_url }})
 
 #### 革新的な特徴
 
