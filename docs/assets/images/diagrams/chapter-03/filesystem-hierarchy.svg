@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .root { fill: #ffeb3b; stroke: #333; stroke-width: 2; }
+      .dev { fill: #e3f2fd; stroke: #333; stroke-width: 1; }
+      .proc { fill: #e8f5e8; stroke: #333; stroke-width: 1; }
+      .sys { fill: #f3e5f5; stroke: #333; stroke-width: 1; }
+      .usr { fill: #fff3e0; stroke: #333; stroke-width: 1; }
+      .var { fill: #fce4ec; stroke: #333; stroke-width: 1; }
+      .default { fill: #f9f9f9; stroke: #333; stroke-width: 1; }
+      .text { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .small-text { font-family: Arial, sans-serif; font-size: 10px; text-anchor: middle; }
+      .line { stroke: #333; stroke-width: 1; }
+    </style>
+  </defs>
+  
+  <!-- Root Directory -->
+  <rect x="350" y="20" width="100" height="40" class="root" rx="5"/>
+  <text x="400" y="35" class="text">/</text>
+  <text x="400" y="50" class="small-text">ルート</text>
+  
+  <!-- Main directories (level 1) -->
+  <!-- /bin -->
+  <rect x="50" y="120" width="80" height="30" class="default" rx="3"/>
+  <text x="90" y="135" class="small-text">/bin</text>
+  <text x="90" y="145" class="small-text">基本コマンド</text>
+  <line x1="350" y1="60" x2="90" y2="120" class="line"/>
+  
+  <!-- /boot -->
+  <rect x="140" y="120" width="80" height="30" class="default" rx="3"/>
+  <text x="180" y="135" class="small-text">/boot</text>
+  <text x="180" y="145" class="small-text">起動ファイル</text>
+  <line x1="350" y1="60" x2="180" y2="120" class="line"/>
+  
+  <!-- /dev -->
+  <rect x="230" y="120" width="80" height="30" class="dev" rx="3"/>
+  <text x="270" y="135" class="small-text">/dev</text>
+  <text x="270" y="145" class="small-text">デバイス</text>
+  <line x1="350" y1="60" x2="270" y2="120" class="line"/>
+  
+  <!-- /etc -->
+  <rect x="320" y="120" width="80" height="30" class="default" rx="3"/>
+  <text x="360" y="135" class="small-text">/etc</text>
+  <text x="360" y="145" class="small-text">設定ファイル</text>
+  <line x1="400" y1="60" x2="360" y2="120" class="line"/>
+  
+  <!-- /home -->
+  <rect x="410" y="120" width="80" height="30" class="default" rx="3"/>
+  <text x="450" y="135" class="small-text">/home</text>
+  <text x="450" y="145" class="small-text">ユーザー</text>
+  <line x1="400" y1="60" x2="450" y2="120" class="line"/>
+  
+  <!-- /lib -->
+  <rect x="500" y="120" width="80" height="30" class="default" rx="3"/>
+  <text x="540" y="135" class="small-text">/lib</text>
+  <text x="540" y="145" class="small-text">ライブラリ</text>
+  <line x1="400" y1="60" x2="540" y2="120" class="line"/>
+  
+  <!-- Second row -->
+  <!-- /proc -->
+  <rect x="50" y="200" width="80" height="30" class="proc" rx="3"/>
+  <text x="90" y="215" class="small-text">/proc</text>
+  <text x="90" y="225" class="small-text">プロセス</text>
+  <line x1="400" y1="60" x2="90" y2="200" class="line"/>
+  
+  <!-- /root -->
+  <rect x="140" y="200" width="80" height="30" class="default" rx="3"/>
+  <text x="180" y="215" class="small-text">/root</text>
+  <text x="180" y="225" class="small-text">root</text>
+  <line x1="400" y1="60" x2="180" y2="200" class="line"/>
+  
+  <!-- /run -->
+  <rect x="230" y="200" width="80" height="30" class="default" rx="3"/>
+  <text x="270" y="215" class="small-text">/run</text>
+  <text x="270" y="225" class="small-text">実行時</text>
+  <line x1="400" y1="60" x2="270" y2="200" class="line"/>
+  
+  <!-- /sys -->
+  <rect x="320" y="200" width="80" height="30" class="sys" rx="3"/>
+  <text x="360" y="215" class="small-text">/sys</text>
+  <text x="360" y="225" class="small-text">システム</text>
+  <line x1="400" y1="60" x2="360" y2="200" class="line"/>
+  
+  <!-- /tmp -->
+  <rect x="410" y="200" width="80" height="30" class="default" rx="3"/>
+  <text x="450" y="215" class="small-text">/tmp</text>
+  <text x="450" y="225" class="small-text">一時</text>
+  <line x1="400" y1="60" x2="450" y2="200" class="line"/>
+  
+  <!-- /usr -->
+  <rect x="500" y="200" width="80" height="30" class="usr" rx="3"/>
+  <text x="540" y="215" class="small-text">/usr</text>
+  <text x="540" y="225" class="small-text">ユーザー</text>
+  <line x1="400" y1="60" x2="540" y2="200" class="line"/>
+  
+  <!-- /var -->
+  <rect x="590" y="200" width="80" height="30" class="var" rx="3"/>
+  <text x="630" y="215" class="small-text">/var</text>
+  <text x="630" y="225" class="small-text">可変</text>
+  <line x1="400" y1="60" x2="630" y2="200" class="line"/>
+  
+  <!-- /dev subdirectories -->
+  <rect x="180" y="280" width="60" height="25" class="dev" rx="2"/>
+  <text x="210" y="295" class="small-text">sda</text>
+  <line x1="270" y1="150" x2="210" y2="280" class="line"/>
+  
+  <rect x="250" y="280" width="60" height="25" class="dev" rx="2"/>
+  <text x="280" y="295" class="small-text">null</text>
+  <line x1="270" y1="150" x2="280" y2="280" class="line"/>
+  
+  <rect x="320" y="280" width="60" height="25" class="dev" rx="2"/>
+  <text x="350" y="295" class="small-text">zero</text>
+  <line x1="270" y1="150" x2="350" y2="280" class="line"/>
+  
+  <!-- /proc subdirectories -->
+  <rect x="20" y="280" width="70" height="25" class="proc" rx="2"/>
+  <text x="55" y="295" class="small-text">cpuinfo</text>
+  <line x1="90" y1="230" x2="55" y2="280" class="line"/>
+  
+  <rect x="100" y="280" width="70" height="25" class="proc" rx="2"/>
+  <text x="135" y="295" class="small-text">meminfo</text>
+  <line x1="90" y1="230" x2="135" y2="280" class="line"/>
+  
+  <!-- /sys subdirectories -->
+  <rect x="290" y="280" width="60" height="25" class="sys" rx="2"/>
+  <text x="320" y="295" class="small-text">class</text>
+  <line x1="360" y1="230" x2="320" y2="280" class="line"/>
+  
+  <rect x="360" y="280" width="70" height="25" class="sys" rx="2"/>
+  <text x="395" y="295" class="small-text">devices</text>
+  <line x1="360" y1="230" x2="395" y2="280" class="line"/>
+  
+  <!-- /usr subdirectories -->
+  <rect x="460" y="280" width="60" height="25" class="usr" rx="2"/>
+  <text x="490" y="295" class="small-text">bin</text>
+  <line x1="540" y1="230" x2="490" y2="280" class="line"/>
+  
+  <rect x="530" y="280" width="60" height="25" class="usr" rx="2"/>
+  <text x="560" y="295" class="small-text">lib</text>
+  <line x1="540" y1="230" x2="560" y2="280" class="line"/>
+  
+  <rect x="600" y="280" width="60" height="25" class="usr" rx="2"/>
+  <text x="630" y="295" class="small-text">share</text>
+  <line x1="540" y1="230" x2="630" y2="280" class="line"/>
+  
+  <!-- /var subdirectories -->
+  <rect x="570" y="280" width="60" height="25" class="var" rx="2"/>
+  <text x="600" y="295" class="small-text">log</text>
+  <line x1="630" y1="230" x2="600" y2="280" class="line"/>
+  
+  <rect x="640" y="280" width="60" height="25" class="var" rx="2"/>
+  <text x="670" y="295" class="small-text">run</text>
+  <line x1="630" y1="230" x2="670" y2="280" class="line"/>
+  
+  <rect x="710" y="280" width="60" height="25" class="var" rx="2"/>
+  <text x="740" y="295" class="small-text">tmp</text>
+  <line x1="630" y1="230" x2="740" y2="280" class="line"/>
+  
+</svg>

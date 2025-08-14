@@ -1,0 +1,28 @@
+{
+  "title": "Linuxインフラ教本 - サーバー構築・運用の基礎",
+  "description": "Linuxインフラ教本 - サーバー構築・運用の基礎",
+  "author": "ITDO Inc.（株式会社アイティードゥ）",
+  "version": "1.0.0",
+  "language": "ja",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/itdojp/linux-infra-textbook.git",
+    "branch": "main"
+  },
+  "structure": {
+    "chapters": [
+      {
+        "id": "chapter01",
+        "title": "第1章：基礎概念",
+        "description": "基本的な概念と原理"
+      }
+    ]
+  },
+  "build": {
+    "outputDirectory": "docs",
+    "framework": "book-formatter",
+    "enableNavigation": true,
+    "enableSyntaxHighlighting": true,
+    "enableMobileOptimization": true
+  }
+}

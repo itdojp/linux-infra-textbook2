@@ -1,0 +1,46 @@
+{
+  "name": "linux-infra-textbook",
+  "version": "1.0.0",
+  "description": "Linuxインフラ教本 - サーバー構築・運用の基礎",
+  "author": "ITDO Inc.（株式会社アイティードゥ）",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "cd docs && bundle exec jekyll serve --livereload",
+    "build": "cd docs && bundle exec jekyll build",
+    "build:gh-pages": "cd docs && bundle exec jekyll build",
+    "preview": "npm run build && cd docs && npx http-server _site -p 8080 --silent",
+    "deploy": "gh-pages -d docs/_site",
+    "clean": "rm -rf docs/_site docs/.jekyll-cache",
+    "test": "npm run lint && npm run check-links",
+    "lint": "markdownlint 'docs/**/*.md' --ignore node_modules",
+    "lint:light": "markdownlint 'docs/**/*.md' --ignore node_modules",
+    "check-links": "markdown-link-check docs/**/*.md",
+    "help": "echo 'Available commands:\n  npm start - Start development server\n  npm run build - Build the book\n  npm run preview - Local preview\n  npm run deploy - Deploy to GitHub Pages'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "markdownlint-cli": "^0.37.0",
+    "markdown-link-check": "^3.11.2",
+    "gh-pages": "^6.0.0",
+    "http-server": "^14.1.1"
+  },
+  "keywords": [
+    "book",
+    "documentation",
+    "japanese",
+    "linux",
+    "infrastructure",
+    "server"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itdojp/linux-infra-textbook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itdojp/linux-infra-textbook/issues"
+  },
+  "homepage": "https://github.com/itdojp/linux-infra-textbook#readme"
+}

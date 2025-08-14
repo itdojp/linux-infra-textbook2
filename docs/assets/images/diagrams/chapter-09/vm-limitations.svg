@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      <![CDATA[
+        :root {
+          --bg-color: #FFFFFF;
+          --text-color: #1A1A1A;
+          --primary-color: #0066CC;
+          --warning-color: #D97706;
+          --error-color: #DC2626;
+          --vm-bg: #ffebee;
+          --vm-border: #ffcdd2;
+          --guest-os-bg: #ffcdd2;
+          --hypervisor-bg: #e3f2fd;
+          --host-os-bg: #e8f5e8;
+          --hardware-bg: #f3e5f5;
+        }
+
+        .title {
+          font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+          font-size: 16px;
+          font-weight: 600;
+          fill: var(--text-color);
+          text-anchor: middle;
+          dominant-baseline: middle;
+        }
+
+        .label {
+          font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+          font-size: 12px;
+          font-weight: 400;
+          fill: var(--text-color);
+          text-anchor: middle;
+          dominant-baseline: middle;
+        }
+
+        .annotation {
+          font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+          font-size: 10px;
+          font-weight: 400;
+          fill: var(--text-color);
+          text-anchor: middle;
+          dominant-baseline: middle;
+        }
+
+        .vm-container {
+          fill: var(--vm-bg);
+          stroke: var(--vm-border);
+          stroke-width: 2;
+          rx: 4;
+        }
+
+        .vm-component {
+          fill: var(--bg-color);
+          stroke: var(--vm-border);
+          stroke-width: 1;
+          rx: 4;
+        }
+
+        .guest-os {
+          fill: var(--guest-os-bg);
+          stroke: var(--vm-border);
+          stroke-width: 1;
+          rx: 4;
+        }
+
+        .hypervisor {
+          fill: var(--hypervisor-bg);
+          stroke: var(--primary-color);
+          stroke-width: 2;
+          rx: 4;
+        }
+
+        .host-os {
+          fill: var(--host-os-bg);
+          stroke: #4caf50;
+          stroke-width: 2;  
+          rx: 4;
+        }
+
+        .hardware {
+          fill: var(--hardware-bg);
+          stroke: #9c27b0;
+          stroke-width: 2;
+          rx: 4;
+        }
+
+        .connection-line {
+          stroke: var(--text-color);
+          stroke-width: 2;
+          fill: none;
+        }
+      ]]>
+    </style>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="60" class="title">仮想マシンの限界</text>
+
+  <!-- VM1 Container -->
+  <rect x="60" y="100" width="160" height="200" class="vm-container"/>
+  <text x="140" y="120" class="label">仮想マシン1</text>
+  
+  <!-- VM1 Components -->
+  <rect x="80" y="140" width="120" height="40" class="vm-component"/>
+  <text x="140" y="160" class="annotation">アプリケーション1</text>
+  
+  <rect x="80" y="190" width="120" height="50" class="guest-os"/>
+  <text x="140" y="210" class="annotation">ゲストOS</text>
+  <text x="140" y="225" class="annotation">2-4GB</text>
+  
+  <rect x="80" y="250" width="120" height="40" class="vm-component"/>
+  <text x="140" y="270" class="annotation">仮想ハードウェア</text>
+
+  <!-- VM2 Container -->
+  <rect x="260" y="100" width="160" height="200" class="vm-container"/>
+  <text x="340" y="120" class="label">仮想マシン2</text>
+  
+  <!-- VM2 Components -->
+  <rect x="280" y="140" width="120" height="40" class="vm-component"/>
+  <text x="340" y="160" class="annotation">アプリケーション2</text>
+  
+  <rect x="280" y="190" width="120" height="50" class="guest-os"/>
+  <text x="340" y="210" class="annotation">ゲストOS</text>
+  <text x="340" y="225" class="annotation">2-4GB</text>
+  
+  <rect x="280" y="250" width="120" height="40" class="vm-component"/>
+  <text x="340" y="270" class="annotation">仮想ハードウェア</text>
+
+  <!-- VM3 Container -->
+  <rect x="460" y="100" width="160" height="200" class="vm-container"/>
+  <text x="540" y="120" class="label">仮想マシン3</text>
+  
+  <!-- VM3 Components -->
+  <rect x="480" y="140" width="120" height="40" class="vm-component"/>
+  <text x="540" y="160" class="annotation">アプリケーション3</text>
+  
+  <rect x="480" y="190" width="120" height="50" class="guest-os"/>
+  <text x="540" y="210" class="annotation">ゲストOS</text>
+  <text x="540" y="225" class="annotation">2-4GB</text>
+  
+  <rect x="480" y="250" width="120" height="40" class="vm-component"/>
+  <text x="540" y="270" class="annotation">仮想ハードウェア</text>
+
+  <!-- Hypervisor Layer -->
+  <rect x="100" y="340" width="520" height="60" class="hypervisor"/>
+  <text x="360" y="365" class="label">ハイパーバイザー</text>
+  <text x="360" y="385" class="annotation">VMware / KVM / Xen</text>
+
+  <!-- Host OS Layer -->
+  <rect x="120" y="440" width="480" height="60" class="host-os"/>
+  <text x="360" y="465" class="label">ホストOS</text>
+  <text x="360" y="485" class="annotation">Linux / Windows</text>
+
+  <!-- Physical Hardware Layer -->
+  <rect x="140" y="540" width="440" height="60" class="hardware"/>
+  <text x="360" y="565" class="label">物理ハードウェア</text>
+  <text x="360" y="585" class="annotation">CPU / Memory / Storage</text>
+
+  <!-- Connection Lines -->
+  <!-- VM1 to Hypervisor -->
+  <line x1="140" y1="290" x2="140" y2="340" class="connection-line"/>
+  
+  <!-- VM2 to Hypervisor -->
+  <line x1="340" y1="290" x2="340" y2="340" class="connection-line"/>
+  
+  <!-- VM3 to Hypervisor -->
+  <line x1="540" y1="290" x2="540" y2="340" class="connection-line"/>
+  
+  <!-- Hypervisor to Host OS -->
+  <line x1="360" y1="400" x2="360" y2="440" class="connection-line"/>
+  
+  <!-- Host OS to Hardware -->
+  <line x1="360" y1="500" x2="360" y2="540" class="connection-line"/>
+
+  <!-- Problem indicators (subtle warning elements) -->
+  <circle cx="650" cy="160" r="8" fill="var(--warning-color)" opacity="0.7"/>
+  <text x="650" y="165" class="annotation" fill="white">!</text>
+  
+  <circle cx="650" cy="210" r="8" fill="var(--warning-color)" opacity="0.7"/>
+  <text x="650" y="215" class="annotation" fill="white">!</text>
+  
+  <circle cx="650" cy="270" r="8" fill="var(--warning-color)" opacity="0.7"/>
+  <text x="650" y="275" class="annotation" fill="white">!</text>
+
+  <!-- Legend for problems -->
+  <text x="680" y="165" class="annotation" fill="var(--warning-color)">リソース重複</text>
+  <text x="680" y="185" class="annotation" fill="var(--warning-color)">起動時間長</text>
+  <text x="680" y="205" class="annotation" fill="var(--warning-color)">オーバーヘッド大</text>
+</svg>

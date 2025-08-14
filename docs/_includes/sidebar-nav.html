@@ -1,0 +1,168 @@
+<!-- Sidebar Navigation - Linux Infrastructure Textbook -->
+<div class="sidebar-content">
+    <!-- Book Info -->
+    <div class="book-info">
+        <h2 class="book-title">🐧 実践Linux インフラエンジニア入門</h2>
+        
+        <p class="book-subtitle">コンテナ・クラウド時代に必要なLinuxインフラエンジニアの基礎技術を実践的に学べる技術書</p>
+        
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h3 class="toc-title">目次</h3>
+        
+        <!-- Introduction -->
+        <div class="toc-section">
+            <ul class="toc-list">
+                <li class="toc-item">
+                    <a href="{{ '/' | relative_url }}" class="toc-link {% if page.url == '/' %}active{% endif %}">
+                        🏠 はじめに
+                    </a>
+                </li>
+                <li class="toc-item">
+                    <a href="{{ '/introduction/' | relative_url }}" class="toc-link {% if page.url contains 'introduction' %}active{% endif %}">
+                        📖 イントロダクション
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Part I: 基礎編 -->
+        <div class="toc-section">
+            <h3 class="toc-section-title">🔰 Part I: 基礎編</h3>
+            <ul class="toc-list">
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-01-linux-overview/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-01-linux-overview' %}active{% endif %}">
+                        <span class="chapter-number">1.</span>ITインフラの全体像とLinuxの位置づけ
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-02-linux-philosophy/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-02-linux-philosophy' %}active{% endif %}">
+                        <span class="chapter-number">2.</span>Linuxというオペレーティングシステムの設計思想
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-03-filesystem-abstraction/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-03-filesystem-abstraction' %}active{% endif %}">
+                        <span class="chapter-number">3.</span>ファイルシステムという抽象化の威力
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-04-shell-and-commands/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-04-shell-and-commands' %}active{% endif %}">
+                        <span class="chapter-number">4.</span>シェルとコマンド - 対話的管理の基礎
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-05-process-and-signals/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-05-process-and-signals' %}active{% endif %}">
+                        <span class="chapter-number">5.</span>プロセスとシグナル - 並行処理の制御
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-06-permissions/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-06-permissions' %}active{% endif %}">
+                        <span class="chapter-number">6.</span>権限管理 - セキュリティの第一歩
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Part II: ネットワーク編 -->
+        <div class="toc-section">
+            <h3 class="toc-section-title">🌐 Part II: ネットワーク編</h3>
+            <ul class="toc-list">
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-07-tcp-ip/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-07-tcp-ip' %}active{% endif %}">
+                        <span class="chapter-number">7.</span>TCP/IPスタックとLinux
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-08-name-resolution/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-08-name-resolution' %}active{% endif %}">
+                        <span class="chapter-number">8.</span>名前解決とサービス発見
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Part III: コンテナ編 -->
+        <div class="toc-section">
+            <h3 class="toc-section-title">📦 Part III: コンテナ編</h3>
+            <ul class="toc-list">
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-09-container-evolution/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-09-container-evolution' %}active{% endif %}">
+                        <span class="chapter-number">9.</span>仮想化からコンテナへ - 隔離技術の進化
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-10-podman/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-10-podman' %}active{% endif %}">
+                        <span class="chapter-number">10.</span>Podmanという選択 - エンタープライズ向けコンテナ
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-11-with-exercises/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-11-with-exercises' %}active{% endif %}">
+                        <span class="chapter-number">11.</span>イメージとレジストリ - 配布可能な実行環境
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Part IV: クラウド編 -->
+        <div class="toc-section">
+            <h3 class="toc-section-title">☁️ Part IV: クラウド編</h3>
+            <ul class="toc-list">
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-12-with-exercises/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-12-with-exercises' %}active{% endif %}">
+                        <span class="chapter-number">12.</span>AWSという巨大なデータセンター
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-13-with-exercises/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-13-with-exercises' %}active{% endif %}">
+                        <span class="chapter-number">13.</span>仮想ネットワークの設計と実装
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-14-with-exercises/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-14-with-exercises' %}active{% endif %}">
+                        <span class="chapter-number">14.</span>監視とログ - システムの可観測性
+                    </a>
+                </li>
+                <li class="toc-item toc-chapter">
+                    <a href="{{ '/chapters/chapter-15-infrastructure-as-code/' | relative_url }}" class="toc-link {% if page.url contains 'chapter-15-infrastructure-as-code' %}active{% endif %}">
+                        <span class="chapter-number">15.</span>自動化への道 - Infrastructure as Code
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Appendices -->
+        <div class="toc-section">
+            <h3 class="toc-section-title">📋 付録</h3>
+            <ul class="toc-list">
+                <li class="toc-item">
+                    <a href="{{ '/appendices/merged-exercise-answers/' | relative_url }}" class="toc-link {% if page.url contains 'merged-exercise-answers' %}active{% endif %}">
+                        演習問題解答集
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Additional Resources -->
+        <div class="toc-section">
+            <h3 class="toc-section-title">📚 リソース</h3>
+            <ul class="toc-list">
+                <li class="toc-item">
+                    <a href="https://github.com/itdojp/linux-infra-textbook" class="toc-link" target="_blank" rel="noopener">
+                        💾 GitHubリポジトリ
+                    </a>
+                </li>
+                <li class="toc-item">
+                    <a href="https://itdojp.github.io/it-engineer-knowledge-architecture/" class="toc-link" target="_blank" rel="noopener">
+                        📚 書籍一覧
+                    </a>
+                </li>
+                <li class="toc-item">
+                    <a href="https://itdo.jp" class="toc-link" target="_blank" rel="noopener">
+                        🏢 株式会社アイティードゥ
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

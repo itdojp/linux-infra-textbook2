@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <title>TCP/IPパケットフロー</title>
+  <desc>Linuxネットワークスタックにおけるパケット処理フロー、各レイヤーでの処理とNetfilterフック</desc>
+  <defs>
+    <style>
+      :root {
+        --svg-bg: #FFFFFF;
+        --svg-bg-alt: #F8F9FA;
+        --svg-text: #1A1A1A;
+        --svg-text-secondary: #666666;
+        --svg-border: #E0E0E0;
+        --svg-primary: #0066CC;
+        --svg-success: #059669;
+        --svg-warning: #D97706;
+        --svg-error: #DC2626;
+        --svg-neutral: #6B7280;
+      }
+      .title-text { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 600; fill: var(--svg-text); }
+      .layer-title { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 500; fill: white; }
+      .component-text { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 400; fill: var(--svg-text); }
+      .label-text { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 10px; font-weight: 400; fill: var(--svg-text-secondary); }
+      .user-layer { fill: var(--svg-primary); stroke: var(--svg-primary); stroke-width: 2; }
+      .kernel-layer { fill: var(--svg-success); stroke: var(--svg-success); stroke-width: 2; }
+      .network-layer { fill: var(--svg-warning); stroke: var(--svg-warning); stroke-width: 2; }
+      .hardware-layer { fill: var(--svg-error); stroke: var(--svg-error); stroke-width: 2; }
+      .packet-flow { stroke: var(--svg-primary); stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .reverse-flow { stroke: var(--svg-success); stroke-width: 2; stroke-dasharray: 5,3; fill: none; marker-end: url(#arrowhead-green); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="var(--svg-primary)"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="var(--svg-success)"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="30" class="title-text" text-anchor="middle">TCP/IPパケットフロー</text>
+
+  <!-- User Space Layer -->
+  <g id="user-space">
+    <rect x="40" y="60" width="720" height="80" class="user-layer" rx="4"/>
+    <text x="400" y="80" class="layer-title" text-anchor="middle">ユーザー空間</text>
+    
+    <rect x="160" y="90" width="120" height="40" fill="white" stroke="var(--svg-primary)" stroke-width="1" rx="4"/>
+    <text x="220" y="105" class="component-text" text-anchor="middle">アプリケーション</text>
+    <text x="220" y="120" class="label-text" text-anchor="middle">socket(), send(), recv()</text>
+    
+    <rect x="340" y="90" width="120" height="40" fill="white" stroke="var(--svg-primary)" stroke-width="1" rx="4"/>
+    <text x="400" y="105" class="component-text" text-anchor="middle">ライブラリ</text>
+    <text x="400" y="120" class="label-text" text-anchor="middle">glibc, システムコール</text>
+    
+    <rect x="520" y="90" width="120" height="40" fill="white" stroke="var(--svg-primary)" stroke-width="1" rx="4"/>
+    <text x="580" y="105" class="component-text" text-anchor="middle">プロセス/スレッド</text>
+    <text x="580" y="120" class="label-text" text-anchor="middle">バッファ管理</text>
+  </g>
+
+  <!-- System Call Interface -->
+  <rect x="40" y="150" width="720" height="30" fill="var(--svg-neutral)" fill-opacity="0.2" stroke="var(--svg-neutral)" stroke-width="1" rx="4"/>
+  <text x="400" y="170" class="component-text" text-anchor="middle">システムコールインターフェース</text>
+
+  <!-- Kernel Space - Socket Layer -->
+  <g id="socket-layer">
+    <rect x="40" y="190" width="720" height="60" class="kernel-layer" rx="4"/>
+    <text x="100" y="210" class="layer-title">ソケット層</text>
+    
+    <rect x="160" y="200" width="100" height="40" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+    <text x="210" y="215" class="component-text" text-anchor="middle">Socket API</text>
+    <text x="210" y="230" class="label-text" text-anchor="middle">BSD Socket</text>
+    
+    <rect x="280" y="200" width="100" height="40" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+    <text x="330" y="215" class="component-text" text-anchor="middle">VFS</text>
+    <text x="330" y="230" class="label-text" text-anchor="middle">ファイル記述子</text>
+    
+    <rect x="400" y="200" width="100" height="40" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+    <text x="450" y="215" class="component-text" text-anchor="middle">Protocol Ops</text>
+    <text x="450" y="230" class="label-text" text-anchor="middle">プロトコル操作</text>
+    
+    <rect x="520" y="200" width="120" height="40" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+    <text x="580" y="215" class="component-text" text-anchor="middle">Socket Buffer</text>
+    <text x="580" y="230" class="label-text" text-anchor="middle">sk_buff構造体</text>
+  </g>
+
+  <!-- TCP/UDP Layer -->
+  <g id="transport-layer">
+    <rect x="40" y="260" width="350" height="80" fill="var(--svg-warning)" fill-opacity="0.1" stroke="var(--svg-warning)" stroke-width="2" rx="4"/>
+    <text x="215" y="280" class="component-text" text-anchor="middle" font-weight="500">トランスポート層</text>
+    
+    <rect x="60" y="290" width="140" height="40" fill="white" stroke="var(--svg-warning)" stroke-width="1" rx="4"/>
+    <text x="130" y="305" class="component-text" text-anchor="middle">TCP</text>
+    <text x="130" y="320" class="label-text" text-anchor="middle">輻輳制御・再送制御</text>
+    
+    <rect x="220" y="290" width="140" height="40" fill="white" stroke="var(--svg-warning)" stroke-width="1" rx="4"/>
+    <text x="290" y="305" class="component-text" text-anchor="middle">UDP</text>
+    <text x="290" y="320" class="label-text" text-anchor="middle">コネクションレス</text>
+  </g>
+
+  <!-- Netfilter Hooks -->
+  <g id="netfilter">
+    <rect x="410" y="260" width="350" height="80" fill="var(--svg-error)" fill-opacity="0.1" stroke="var(--svg-error)" stroke-width="2" rx="4"/>
+    <text x="585" y="280" class="component-text" text-anchor="middle" font-weight="500">Netfilter/iptables</text>
+    
+    <rect x="430" y="290" width="80" height="40" fill="white" stroke="var(--svg-error)" stroke-width="1" rx="4"/>
+    <text x="470" y="305" class="label-text" text-anchor="middle">PREROUTING</text>
+    <text x="470" y="320" class="label-text" text-anchor="middle">NAT/DNAT</text>
+    
+    <rect x="520" y="290" width="70" height="40" fill="white" stroke="var(--svg-error)" stroke-width="1" rx="4"/>
+    <text x="555" y="305" class="label-text" text-anchor="middle">FORWARD</text>
+    <text x="555" y="320" class="label-text" text-anchor="middle">フィルタ</text>
+    
+    <rect x="600" y="290" width="70" height="40" fill="white" stroke="var(--svg-error)" stroke-width="1" rx="4"/>
+    <text x="635" y="305" class="label-text" text-anchor="middle">INPUT</text>
+    <text x="635" y="320" class="label-text" text-anchor="middle">ローカル</text>
+    
+    <rect x="680" y="290" width="70" height="40" fill="white" stroke="var(--svg-error)" stroke-width="1" rx="4"/>
+    <text x="715" y="305" class="label-text" text-anchor="middle">OUTPUT</text>
+    <text x="715" y="320" class="label-text" text-anchor="middle">送信元</text>
+  </g>
+
+  <!-- IP Layer -->
+  <g id="ip-layer">
+    <rect x="40" y="350" width="720" height="70" class="network-layer" rx="4"/>
+    <text x="100" y="370" class="layer-title">ネットワーク層 (IP)</text>
+    
+    <rect x="160" y="360" width="120" height="50" fill="white" stroke="var(--svg-warning)" stroke-width="1" rx="4"/>
+    <text x="220" y="380" class="component-text" text-anchor="middle">ルーティング</text>
+    <text x="220" y="395" class="label-text" text-anchor="middle">経路選択</text>
+    <text x="220" y="408" class="label-text" text-anchor="middle">ルーティングテーブル</text>
+    
+    <rect x="300" y="360" width="120" height="50" fill="white" stroke="var(--svg-warning)" stroke-width="1" rx="4"/>
+    <text x="360" y="380" class="component-text" text-anchor="middle">フラグメンテーション</text>
+    <text x="360" y="395" class="label-text" text-anchor="middle">MTU処理</text>
+    <text x="360" y="408" class="label-text" text-anchor="middle">パケット分割/結合</text>
+    
+    <rect x="440" y="360" width="120" height="50" fill="white" stroke="var(--svg-warning)" stroke-width="1" rx="4"/>
+    <text x="500" y="380" class="component-text" text-anchor="middle">QoS/TC</text>
+    <text x="500" y="395" class="label-text" text-anchor="middle">Traffic Control</text>
+    <text x="500" y="408" class="label-text" text-anchor="middle">帯域制御</text>
+    
+    <rect x="580" y="360" width="120" height="50" fill="white" stroke="var(--svg-warning)" stroke-width="1" rx="4"/>
+    <text x="640" y="380" class="component-text" text-anchor="middle">Neighbor</text>
+    <text x="640" y="395" class="label-text" text-anchor="middle">ARP/NDP</text>
+    <text x="640" y="408" class="label-text" text-anchor="middle">MACアドレス解決</text>
+  </g>
+
+  <!-- Data Link Layer -->
+  <g id="datalink-layer">
+    <rect x="40" y="430" width="720" height="60" fill="var(--svg-success)" fill-opacity="0.1" stroke="var(--svg-success)" stroke-width="2" rx="4"/>
+    <text x="400" y="450" class="component-text" text-anchor="middle" font-weight="500">データリンク層</text>
+    
+    <rect x="160" y="445" width="100" height="35" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+    <text x="210" y="460" class="component-text" text-anchor="middle">Ethernet</text>
+    <text x="210" y="475" class="label-text" text-anchor="middle">フレーム処理</text>
+    
+    <rect x="280" y="445" width="100" height="35" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+    <text x="330" y="460" class="component-text" text-anchor="middle">Bridge/VLAN</text>
+    <text x="330" y="475" class="label-text" text-anchor="middle">L2スイッチング</text>
+    
+    <rect x="400" y="445" width="100" height="35" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+    <text x="450" y="460" class="component-text" text-anchor="middle">Bonding</text>
+    <text x="450" y="475" class="label-text" text-anchor="middle">リンクアグリゲーション</text>
+    
+    <rect x="520" y="445" width="120" height="35" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+    <text x="580" y="460" class="component-text" text-anchor="middle">Queue Discipline</text>
+    <text x="580" y="475" class="label-text" text-anchor="middle">送信キュー管理</text>
+  </g>
+
+  <!-- Hardware Layer -->
+  <g id="hardware-layer">
+    <rect x="40" y="500" width="720" height="60" class="hardware-layer" rx="4"/>
+    <text x="100" y="520" class="layer-title">ハードウェア層</text>
+    
+    <rect x="200" y="510" width="120" height="40" fill="white" stroke="var(--svg-error)" stroke-width="1" rx="4"/>
+    <text x="260" y="525" class="component-text" text-anchor="middle">NIC Driver</text>
+    <text x="260" y="540" class="label-text" text-anchor="middle">デバイスドライバ</text>
+    
+    <rect x="340" y="510" width="120" height="40" fill="white" stroke="var(--svg-error)" stroke-width="1" rx="4"/>
+    <text x="400" y="525" class="component-text" text-anchor="middle">DMA/Ring Buffer</text>
+    <text x="400" y="540" class="label-text" text-anchor="middle">バッファ管理</text>
+    
+    <rect x="480" y="510" width="120" height="40" fill="white" stroke="var(--svg-error)" stroke-width="1" rx="4"/>
+    <text x="540" y="525" class="component-text" text-anchor="middle">Interrupt/NAPI</text>
+    <text x="540" y="540" class="label-text" text-anchor="middle">割り込み処理</text>
+  </g>
+
+  <!-- Flow Arrows -->
+  <path d="M 400 140 L 400 150" class="packet-flow"/>
+  <path d="M 400 180 L 400 190" class="packet-flow"/>
+  <path d="M 400 250 L 400 260" class="packet-flow"/>
+  <path d="M 400 340 L 400 350" class="packet-flow"/>
+  <path d="M 400 420 L 400 430" class="packet-flow"/>
+  <path d="M 400 490 L 400 500" class="packet-flow"/>
+  
+  <!-- Reverse Flow -->
+  <path d="M 380 500 L 380 490" class="reverse-flow"/>
+  <path d="M 380 430 L 380 420" class="reverse-flow"/>
+  <path d="M 380 350 L 380 340" class="reverse-flow"/>
+  <path d="M 380 260 L 380 250" class="reverse-flow"/>
+  <path d="M 380 190 L 380 180" class="reverse-flow"/>
+  <path d="M 380 150 L 380 140" class="reverse-flow"/>
+  
+  <!-- Labels -->
+  <text x="410" y="170" class="label-text">送信 →</text>
+  <text x="340" y="170" class="label-text">← 受信</text>
+</svg>

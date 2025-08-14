@@ -1,0 +1,49 @@
+title: "実践Linux インフラエンジニア入門"
+description: "コンテナ・クラウド時代に必要なLinuxインフラエンジニアの基礎技術を実践的に学べる技術書"
+author: "株式会社アイティードゥ"
+lang: "ja"
+url: "https://itdojp.github.io"
+baseurl: "/linux-infra-textbook"
+repository: "https://github.com/itdojp/linux-infra-textbook"
+
+# Jekyll設定
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+
+# プラグイン
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap 
+  - jekyll-seo-tag
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+
+# デフォルト設定
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "book"
+
+# 日本語対応
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    line_numbers: false
+
+# GitHub Pages設定
+github:
+  is_project_page: true
+
+exclude:
+  - node_modules/
+  - scripts/
+  - templates/
+  - src/
+  - package*.json
+  - README.md
+  - "*.tmp"
+  - Gemfile*

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <title>プロセスメモリレイアウト</title>
+  <desc>Linuxプロセスの仮想メモリ空間レイアウト、スタック、ヒープ、データセグメント、テキストセグメントの配置</desc>
+  <defs>
+    <style>
+      :root {
+        --svg-bg: #FFFFFF;
+        --svg-bg-alt: #F8F9FA;
+        --svg-text: #1A1A1A;
+        --svg-text-secondary: #666666;
+        --svg-border: #E0E0E0;
+        --svg-primary: #0066CC;
+        --svg-success: #059669;
+        --svg-warning: #D97706;
+        --svg-error: #DC2626;
+        --svg-neutral: #6B7280;
+      }
+      .title-text { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 600; fill: var(--svg-text); }
+      .section-title { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 500; fill: white; }
+      .segment-text { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 400; fill: var(--svg-text); }
+      .label-text { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-size: 10px; font-weight: 400; fill: var(--svg-text-secondary); }
+      .address-text { font-family: 'Courier New', monospace; font-size: 10px; fill: var(--svg-text-secondary); }
+      .stack-segment { fill: var(--svg-primary); stroke: var(--svg-primary); stroke-width: 2; }
+      .heap-segment { fill: var(--svg-success); stroke: var(--svg-success); stroke-width: 2; }
+      .data-segment { fill: var(--svg-warning); stroke: var(--svg-warning); stroke-width: 2; }
+      .text-segment { fill: var(--svg-error); stroke: var(--svg-error); stroke-width: 2; }
+      .free-space { fill: var(--svg-bg-alt); stroke: var(--svg-border); stroke-width: 1; stroke-dasharray: 5,3; }
+      .growth-arrow { stroke: var(--svg-neutral); stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="var(--svg-neutral)"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="30" class="title-text" text-anchor="middle">プロセスメモリレイアウト</text>
+
+  <!-- Memory Address Labels -->
+  <text x="200" y="80" class="address-text" text-anchor="end">0xFFFFFFFF</text>
+  <text x="200" y="540" class="address-text" text-anchor="end">0x00000000</text>
+  
+  <!-- Memory Layout Container -->
+  <rect x="240" y="60" width="320" height="480" fill="none" stroke="var(--svg-border)" stroke-width="2" rx="4"/>
+
+  <!-- Kernel Space -->
+  <rect x="240" y="60" width="320" height="40" fill="var(--svg-neutral)" fill-opacity="0.2" stroke="var(--svg-neutral)" stroke-width="2" rx="4"/>
+  <text x="400" y="85" class="segment-text" text-anchor="middle" font-weight="500">カーネル空間（1GB）</text>
+
+  <!-- Stack Section -->
+  <rect x="240" y="100" width="320" height="80" class="stack-segment" rx="4"/>
+  <text x="400" y="120" class="section-title" text-anchor="middle">スタック (Stack)</text>
+  <rect x="256" y="130" width="288" height="40" fill="white" stroke="var(--svg-primary)" stroke-width="1" rx="4"/>
+  <text x="266" y="145" class="label-text">• ローカル変数</text>
+  <text x="266" y="160" class="label-text">• 関数パラメータ・戻りアドレス</text>
+  <text x="416" y="145" class="label-text">• 自動変数</text>
+  <text x="416" y="160" class="label-text">• 再帰呼び出し情報</text>
+
+  <!-- Stack Growth Arrow -->
+  <path d="M 580 140 L 620 140 L 620 200 L 600 200" class="growth-arrow"/>
+  <text x="625" y="170" class="label-text">成長方向 ↓</text>
+
+  <!-- Memory Mapping Section -->
+  <rect x="240" y="180" width="320" height="60" fill="var(--svg-primary)" fill-opacity="0.1" stroke="var(--svg-primary)" stroke-width="1" rx="4"/>
+  <text x="400" y="200" class="segment-text" text-anchor="middle" font-weight="500">メモリマップ領域</text>
+  <text x="250" y="215" class="label-text">• 共有ライブラリ (libc.so等)</text>
+  <text x="250" y="230" class="label-text">• mmap()によるファイルマッピング</text>
+  <text x="430" y="215" class="label-text">• 共有メモリ</text>
+  <text x="430" y="230" class="label-text">• スレッドスタック</text>
+
+  <!-- Free Space -->
+  <rect x="240" y="240" width="320" height="100" class="free-space" rx="4"/>
+  <text x="400" y="290" class="segment-text" text-anchor="middle" font-weight="500">空き領域</text>
+  <text x="400" y="305" class="label-text" text-anchor="middle">（動的に拡張/縮小）</text>
+
+  <!-- Heap Growth Arrow -->
+  <path d="M 580 340 L 620 340 L 620 280 L 600 280" class="growth-arrow"/>
+  <text x="625" y="310" class="label-text">成長方向 ↑</text>
+
+  <!-- Heap Section -->
+  <rect x="240" y="340" width="320" height="80" class="heap-segment" rx="4"/>
+  <text x="400" y="360" class="section-title" text-anchor="middle">ヒープ (Heap)</text>
+  <rect x="256" y="370" width="288" height="40" fill="white" stroke="var(--svg-success)" stroke-width="1" rx="4"/>
+  <text x="266" y="385" class="label-text">• malloc()/free()による動的メモリ</text>
+  <text x="266" y="400" class="label-text">• new/deleteによるオブジェクト</text>
+  <text x="436" y="385" class="label-text">• 実行時割り当て</text>
+  <text x="436" y="400" class="label-text">• brk/sbrkシステムコール</text>
+
+  <!-- BSS Section -->
+  <rect x="240" y="420" width="320" height="40" class="data-segment" rx="4"/>
+  <text x="400" y="435" class="section-title" text-anchor="middle">BSS セグメント</text>
+  <text x="400" y="450" class="label-text" text-anchor="middle">未初期化グローバル変数・静的変数（ゼロ初期化）</text>
+
+  <!-- Data Section -->
+  <rect x="240" y="460" width="320" height="40" fill="var(--svg-warning)" fill-opacity="0.7" stroke="var(--svg-warning)" stroke-width="2" rx="4"/>
+  <text x="400" y="475" class="section-title" text-anchor="middle">データセグメント</text>
+  <text x="400" y="490" class="label-text" text-anchor="middle">初期化済みグローバル変数・静的変数</text>
+
+  <!-- Text Section -->
+  <rect x="240" y="500" width="320" height="40" class="text-segment" rx="4"/>
+  <text x="400" y="515" class="section-title" text-anchor="middle">テキストセグメント</text>
+  <text x="400" y="530" class="label-text" text-anchor="middle">実行可能コード（読み取り専用）</text>
+
+  <!-- Additional Information -->
+  <g id="additional-info">
+    <rect x="40" y="560" width="720" height="30" fill="var(--svg-bg-alt)" stroke="var(--svg-border)" stroke-width="1" rx="4"/>
+    <text x="60" y="578" class="label-text" font-weight="500">補足:</text>
+    <text x="100" y="578" class="label-text">32bitシステム: 4GB仮想空間（ユーザー3GB + カーネル1GB）</text>
+    <text x="400" y="578" class="label-text">64bitシステム: 128TB〜256TB仮想空間</text>
+  </g>
+</svg>
