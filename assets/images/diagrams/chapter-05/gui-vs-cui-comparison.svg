@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="600" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+  <title>GUI vs CUI 比較図</title>
+  <desc>GUIとCUIの作業方法、メリット・デメリット、適用場面の比較</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 18px; font-weight: 600; fill: #1a1a1a; }
+      .section-title { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .label { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 12px; font-weight: 400; fill: #333; }
+      .method-label { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11px; font-weight: 600; fill: #1976d2; }
+      .advantage { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10px; font-weight: 400; fill: #2e7d32; }
+      .disadvantage { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10px; font-weight: 400; fill: #d32f2f; }
+      .command { font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace; font-size: 9px; font-weight: 400; fill: #6a1b9a; }
+      .emoji { font-size: 16px; }
+      
+      .gui-bg { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 8; }
+      .cui-bg { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 8; }
+      .vs-circle { fill: #fff3e0; stroke: #ff9800; stroke-width: 3; }
+      
+      .advantage-box { fill: #e8f5e8; stroke: #4caf50; stroke-width: 1; rx: 4; }
+      .disadvantage-box { fill: #ffebee; stroke: #f44336; stroke-width: 1; rx: 4; }
+      .action-box { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 1; rx: 4; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="600" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" class="title">GUI vs CUI: 作業方式比較</text>
+  
+  <!-- VS Symbol -->
+  <circle cx="450" cy="90" r="25" class="vs-circle"/>
+  <text x="450" y="98" text-anchor="middle" class="section-title">VS</text>
+  
+  <!-- GUI Section -->
+  <rect x="50" y="50" width="350" height="500" class="gui-bg"/>
+  <text x="225" y="80" text-anchor="middle" class="section-title">🖱️ GUI作業</text>
+  
+  <!-- GUI Actions -->
+  <rect x="70" y="100" width="310" height="60" class="action-box"/>
+  <text x="90" y="120" class="method-label">🖱️ クリック操作</text>
+  <text x="90" y="135" class="label">• マウスでアイコン選択</text>
+  <text x="90" y="150" class="label">• ドラッグ&ドロップでファイル移動</text>
+  
+  <rect x="70" y="170" width="310" height="60" class="action-box"/>
+  <text x="90" y="190" class="method-label">👆 ドラッグ操作</text>
+  <text x="90" y="205" class="label">• ウィンドウサイズ調整</text>
+  <text x="90" y="220" class="label">• 複数ファイル選択</text>
+  
+  <rect x="70" y="240" width="310" height="60" class="action-box"/>
+  <text x="90" y="260" class="method-label">🔄 手作業繰り返し</text>
+  <text x="90" y="275" class="label">• 同じ操作を何度も実行</text>
+  <text x="90" y="290" class="label">• 手順を覚えて毎回実行</text>
+  
+  <!-- GUI Advantages -->
+  <text x="90" y="325" class="section-title">✅ メリット</text>
+  <rect x="70" y="330" width="310" height="80" class="advantage-box"/>
+  <text x="90" y="350" class="advantage">• 直感的で覚えやすい</text>
+  <text x="90" y="365" class="advantage">• 視覚的フィードバック</text>
+  <text x="90" y="380" class="advantage">• 初心者に優しい</text>
+  <text x="90" y="395" class="advantage">• エラーが起きにくい</text>
+  
+  <!-- GUI Disadvantages -->
+  <text x="90" y="430" class="section-title">❌ デメリット</text>
+  <rect x="70" y="435" width="310" height="100" class="disadvantage-box"/>
+  <text x="90" y="455" class="disadvantage">• 大量処理が困難</text>
+  <text x="90" y="470" class="disadvantage">• 手順の再現が困難</text>
+  <text x="90" y="485" class="disadvantage">• 自動化ができない</text>
+  <text x="90" y="500" class="disadvantage">• 操作ミスのリスク</text>
+  <text x="90" y="515" class="disadvantage">• 手順の記録・共有が困難</text>
+  
+  <!-- CUI Section -->
+  <rect x="500" y="50" width="350" height="500" class="cui-bg"/>
+  <text x="675" y="80" text-anchor="middle" class="section-title">⌨️ CUI作業</text>
+  
+  <!-- CUI Actions -->
+  <rect x="520" y="100" width="310" height="60" class="action-box"/>
+  <text x="540" y="120" class="method-label">📝 コマンド入力</text>
+  <text x="540" y="135" class="label">• キーボードでコマンド実行</text>
+  <text x="540" y="150" class="label">• パラメータで詳細制御</text>
+  
+  <rect x="520" y="170" width="310" height="60" class="action-box"/>
+  <text x="540" y="190" class="method-label">⌨️ スクリプト化</text>
+  <text x="540" y="205" class="label">• 手順をファイルに保存</text>
+  <text x="540" y="220" class="label">• 一括実行・繰り返し実行</text>
+  
+  <rect x="520" y="240" width="310" height="60" class="action-box"/>
+  <text x="540" y="260" class="method-label">🤖 自動実行</text>
+  <text x="540" y="275" class="label">• スケジューラで定期実行</text>
+  <text x="540" y="290" class="label">• 条件分岐・エラー処理</text>
+  
+  <!-- CUI Advantages -->
+  <text x="540" y="325" class="section-title">✅ メリット</text>
+  <rect x="520" y="330" width="310" height="80" class="advantage-box"/>
+  <text x="540" y="350" class="advantage">• 完全再現可能</text>
+  <text x="540" y="365" class="advantage">• 永続保存できる</text>
+  <text x="540" y="380" class="advantage">• 大量処理が得意</text>
+  <text x="540" y="395" class="advantage">• 自動化可能</text>
+  
+  <!-- CUI Disadvantages -->
+  <text x="540" y="430" class="section-title">❌ デメリット</text>
+  <rect x="520" y="435" width="310" height="100" class="disadvantage-box"/>
+  <text x="540" y="455" class="disadvantage">• 学習コストが高い</text>
+  <text x="540" y="470" class="disadvantage">• コマンド暗記が必要</text>
+  <text x="540" y="485" class="disadvantage">• 初心者には難しい</text>
+  <text x="540" y="500" class="disadvantage">• タイポでエラーリスク</text>
+  <text x="540" y="515" class="disadvantage">• 視覚的フィードバック限定</text>
+  
+  <!-- Bottom comparison -->
+  <rect x="50" y="560" width="800" height="35" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="575" class="section-title">適用場面:</text>
+  <text x="70" y="590" class="label">GUI: 単発作業、学習段階、視覚的確認</text>
+  <text x="450" y="590" class="label">CUI: 反復作業、大量処理、自動化、サーバー管理</text>
+</svg>
