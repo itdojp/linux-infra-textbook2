@@ -39,45 +39,7 @@ title: "第8章：名前解決とサービス発見"
 
 1983年、Paul MockapetrisによってDNS（Domain Name System）が発明されました：
 
-```mermaid
-graph TB
-    subgraph "従来: 中央集権型"
-        HOSTS["HOSTS.TXT<br/>一元管理"] 
-        H1["ホストA"]
-        H2["ホストB"]
-        H3["ホストC"]
-        
-        HOSTS -.->|ダウンロード| H1
-        HOSTS -.->|ダウンロード| H2
-        HOSTS -.->|ダウンロード| H3
-    end
-    
-    subgraph "DNS: 分散型"
-        subgraph "トップレベルドメイン"
-            COM[".com"]
-            ORG[".org"]
-            JP[".jp"]
-        end
-        
-        subgraph "セカンドレベルドメイン"
-            GOOGLE["google"]
-            EXAMPLE["example"]
-            COJP["co.jp"]
-        end
-        
-        COM --> GOOGLE
-        ORG --> EXAMPLE
-        JP --> COJP
-    end
-    
-    style HOSTS fill:#ffcccc,stroke:#ff0000
-    style COM fill:#99ccff,stroke:#0066cc
-    style ORG fill:#99ccff,stroke:#0066cc
-    style JP fill:#99ccff,stroke:#0066cc
-    style GOOGLE fill:#99ff99,stroke:#00cc00
-    style EXAMPLE fill:#99ff99,stroke:#00cc00
-    style COJP fill:#99ff99,stroke:#00cc00
-```
+<img src="{{ '/assets/images/diagrams/chapter-08/dns-hierarchy.svg' | relative_url }}" alt="DNS：中央集権型から分散型へ" style="width: 100%; max-width: 800px; height: auto;">
 
 ## 8.3 DNS、mDNS、サービスディスカバリの仕組み
 
@@ -145,23 +107,7 @@ hosts: files dns mDNS4_minimal [NOTFOUND=return]
 
 名前解決の順序:
 
-```mermaid
-flowchart LR
-    START["名前解決要求"] --> FILES["/etc/hostsファイル"]
-    FILES -->|NOTFOUND| DNS["DNSサーバー"]
-    DNS -->|NOTFOUND| MDNS["マルチキャストDNS"]
-    MDNS -->|NOTFOUND| FAIL["解決失敗"]
-    
-    FILES -->|FOUND| SUCCESS["解決成功"]
-    DNS -->|FOUND| SUCCESS
-    MDNS -->|FOUND| SUCCESS
-    
-    style FILES fill:#e8f5e8,stroke:#00cc00
-    style DNS fill:#e1f5fe,stroke:#0066cc
-    style MDNS fill:#fff3e0,stroke:#ff9900
-    style SUCCESS fill:#c8e6c9,stroke:#4caf50
-    style FAIL fill:#ffcdd2,stroke:#f44336
-```
+<img src="{{ '/assets/images/diagrams/chapter-08/dns-resolution-flow.svg' | relative_url }}" alt="名前解決の流れ" style="width: 100%; max-width: 800px; height: auto;">
 
 ### DNSレコードの種類
 

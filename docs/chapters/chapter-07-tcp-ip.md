@@ -30,84 +30,13 @@ title: "第7章：TCP/IPスタックとLinux"
 
 複雑なネットワーク通信を理解するため、OSI（Open Systems Interconnection）参照モデルが作られました：
 
-```mermaid
-graph TD
-    subgraph "OSI参照モデル"
-        L7["7. アプリケーション<br/>ユーザーインターフェース<br/>HTTP, FTP, SSH"]
-        L6["6. プレゼンテーション<br/>データ形式の変換<br/>SSL/TLS, JPEG"]
-        L5["5. セッション<br/>通信の開始・終了管理<br/>NetBIOS, SQL"]
-        L4["4. トランスポート<br/>信頼性のある通信<br/>TCP, UDP"]
-        L3["3. ネットワーク<br/>経路選択<br/>IP, ICMP"]
-        L2["2. データリンク<br/>隣接機器間の通信<br/>Ethernet, WiFi"]
-        L1["1. 物理<br/>電気信号<br/>ケーブル、無線電波"]
-    end
-    
-    L7 --> L6 --> L5 --> L4 --> L3 --> L2 --> L1
-    
-    style L7 fill:#e1f5fe
-    style L6 fill:#e8f5e8
-    style L5 fill:#fff3e0
-    style L4 fill:#f3e5f5
-    style L3 fill:#fce4ec
-    style L2 fill:#f0f4c3
-    style L1 fill:#ffecb3
-```
+<img src="{{ '/assets/images/diagrams/chapter-07/osi-model.svg' | relative_url }}" alt="OSI参照モデル" style="width: 100%; max-width: 600px; height: auto;">
 
 ### TCP/IPモデル：実用的な4層構造
 
 実際のインターネットでは、よりシンプルなTCP/IPモデルが使われています：
 
-```mermaid
-graph LR
-    subgraph "OSI参照モデル"
-        O7["アプリケーション"]
-        O6["プレゼンテーション"]
-        O5["セッション"]
-        O4["トランスポート"]
-        O3["ネットワーク"]
-        O2["データリンク"]
-        O1["物理"]
-    end
-    
-    subgraph "TCP/IPモデル"
-        T4["アプリケーション<br/>層"]
-        T3["トランスポート<br/>層"]
-        T2["インターネット<br/>層"]
-        T1["ネットワーク<br/>インターフェース層"]
-    end
-    
-    subgraph "Linuxでの実装"
-        L4["ユーザー空間<br/>nginx, sshd"]
-        L3[カーネル空間<br/>TCP/UDPスタック]
-        L2[カーネル空間<br/>IPスタック]
-        L1[カーネル空間<br/>デバイスドライバ/NIC]
-    end
-    
-    O7 --> T4
-    O6 --> T4
-    O5 --> T4
-    O4 --> T3
-    O3 --> T2
-    O2 --> T1
-    O1 --> T1
-    
-    T4 --> L4
-    T3 --> L3
-    T2 --> L2
-    T1 --> L1
-    
-    style O7 fill:#e1f5fe
-    style O6 fill:#e1f5fe
-    style O5 fill:#e1f5fe
-    style T4 fill:#e8f5e8
-    style T3 fill:#fff3e0
-    style T2 fill:#f3e5f5
-    style T1 fill:#fce4ec
-    style L4 fill:#e8f5e8
-    style L3 fill:#fff3e0
-    style L2 fill:#f3e5f5
-    style L1 fill:#fce4ec
-```
+<img src="{{ '/assets/images/diagrams/chapter-07/osi-vs-tcpip.svg' | relative_url }}" alt="OSI参照モデル vs TCP/IPモデル" style="width: 100%; max-width: 800px; height: auto;">
 
 ## 7.3 各層の役割と相互作用
 
@@ -179,63 +108,7 @@ traceroute to google.com (172.217.175.110), 30 hops max
 
 ### カーネル空間でのパケット処理フロー
 
-```mermaid
-graph TB
-    subgraph "ユーザー空間"
-        A1["アプリケーション<br/>nginx, apache, ssh"]
-        A2["システムコール<br/>socket, send, recv"]
-        A3["ライブラリ<br/>libc, OpenSSL"]
-    end
-    
-    subgraph "カーネル空間"
-        B1["ソケット層<br/>AF_INET, AF_INET6"]
-        B2["トランスポート層<br/>TCP/UDP スタック"]
-        B3["ネットワーク層<br/>IPv4/IPv6 ルーティング"]
-        B4["Netfilter/iptables<br/>パケットフィルタリング"]
-        B5["データリンク層<br/>Ethernet, WiFi"]
-        B6["デバイスドライバ<br/>NIC固有ドライバ"]
-    end
-    
-    subgraph "ハードウェア"
-        C1["ネットワークカード<br/>NIC"]
-        C2["DMA<br/>メモリ直接転送"]
-        C3["割り込み処理<br/>IRQ"]
-    end
-    
-    subgraph "パケット処理"
-        D1[受信バッファ<br/>sk_buff構造体]
-        D2[送信キュー<br/>qdisc]
-        D3[プロトコル解析<br/>ヘッダ処理]
-        D4[ルーティング決定<br/>FIB lookup]
-    end
-    
-    A1 --> A2
-    A2 --> A3
-    A3 --> B1
-    B1 --> B2
-    B2 --> B3
-    B3 --> B4
-    B4 --> B5
-    B5 --> B6
-    B6 --> C1
-    
-    C1 --> D1
-    D1 --> D3
-    D3 --> D4
-    D4 --> D2
-    
-    C1 --> C2
-    C2 --> C3
-    
-    style A1 fill:#e1f5fe
-    style B1 fill:#e8f5e8
-    style B2 fill:#e8f5e8
-    style B3 fill:#e8f5e8
-    style B4 fill:#fff3e0
-    style B5 fill:#f3e5f5
-    style B6 fill:#fce4ec
-    style C1 fill:#f0f4c3
-```
+<img src="{{ '/assets/images/diagrams/chapter-07/linux-network-stack.svg' | relative_url }}" alt="Linuxカーネル空間でのパケット処理フロー" style="width: 100%; max-width: 700px; height: auto;">
 
 ### パケット処理の詳細フロー
 

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="700" height="600" viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg">
+  <title>プロセスの誕生：fork()とexec()</title>
+  <desc>Linuxにおけるプロセス作成の流れ：親プロセスからfork、exec、終了まで</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .label { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 12px; font-weight: 400; fill: #333; }
+      .process-label { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11px; font-weight: 600; fill: #1976d2; }
+      .syscall-label { font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace; font-size: 10px; font-weight: 400; fill: #7b1fa2; }
+      .annotation { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 10px; font-weight: 400; fill: #666; }
+      
+      .parent-box { fill: #e1f5fe; stroke: #0277bd; stroke-width: 2; rx: 6; }
+      .child-box { fill: #fff3e0; stroke: #ef6c00; stroke-width: 2; rx: 6; }
+      .action-box { fill: #f3e5f5; stroke: #7b1fa2; stroke-width: 2; rx: 6; }
+      .decision { fill: #e8f5e8; stroke: #388e3c; stroke-width: 2; rx: 8; }
+      
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .parent-flow { stroke: #0277bd; stroke-width: 2; fill: none; marker-end: url(#arrowhead-blue); }
+      .child-flow { stroke: #ef6c00; stroke-width: 2; fill: none; marker-end: url(#arrowhead-orange); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0277bd" />
+    </marker>
+    <marker id="arrowhead-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ef6c00" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="700" height="600" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="350" y="30" text-anchor="middle" class="title">プロセスの誕生：fork()とexec()</text>
+  
+  <!-- Parent Process Start -->
+  <rect x="280" y="60" width="140" height="60" class="parent-box"/>
+  <text x="350" y="80" text-anchor="middle" class="process-label">親プロセス</text>
+  <text x="350" y="95" text-anchor="middle" class="annotation">bash</text>
+  <text x="350" y="110" text-anchor="middle" class="annotation">PID = 1234</text>
+  
+  <!-- Fork System Call -->
+  <rect x="280" y="150" width="140" height="50" class="action-box"/>
+  <text x="350" y="170" text-anchor="middle" class="syscall-label">fork()</text>
+  <text x="350" y="185" text-anchor="middle" class="annotation">システムコール実行</text>
+  
+  <!-- Process Split Decision -->
+  <polygon points="350,240 420,270 350,300 280,270" class="decision"/>
+  <text x="350" y="265" text-anchor="middle" class="label">プロセス</text>
+  <text x="350" y="280" text-anchor="middle" class="label">分裂</text>
+  
+  <!-- Parent Process Path -->
+  <rect x="100" y="340" width="140" height="80" class="parent-box"/>
+  <text x="170" y="360" text-anchor="middle" class="process-label">親プロセス</text>
+  <text x="170" y="375" text-anchor="middle" class="annotation">PID = 1234</text>
+  <text x="170" y="390" text-anchor="middle" class="annotation">戻り値 = child_pid</text>
+  <text x="170" y="405" text-anchor="middle" class="annotation">wait()で子を待機</text>
+  
+  <!-- Child Process Path -->
+  <rect x="460" y="340" width="140" height="80" class="child-box"/>
+  <text x="530" y="360" text-anchor="middle" class="process-label">子プロセス</text>
+  <text x="530" y="375" text-anchor="middle" class="annotation">PID = 5678</text>
+  <text x="530" y="390" text-anchor="middle" class="annotation">戻り値 = 0</text>
+  <text x="530" y="405" text-anchor="middle" class="annotation">親のメモリ空間コピー</text>
+  
+  <!-- Exec System Call -->
+  <rect x="460" y="450" width="140" height="50" class="action-box"/>
+  <text x="530" y="470" text-anchor="middle" class="syscall-label">exec()</text>
+  <text x="530" y="485" text-anchor="middle" class="annotation">プログラム置き換え</text>
+  
+  <!-- New Program -->
+  <rect x="460" y="530" width="140" height="60" class="child-box"/>
+  <text x="530" y="550" text-anchor="middle" class="process-label">新しいプログラム</text>
+  <text x="530" y="565" text-anchor="middle" class="annotation">ls -la</text>
+  <text x="530" y="580" text-anchor="middle" class="annotation">メモリ空間置き換え</text>
+  
+  <!-- Process Termination -->
+  <path d="M 460 560 Q 400 560 400 480 Q 400 400 300 400" class="child-flow"/>
+  <text x="380" y="520" class="annotation">exit()</text>
+  <text x="380" y="535" class="annotation">SIGCHLD送信</text>
+  
+  <!-- Parent Wait Return -->
+  <rect x="100" y="450" width="140" height="60" class="parent-box"/>
+  <text x="170" y="470" text-anchor="middle" class="process-label">親プロセス</text>
+  <text x="170" y="485" text-anchor="middle" class="annotation">wait()から復帰</text>
+  <text x="170" y="500" text-anchor="middle" class="annotation">子の終了コード取得</text>
+  
+  <!-- Flow Arrows -->
+  <line x1="350" y1="120" x2="350" y2="150" class="arrow"/>
+  <line x1="350" y1="200" x2="350" y2="240" class="arrow"/>
+  
+  <!-- Split flows -->
+  <line x1="280" y1="270" x2="240" y2="340" class="parent-flow"/>
+  <line x1="420" y1="270" x2="460" y2="340" class="child-flow"/>
+  
+  <!-- Child process flow -->
+  <line x1="530" y1="420" x2="530" y2="450" class="child-flow"/>
+  <line x1="530" y1="500" x2="530" y2="530" class="child-flow"/>
+  
+  <!-- Parent wait flow -->
+  <line x1="170" y1="420" x2="170" y2="450" class="parent-flow"/>
+  
+  <!-- Labels for flows -->
+  <text x="190" y="310" class="annotation">親プロセス側</text>
+  <text x="510" y="310" class="annotation">子プロセス側</text>
+</svg>

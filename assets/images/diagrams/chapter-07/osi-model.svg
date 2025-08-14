@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="700" viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg">
+  <title>OSI参照モデル</title>
+  <desc>7層からなるOSI参照モデルの構造と各層の役割・プロトコル例</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 18px; font-weight: 600; fill: #1a1a1a; }
+      .layer-number { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 16px; font-weight: 600; fill: #1976d2; }
+      .layer-name { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .layer-desc { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11px; font-weight: 400; fill: #666; }
+      .protocols { font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace; font-size: 10px; font-weight: 400; fill: #7b1fa2; }
+      
+      .layer7 { fill: #e1f5fe; stroke: #01579b; stroke-width: 2; }
+      .layer6 { fill: #e8f5e8; stroke: #1b5e20; stroke-width: 2; }
+      .layer5 { fill: #fff3e0; stroke: #e65100; stroke-width: 2; }
+      .layer4 { fill: #f3e5f5; stroke: #4a148c; stroke-width: 2; }
+      .layer3 { fill: #fce4ec; stroke: #880e4f; stroke-width: 2; }
+      .layer2 { fill: #f0f4c3; stroke: #33691e; stroke-width: 2; }
+      .layer1 { fill: #ffecb3; stroke: #ff6f00; stroke-width: 2; }
+      
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="700" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="300" y="40" text-anchor="middle" class="title">OSI参照モデル</text>
+  
+  <!-- Layer 7: Application -->
+  <rect x="100" y="80" width="400" height="80" rx="8" class="layer7"/>
+  <text x="120" y="110" class="layer-number">7.</text>
+  <text x="150" y="110" class="layer-name">アプリケーション層</text>
+  <text x="120" y="130" class="layer-desc">ユーザーインターフェース</text>
+  <text x="120" y="145" class="protocols">HTTP, HTTPS, FTP, SSH, SMTP, DNS</text>
+  
+  <!-- Layer 6: Presentation -->
+  <rect x="100" y="170" width="400" height="80" rx="8" class="layer6"/>
+  <text x="120" y="200" class="layer-number">6.</text>
+  <text x="150" y="200" class="layer-name">プレゼンテーション層</text>
+  <text x="120" y="220" class="layer-desc">データ形式の変換・暗号化</text>
+  <text x="120" y="235" class="protocols">SSL/TLS, JPEG, MPEG, ASCII</text>
+  
+  <!-- Layer 5: Session -->
+  <rect x="100" y="260" width="400" height="80" rx="8" class="layer5"/>
+  <text x="120" y="290" class="layer-number">5.</text>
+  <text x="150" y="290" class="layer-name">セッション層</text>
+  <text x="120" y="310" class="layer-desc">通信の開始・終了管理</text>
+  <text x="120" y="325" class="protocols">NetBIOS, SQL, RPC</text>
+  
+  <!-- Layer 4: Transport -->
+  <rect x="100" y="350" width="400" height="80" rx="8" class="layer4"/>
+  <text x="120" y="380" class="layer-number">4.</text>
+  <text x="150" y="380" class="layer-name">トランスポート層</text>
+  <text x="120" y="400" class="layer-desc">信頼性のある端末間通信</text>
+  <text x="120" y="415" class="protocols">TCP, UDP</text>
+  
+  <!-- Layer 3: Network -->
+  <rect x="100" y="440" width="400" height="80" rx="8" class="layer3"/>
+  <text x="120" y="470" class="layer-number">3.</text>
+  <text x="150" y="470" class="layer-name">ネットワーク層</text>
+  <text x="120" y="490" class="layer-desc">経路選択・アドレッシング</text>
+  <text x="120" y="505" class="protocols">IP, ICMP, ARP, OSPF</text>
+  
+  <!-- Layer 2: Data Link -->
+  <rect x="100" y="530" width="400" height="80" rx="8" class="layer2"/>
+  <text x="120" y="560" class="layer-number">2.</text>
+  <text x="150" y="560" class="layer-name">データリンク層</text>
+  <text x="120" y="580" class="layer-desc">隣接機器間の信頼性確保</text>
+  <text x="120" y="595" class="protocols">Ethernet, WiFi, PPP</text>
+  
+  <!-- Layer 1: Physical -->
+  <rect x="100" y="620" width="400" height="80" rx="8" class="layer1"/>
+  <text x="120" y="650" class="layer-number">1.</text>
+  <text x="150" y="650" class="layer-name">物理層</text>
+  <text x="120" y="670" class="layer-desc">電気信号・光信号</text>
+  <text x="120" y="685" class="protocols">ケーブル, 無線電波, 光ファイバー</text>
+  
+  <!-- Arrows showing data flow -->
+  <line x1="520" y1="160" x2="520" y2="170" class="arrow"/>
+  <line x1="520" y1="250" x2="520" y2="260" class="arrow"/>
+  <line x1="520" y1="340" x2="520" y2="350" class="arrow"/>
+  <line x1="520" y1="430" x2="520" y2="440" class="arrow"/>
+  <line x1="520" y1="520" x2="520" y2="530" class="arrow"/>
+  <line x1="520" y1="610" x2="520" y2="620" class="arrow"/>
+  
+  <!-- Data flow label -->
+  <text x="530" y="380" class="layer-desc">データの流れ</text>
+  
+  <!-- Note about actual implementation -->
+  <rect x="50" y="50" width="200" height="60" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="60" y="70" class="layer-desc">📝 実際のネットワーク実装では</text>
+  <text x="60" y="85" class="layer-desc">TCP/IPが主流（4層モデル）</text>
+  <text x="60" y="100" class="layer-desc">OSIは理論的な参考モデル</text>
+</svg>
