@@ -116,7 +116,7 @@ code, pre {
 3. ジェネリックフォント（最終フォールバック）
 
 ### 実際のファイル場所
-- 本書の設定ファイル: `docs/assets/css/main.css` (lines 41-42)
+- 本書の設定ファイル: `assets/css/main.css` または `docs/assets/css/main.css`
 - SVG図表の例: `assets/images/diagrams/` 配下の各SVGファイル
 
 ---
