@@ -7,8 +7,8 @@ order: 3
 # 第1章：30分でLinuxサーバーを構築しよう
 
 ## 🎯 この章の目標
-- 実際にLinuxサーバーを構築して動かす
-- Webサーバーを立ち上げてブラウザからアクセスする
+- 実際に**Linux**（リナックス: オープンソースのオペレーティングシステム）サーバーを構築して動かす
+- **Webサーバー**（Web Server: Webページを配信するソフトウェア）を立ち上げてブラウザからアクセスする
 - Linuxの基本操作に慣れる
 
 ## 🚀 30分後にできるようになること
@@ -50,9 +50,9 @@ Webサーバー（Apache）
 ```
 
 #### 📝 **今すぐ試そう（5分）**
-1. [VirtualBox公式サイト](https://www.virtualbox.org/)からダウンロード
-2. [Ubuntu Server](https://ubuntu.com/download/server)の最新LTS版をダウンロード
-3. VirtualBoxで新規仮想マシンを作成
+1. [**VirtualBox**（バーチャルボックス: 仮想化ソフトウェア）公式サイト](https://www.virtualbox.org/)からダウンロード
+2. [**Ubuntu Server**（ウブントゥサーバー: Linuxの代表的なディストリビューション）](https://ubuntu.com/download/server)の最新**LTS版**（Long Term Support: 長期サポート版）をダウンロード
+3. VirtualBoxで新規**仮想マシン**（Virtual Machine: 物理コンピュータ上で動く仮想的なコンピュータ）を作成
    - 名前: MyLinuxServer
    - メモリ: 2GB（2048MB）
    - ストレージ: 20GB
@@ -71,6 +71,10 @@ Webサーバー（Apache）
 パスワード: L!nuxRocks2024!（例・実際は強力なパスワードを設定してください）
 SSH: インストールする（重要！）
 ```
+
+**📘 用語説明**
+- **DHCP**（Dynamic Host Configuration Protocol: IPアドレスを自動割り当てするプロトコル）
+- **SSH**（Secure Shell: 暗号化された安全なリモート接続方式）
 
 #### 📝 **今すぐ試そう（10分）**
 画面の指示に従ってインストールを進めてください。
@@ -123,6 +127,11 @@ admin@ubuntu:~$ sudo systemctl status apache2
    Loaded: loaded
    Active: active (running)  ← これが表示されればOK！
 ```
+
+**📘 用語説明**
+- **Apache**（アパッチ: 世界で最も使われているWebサーバーソフトウェア）
+- **apt**（Advanced Package Tool: Ubuntu/Debianのパッケージ管理システム）
+- **systemctl**（システムコントロール: サービスを管理するLinuxコマンド）
 
 #### 📝 **今すぐ試そう（5分）**
 コマンドを順番に実行してください。
@@ -177,6 +186,10 @@ admin@ubuntu:~$ ip addr show | grep inet
                 ↑
         このIPアドレスをメモ
 ```
+
+**📘 用語説明**
+- **IPアドレス**（Internet Protocol Address: ネットワーク上でコンピュータを識別する住所）
+- **127.0.0.1**（ローカルループバック: 自分自身を指すIPアドレス）
 
 #### 📝 **今すぐ試そう（2分）**
 1. IPアドレスをメモする
