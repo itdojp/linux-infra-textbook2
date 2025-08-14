@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="700" viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg">
+  <title>プロセス状態遷移図</title>
+  <desc>Linuxプロセスのライフサイクル：生成から終了までの状態遷移</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .state-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 13px; font-weight: 600; fill: #333; }
+      .transition-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #666; }
+      .syscall { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 600; fill: #7b1fa2; }
+      .note-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 600; fill: #1976d2; }
+      .note-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #666; }
+      
+      .start-end { fill: #263238; stroke: #37474f; stroke-width: 3; rx: 20; }
+      .new-state { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 15; }
+      .ready-state { fill: #e8f5e8; stroke: #388e3c; stroke-width: 2; rx: 15; }
+      .running-state { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; rx: 15; }
+      .waiting-state { fill: #f3e5f5; stroke: #7b1fa2; stroke-width: 2; rx: 15; }
+      .zombie-state { fill: #ffebee; stroke: #f44336; stroke-width: 2; rx: 15; }
+      .terminated-state { fill: #e0f2f1; stroke: #00695c; stroke-width: 2; rx: 15; }
+      
+      .state-transition { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .critical-transition { stroke: #f44336; stroke-width: 2; fill: none; marker-end: url(#arrowhead-red); }
+      .normal-transition { stroke: #4caf50; stroke-width: 2; fill: none; marker-end: url(#arrowhead-green); }
+      .note-line { stroke: #1976d2; stroke-width: 1; stroke-dasharray: 3,3; fill: none; }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f44336" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="700" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="450" y="25" text-anchor="middle" class="title">プロセス状態遷移図</text>
+  
+  <!-- Start State -->
+  <ellipse cx="80" cy="180" rx="30" ry="20" class="start-end"/>
+  <text x="80" y="186" text-anchor="middle" class="state-label" fill="white">開始</text>
+  
+  <!-- New State -->
+  <ellipse cx="220" cy="180" rx="60" ry="35" class="new-state"/>
+  <text x="220" y="185" text-anchor="middle" class="state-label">New</text>
+  <text x="220" y="198" text-anchor="middle" class="transition-label">新規プロセス</text>
+  
+  <!-- Ready State -->
+  <ellipse cx="420" cy="180" rx="60" ry="35" class="ready-state"/>
+  <text x="420" y="185" text-anchor="middle" class="state-label">Ready</text>
+  <text x="420" y="198" text-anchor="middle" class="transition-label">実行可能</text>
+  
+  <!-- Running State -->
+  <ellipse cx="620" cy="180" rx="60" ry="35" class="running-state"/>
+  <text x="620" y="185" text-anchor="middle" class="state-label">Running</text>
+  <text x="620" y="198" text-anchor="middle" class="transition-label">実行中</text>
+  
+  <!-- Waiting State -->
+  <ellipse cx="420" cy="320" rx="60" ry="35" class="waiting-state"/>
+  <text x="420" y="325" text-anchor="middle" class="state-label">Waiting</text>
+  <text x="420" y="338" text-anchor="middle" class="transition-label">ブロック状態</text>
+  
+  <!-- Zombie State -->
+  <ellipse cx="620" cy="320" rx="60" ry="35" class="zombie-state"/>
+  <text x="620" y="325" text-anchor="middle" class="state-label">Zombie</text>
+  <text x="620" y="338" text-anchor="middle" class="transition-label">ゾンビ状態</text>
+  
+  <!-- Terminated State -->
+  <ellipse cx="420" cy="460" rx="60" ry="35" class="terminated-state"/>
+  <text x="420" y="465" text-anchor="middle" class="state-label">Terminated</text>
+  <text x="420" y="478" text-anchor="middle" class="transition-label">終了</text>
+  
+  <!-- End State -->
+  <ellipse cx="220" cy="460" rx="30" ry="20" class="start-end"/>
+  <text x="220" y="466" text-anchor="middle" class="state-label" fill="white">終了</text>
+  
+  <!-- State Transitions -->
+  
+  <!-- Start to New -->
+  <line x1="110" y1="180" x2="160" y2="180" class="state-transition"/>
+  <text x="135" y="170" text-anchor="middle" class="syscall">fork()</text>
+  
+  <!-- New to Ready -->
+  <line x1="280" y1="180" x2="360" y2="180" class="state-transition"/>
+  <text x="320" y="170" text-anchor="middle" class="transition-label">スケジューラに登録</text>
+  
+  <!-- Ready to Running -->
+  <line x1="480" y1="180" x2="560" y2="180" class="state-transition"/>
+  <text x="520" y="170" text-anchor="middle" class="transition-label">CPU割り当て</text>
+  
+  <!-- Running to Ready (time slice) -->
+  <path d="M 600 160 Q 520 120 440 160" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="520" y="140" text-anchor="middle" class="transition-label">タイムスライス終了</text>
+  
+  <!-- Running to Waiting -->
+  <line x1="600" y1="210" x2="450" y2="290" class="state-transition"/>
+  <text x="530" y="250" text-anchor="middle" class="transition-label">I/O待機</text>
+  <text x="530" y="262" text-anchor="middle" class="transition-label">シグナル待機</text>
+  
+  <!-- Waiting to Ready -->
+  <line x1="420" y1="285" x2="420" y2="215" class="state-transition"/>
+  <text x="350" y="250" text-anchor="middle" class="transition-label">待機条件が</text>
+  <text x="350" y="262" text-anchor="middle" class="transition-label">満たされる</text>
+  
+  <!-- Running to Terminated -->
+  <line x1="600" y1="210" x2="450" y2="430" class="normal-transition"/>
+  <text x="525" y="320" text-anchor="middle" class="syscall">exit()</text>
+  
+  <!-- Running to Zombie -->
+  <line x1="620" y1="215" x2="620" y2="285" class="critical-transition"/>
+  <text x="670" y="250" text-anchor="middle" class="transition-label">親プロセスが</text>
+  <text x="670" y="262" text-anchor="middle" class="syscall">wait()</text>
+  <text x="670" y="274" text-anchor="middle" class="transition-label">していない</text>
+  
+  <!-- Zombie to End -->
+  <path d="M 580 340 Q 400 380 250 440" stroke="#4caf50" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
+  <text x="415" y="390" text-anchor="middle" class="transition-label">親プロセスが</text>
+  <text x="415" y="402" text-anchor="middle" class="syscall">wait()</text>
+  <text x="415" y="414" text-anchor="middle" class="transition-label">を呼び出し</text>
+  
+  <!-- Terminated to End -->
+  <line x1="360" y1="460" x2="250" y2="460" class="normal-transition"/>
+  <text x="305" y="450" text-anchor="middle" class="transition-label">正常終了</text>
+  
+  <!-- Notes -->
+  
+  <!-- New State Note -->
+  <rect x="50" y="250" width="140" height="60" fill="#e3f2fd" stroke="#1976d2" stroke-width="1" rx="4"/>
+  <text x="120" y="265" text-anchor="middle" class="note-title">新規プロセス</text>
+  <text x="60" y="280" class="note-text">メモリ確保</text>
+  <text x="60" y="292" class="note-text">PCB作成</text>
+  <text x="60" y="304" class="note-text">初期化処理</text>
+  
+  <line x1="190" y1="200" x2="120" y2="250" class="note-line"/>
+  
+  <!-- Ready State Note -->
+  <rect x="300" y="80" width="140" height="45" fill="#e8f5e8" stroke="#388e3c" stroke-width="1" rx="4"/>
+  <text x="370" y="95" text-anchor="middle" class="note-title">実行可能</text>
+  <text x="310" y="110" class="note-text">実行待ち</text>
+  <text x="310" y="122" class="note-text">レディキュー</text>
+  
+  <line x1="400" y1="160" x2="370" y2="125" class="note-line"/>
+  
+  <!-- Running State Note -->
+  <rect x="700" y="80" width="140" height="60" fill="#fff3e0" stroke="#f57c00" stroke-width="1" rx="4"/>
+  <text x="770" y="95" text-anchor="middle" class="note-title">CPU実行中</text>
+  <text x="710" y="110" class="note-text">タイムスライス内</text>
+  <text x="710" y="122" class="note-text">命令実行</text>
+  <text x="710" y="134" class="note-text">システムコール</text>
+  
+  <line x1="650" y1="160" x2="720" y2="140" class="note-line"/>
+  
+  <!-- Waiting State Note -->
+  <rect x="250" y="360" width="140" height="60" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="1" rx="4"/>
+  <text x="320" y="375" text-anchor="middle" class="note-title">ブロック状態</text>
+  <text x="260" y="390" class="note-text">I/O完了待ち</text>
+  <text x="260" y="402" class="note-text">シグナル待ち</text>
+  <text x="260" y="414" class="note-text">リソース待ち</text>
+  
+  <line x1="400" y1="340" x2="360" y2="380" class="note-line"/>
+  
+  <!-- Zombie State Note -->
+  <rect x="700" y="360" width="140" height="60" fill="#ffebee" stroke="#f44336" stroke-width="1" rx="4"/>
+  <text x="770" y="375" text-anchor="middle" class="note-title">ゾンビ状態</text>
+  <text x="710" y="390" class="note-text">終了済み</text>
+  <text x="710" y="402" class="note-text">親の回収待ち</text>
+  <text x="710" y="414" class="note-text">リソース解放待ち</text>
+  
+  <line x1="650" y1="340" x2="720" y2="380" class="note-line"/>
+  
+  <!-- Legend -->
+  <rect x="50" y="530" width="800" height="140" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="550" class="note-title">🔄 プロセス状態の詳細説明</text>
+  
+  <text x="70" y="570" class="note-text">• New: fork()で作成直後、まだスケジューラに登録されていない</text>
+  <text x="70" y="585" class="note-text">• Ready: CPU実行可能だが、他のプロセスが実行中で待機している</text>
+  <text x="70" y="600" class="note-text">• Running: CPUで実際に命令を実行している</text>
+  <text x="70" y="615" class="note-text">• Waiting: I/O完了やイベント発生を待って一時停止している</text>
+  <text x="70" y="630" class="note-text">• Zombie: 終了しているが、親プロセスがwait()で回収するまで残っている</text>
+  <text x="70" y="645" class="note-text">• Terminated: 正常に終了し、すべてのリソースが解放された</text>
+  
+  <!-- Process state check command -->
+  <text x="500" y="570" class="syscall">ps aux</text>
+  <text x="550" y="570" class="note-text">コマンドでSTAT列を確認:</text>
+  <text x="500" y="585" class="syscall">R</text>
+  <text x="520" y="585" class="note-text">Running (実行中/実行可能)</text>
+  <text x="500" y="600" class="syscall">S</text>
+  <text x="520" y="600" class="note-text">Sleeping (割り込み可能な待機)</text>
+  <text x="500" y="615" class="syscall">D</text>
+  <text x="520" y="615" class="note-text">Uninterruptible sleep (I/O待機)</text>
+  <text x="500" y="630" class="syscall">Z</text>
+  <text x="520" y="630" class="note-text">Zombie (ゾンビプロセス)</text>
+  <text x="500" y="645" class="syscall">T</text>
+  <text x="520" y="645" class="note-text">Stopped (停止中)</text>
+</svg>

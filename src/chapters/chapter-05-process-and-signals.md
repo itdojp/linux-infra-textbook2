@@ -71,24 +71,7 @@ user1    3456  0.0  0.1  23456  4096 pts/2    Ss   10:00   0:00 -bash
 
 Linuxでは、新しいプロセスは既存のプロセスから「分裂」して生まれます：
 
-```mermaid
-graph TD
-    A["親プロセス<br/>bash"] --> B["fork()システムコール<br/>実行"]
-    B --> C{"プロセス分裂"}
-    C -->|"親プロセス側"| D["親プロセス<br/>PID = child_pid<br/>wait()で子を待機"]
-    C -->|"子プロセス側"| E["子プロセス<br/>PID = 0<br/>親のメモリ空間をコピー"]
-    E --> F["exec()システムコール<br/>実行"]
-    F --> G["新しいプログラム<br/>ls -la<br/>元のメモリ空間を置き換え"]
-    G --> H["プロセス終了<br/>exit()システムコール"]
-    H --> I["親プロセスに<br/>終了通知<br/>SIGCHLD"]
-    I --> J["親プロセス<br/>wait()から復帰<br/>子の終了コード取得"]
-    
-    style A fill:#e1f5fe
-    style D fill:#e8f5e8
-    style E fill:#fff3e0
-    style G fill:#f3e5f5
-    style J fill:#e8f5e8
-```
+![プロセスの誕生：fork()とexec()]({{ '/assets/images/diagrams/chapter-05/process-fork-exec-flow.svg' | relative_url }})
 
 ```c
 // プロセス生成の基本的な流れ（C言語）
@@ -119,46 +102,7 @@ init(1)─┬─systemd(100)─┬─systemd-journald(150)
 
 プロセスは以下の状態を遷移します：
 
-```mermaid
-stateDiagram-v2
-    [*] --> New : fork()
-    New --> Ready : "スケジューラに登録"
-    Ready --> Running : "CPU割り当て"
-    Running --> Ready : "タイムスライス終了"
-    Running --> Waiting : "I/O待機<br/>シグナル待機"
-    Waiting --> Ready : "待機条件が満たされる"
-    Running --> Terminated : exit()
-    Running --> Zombie : "親プロセスが<br/>wait()していない"
-    Zombie --> [*] : "親プロセスが<br/>wait()を呼び出し"
-    Terminated --> [*] : "正常終了"
-    
-    note right of New
-        "新規プロセス"
-        "メモリ確保"
-        "PCB作成"
-    end note
-    
-    note right of Ready
-        "実行可能"
-        "実行待ち"
-    end note
-    
-    note right of Running
-        "CPU実行中"
-        "タイムスライス内"
-    end note
-    
-    note right of Waiting
-        "ブロック状態"
-        "I/O完了待ち"
-        "シグナル待ち"
-    end note
-    
-    note right of Zombie
-        "終了済み"
-        "親の回収待ち"
-    end note
-```
+![プロセス状態遷移図]({{ '/assets/images/diagrams/chapter-05/process-state-transitions.svg' | relative_url }})
 
 状態の確認：
 

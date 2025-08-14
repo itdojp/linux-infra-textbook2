@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="600" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+  <title>RAID構成の特徴比較</title>
+  <desc>RAID 0、RAID 1、RAID 5の各構成におけるデータ配置とディスク構成の比較</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .section-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .data-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 500; fill: #333; }
+      .disk-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 600; fill: #333; }
+      .description { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #666; }
+      .feature { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #1976d2; }
+      
+      .raid0-data { fill: #e3f2fd; stroke: #1976d2; stroke-width: 1.5; rx: 4; }
+      .raid0-disk { fill: #e1f5fe; stroke: #0288d1; stroke-width: 2; rx: 6; }
+      .raid1-data { fill: #e8f5e8; stroke: #388e3c; stroke-width: 1.5; rx: 4; }
+      .raid1-disk { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      .raid5-data { fill: #fff8e1; stroke: #f57c00; stroke-width: 1.5; rx: 4; }
+      .raid5-parity { fill: #ffecb3; stroke: #ff9800; stroke-width: 1.5; rx: 4; }
+      .raid5-disk { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; rx: 6; }
+      
+      .data-flow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .mirror-flow { stroke: #4caf50; stroke-width: 2; fill: none; marker-end: url(#arrowhead-green); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1000" height="600" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="500" y="25" text-anchor="middle" class="title">RAID構成の特徴比較</text>
+  
+  <!-- RAID 0 Section -->
+  <rect x="30" y="60" width="300" height="160" fill="none" stroke="#1976d2" stroke-width="2" stroke-dasharray="5,5" rx="8"/>
+  <text x="180" y="80" text-anchor="middle" class="section-title">RAID 0 (ストライピング)</text>
+  
+  <!-- RAID 0 Data -->
+  <rect x="50" y="100" width="60" height="25" class="raid0-data"/>
+  <text x="80" y="117" text-anchor="middle" class="data-label">データ1</text>
+  
+  <rect x="130" y="100" width="60" height="25" class="raid0-data"/>
+  <text x="160" y="117" text-anchor="middle" class="data-label">データ2</text>
+  
+  <rect x="50" y="135" width="60" height="25" class="raid0-data"/>
+  <text x="80" y="152" text-anchor="middle" class="data-label">データ3</text>
+  
+  <rect x="130" y="135" width="60" height="25" class="raid0-data"/>
+  <text x="160" y="152" text-anchor="middle" class="data-label">データ4</text>
+  
+  <!-- RAID 0 Disks -->
+  <rect x="230" y="100" width="70" height="60" class="raid0-disk"/>
+  <text x="265" y="120" text-anchor="middle" class="disk-label">ディスク 1</text>
+  <text x="265" y="145" text-anchor="middle" class="description">高速書込み</text>
+  
+  <rect x="230" y="170" width="70" height="60" class="raid0-disk"/>
+  <text x="265" y="190" text-anchor="middle" class="disk-label">ディスク 2</text>
+  <text x="265" y="215" text-anchor="middle" class="description">高速書込み</text>
+  
+  <!-- RAID 0 Arrows -->
+  <line x1="110" y1="112" x2="230" y2="130" class="data-flow"/>
+  <line x1="190" y1="112" x2="230" y2="200" class="data-flow"/>
+  <line x1="110" y1="147" x2="230" y2="130" class="data-flow"/>
+  <line x1="190" y1="147" x2="230" y2="200" class="data-flow"/>
+  
+  <!-- RAID 1 Section -->
+  <rect x="360" y="60" width="280" height="160" fill="none" stroke="#4caf50" stroke-width="2" stroke-dasharray="5,5" rx="8"/>
+  <text x="500" y="80" text-anchor="middle" class="section-title">RAID 1 (ミラーリング)</text>
+  
+  <!-- RAID 1 Data -->
+  <rect x="450" y="110" width="100" height="30" class="raid1-data"/>
+  <text x="500" y="130" text-anchor="middle" class="data-label">データ (同じ内容)</text>
+  
+  <!-- RAID 1 Disks -->
+  <rect x="380" y="160" width="80" height="50" class="raid1-disk"/>
+  <text x="420" y="180" text-anchor="middle" class="disk-label">ディスク 1</text>
+  <text x="420" y="195" text-anchor="middle" class="description">プライマリ</text>
+  
+  <rect x="540" y="160" width="80" height="50" class="raid1-disk"/>
+  <text x="580" y="180" text-anchor="middle" class="disk-label">ディスク 2</text>
+  <text x="580" y="195" text-anchor="middle" class="description">ミラー</text>
+  
+  <!-- RAID 1 Arrows -->
+  <line x1="480" y1="140" x2="420" y2="160" class="mirror-flow"/>
+  <line x1="520" y1="140" x2="580" y2="160" class="mirror-flow"/>
+  
+  <!-- RAID 5 Section -->
+  <rect x="670" y="60" width="300" height="160" fill="none" stroke="#f57c00" stroke-width="2" stroke-dasharray="5,5" rx="8"/>
+  <text x="820" y="80" text-anchor="middle" class="section-title">RAID 5 (分散パリティ)</text>
+  
+  <!-- RAID 5 Data Grid -->
+  <rect x="690" y="100" width="50" height="20" class="raid5-data"/>
+  <text x="715" y="113" text-anchor="middle" class="data-label">D1</text>
+  
+  <rect x="750" y="100" width="50" height="20" class="raid5-data"/>
+  <text x="775" y="113" text-anchor="middle" class="data-label">D2</text>
+  
+  <rect x="810" y="100" width="50" height="20" class="raid5-parity"/>
+  <text x="835" y="113" text-anchor="middle" class="data-label">P1</text>
+  
+  <rect x="690" y="125" width="50" height="20" class="raid5-data"/>
+  <text x="715" y="138" text-anchor="middle" class="data-label">D3</text>
+  
+  <rect x="750" y="125" width="50" height="20" class="raid5-parity"/>
+  <text x="775" y="138" text-anchor="middle" class="data-label">P2</text>
+  
+  <rect x="810" y="125" width="50" height="20" class="raid5-data"/>
+  <text x="835" y="138" text-anchor="middle" class="data-label">D4</text>
+  
+  <rect x="690" y="150" width="50" height="20" class="raid5-parity"/>
+  <text x="715" y="163" text-anchor="middle" class="data-label">P3</text>
+  
+  <rect x="750" y="150" width="50" height="20" class="raid5-data"/>
+  <text x="775" y="163" text-anchor="middle" class="data-label">D5</text>
+  
+  <rect x="810" y="150" width="50" height="20" class="raid5-data"/>
+  <text x="835" y="163" text-anchor="middle" class="data-label">D6</text>
+  
+  <!-- RAID 5 Disks -->
+  <rect x="690" y="180" width="60" height="30" class="raid5-disk"/>
+  <text x="720" y="198" text-anchor="middle" class="disk-label">ディスク 1</text>
+  
+  <rect x="760" y="180" width="60" height="30" class="raid5-disk"/>
+  <text x="790" y="198" text-anchor="middle" class="disk-label">ディスク 2</text>
+  
+  <rect x="830" y="180" width="60" height="30" class="raid5-disk"/>
+  <text x="860" y="198" text-anchor="middle" class="disk-label">ディスク 3</text>
+  
+  <!-- Feature Comparison -->
+  <rect x="50" y="260" width="900" height="320" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="280" class="section-title">📊 各RAID構成の特徴</text>
+  
+  <!-- RAID 0 Features -->
+  <rect x="70" y="300" width="250" height="100" class="raid0-disk"/>
+  <text x="195" y="320" text-anchor="middle" class="disk-label">RAID 0 (ストライピング)</text>
+  <text x="80" y="340" class="feature">✅ 高速読み書き（並列処理）</text>
+  <text x="80" y="355" class="feature">✅ 容量効率 100%</text>
+  <text x="80" y="370" class="description">❌ 冗長性なし（1台故障で全損失）</text>
+  <text x="80" y="385" class="description">用途：高速処理が必要なワークロード</text>
+  
+  <!-- RAID 1 Features -->
+  <rect x="340" y="300" width="250" height="100" class="raid1-disk"/>
+  <text x="465" y="320" text-anchor="middle" class="disk-label">RAID 1 (ミラーリング)</text>
+  <text x="350" y="340" class="feature">✅ 完全な冗長性（1台故障OK）</text>
+  <text x="350" y="355" class="feature">✅ 読み取り性能向上</text>
+  <text x="350" y="370" class="description">❌ 容量効率 50%</text>
+  <text x="350" y="385" class="description">用途：重要データの保護</text>
+  
+  <!-- RAID 5 Features -->
+  <rect x="610" y="300" width="250" height="100" class="raid5-disk"/>
+  <text x="735" y="320" text-anchor="middle" class="disk-label">RAID 5 (分散パリティ)</text>
+  <text x="620" y="340" class="feature">✅ 冗長性あり（1台故障OK）</text>
+  <text x="620" y="355" class="feature">✅ バランスの取れた性能</text>
+  <text x="620" y="370" class="feature">✅ 容量効率 67-94%</text>
+  <text x="620" y="385" class="description">用途：サーバー・エンタープライズ</text>
+  
+  <!-- Comparison Table -->
+  <text x="70" y="440" class="section-title">比較表</text>
+  
+  <!-- Table Headers -->
+  <rect x="70" y="450" width="120" height="25" fill="#e3f2fd" stroke="#1976d2" stroke-width="1"/>
+  <text x="130" y="467" text-anchor="middle" class="disk-label">構成</text>
+  
+  <rect x="190" y="450" width="80" height="25" fill="#e3f2fd" stroke="#1976d2" stroke-width="1"/>
+  <text x="230" y="467" text-anchor="middle" class="disk-label">最小ディスク</text>
+  
+  <rect x="270" y="450" width="80" height="25" fill="#e3f2fd" stroke="#1976d2" stroke-width="1"/>
+  <text x="310" y="467" text-anchor="middle" class="disk-label">冗長性</text>
+  
+  <rect x="350" y="450" width="100" height="25" fill="#e3f2fd" stroke="#1976d2" stroke-width="1"/>
+  <text x="400" y="467" text-anchor="middle" class="disk-label">パフォーマンス</text>
+  
+  <rect x="450" y="450" width="80" height="25" fill="#e3f2fd" stroke="#1976d2" stroke-width="1"/>
+  <text x="490" y="467" text-anchor="middle" class="disk-label">容量効率</text>
+  
+  <rect x="530" y="450" width="120" height="25" fill="#e3f2fd" stroke="#1976d2" stroke-width="1"/>
+  <text x="590" y="467" text-anchor="middle" class="disk-label">主な用途</text>
+  
+  <!-- RAID 0 Row -->
+  <rect x="70" y="475" width="120" height="25" class="raid0-data"/>
+  <text x="130" y="492" text-anchor="middle" class="data-label">RAID 0</text>
+  
+  <rect x="190" y="475" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="230" y="492" text-anchor="middle" class="description">2台</text>
+  
+  <rect x="270" y="475" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="310" y="492" text-anchor="middle" class="description">なし</text>
+  
+  <rect x="350" y="475" width="100" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="400" y="492" text-anchor="middle" class="description">高速</text>
+  
+  <rect x="450" y="475" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="490" y="492" text-anchor="middle" class="description">100%</text>
+  
+  <rect x="530" y="475" width="120" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="590" y="492" text-anchor="middle" class="description">高速処理</text>
+  
+  <!-- RAID 1 Row -->
+  <rect x="70" y="500" width="120" height="25" class="raid1-data"/>
+  <text x="130" y="517" text-anchor="middle" class="data-label">RAID 1</text>
+  
+  <rect x="190" y="500" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="230" y="517" text-anchor="middle" class="description">2台</text>
+  
+  <rect x="270" y="500" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="310" y="517" text-anchor="middle" class="description">あり</text>
+  
+  <rect x="350" y="500" width="100" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="400" y="517" text-anchor="middle" class="description">読み取り高速</text>
+  
+  <rect x="450" y="500" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="490" y="517" text-anchor="middle" class="description">50%</text>
+  
+  <rect x="530" y="500" width="120" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="590" y="517" text-anchor="middle" class="description">重要データ</text>
+  
+  <!-- RAID 5 Row -->
+  <rect x="70" y="525" width="120" height="25" class="raid5-data"/>
+  <text x="130" y="542" text-anchor="middle" class="data-label">RAID 5</text>
+  
+  <rect x="190" y="525" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="230" y="542" text-anchor="middle" class="description">3台</text>
+  
+  <rect x="270" y="525" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="310" y="542" text-anchor="middle" class="description">あり</text>
+  
+  <rect x="350" y="525" width="100" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="400" y="542" text-anchor="middle" class="description">バランス</text>
+  
+  <rect x="450" y="525" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="490" y="542" text-anchor="middle" class="description">67-94%</text>
+  
+  <rect x="530" y="525" width="120" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
+  <text x="590" y="542" text-anchor="middle" class="description">サーバー</text>
+</svg>
