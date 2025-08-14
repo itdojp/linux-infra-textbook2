@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="550" viewBox="0 0 900 550" xmlns="http://www.w3.org/2000/svg">
+  <title>OSI参照モデル vs TCP/IPモデル vs Linux実装</title>
+  <desc>OSI 7層モデル、TCP/IP 4層モデル、Linux実装の対応関係の比較</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .model-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .layer-number { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 600; fill: #1976d2; }
+      .layer-name { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #333; }
+      .implementation { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 400; fill: #7b1fa2; }
+      
+      .osi-layer { fill: #e3f2fd; stroke: #1976d2; stroke-width: 1.5; rx: 4; }
+      .tcp-layer { fill: #e8f5e8; stroke: #388e3c; stroke-width: 1.5; rx: 4; }
+      .linux-layer { fill: #fff3e0; stroke: #f57c00; stroke-width: 1.5; rx: 4; }
+      .mapping-line { stroke: #ff9800; stroke-width: 2; stroke-dasharray: 5,5; fill: none; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="550" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="450" y="25" text-anchor="middle" class="title">OSI参照モデル vs TCP/IPモデル vs Linux実装</text>
+  
+  <!-- OSI Reference Model -->
+  <text x="150" y="55" text-anchor="middle" class="model-title">OSI参照モデル</text>
+  
+  <!-- OSI Layer 7 -->
+  <rect x="50" y="70" width="200" height="40" class="osi-layer"/>
+  <text x="70" y="85" class="layer-number">7.</text>
+  <text x="150" y="95" text-anchor="middle" class="layer-name">アプリケーション</text>
+  
+  <!-- OSI Layer 6 -->
+  <rect x="50" y="120" width="200" height="40" class="osi-layer"/>
+  <text x="70" y="135" class="layer-number">6.</text>
+  <text x="150" y="145" text-anchor="middle" class="layer-name">プレゼンテーション</text>
+  
+  <!-- OSI Layer 5 -->
+  <rect x="50" y="170" width="200" height="40" class="osi-layer"/>
+  <text x="70" y="185" class="layer-number">5.</text>
+  <text x="150" y="195" text-anchor="middle" class="layer-name">セッション</text>
+  
+  <!-- OSI Layer 4 -->
+  <rect x="50" y="220" width="200" height="40" class="osi-layer"/>
+  <text x="70" y="235" class="layer-number">4.</text>
+  <text x="150" y="245" text-anchor="middle" class="layer-name">トランスポート</text>
+  
+  <!-- OSI Layer 3 -->
+  <rect x="50" y="270" width="200" height="40" class="osi-layer"/>
+  <text x="70" y="285" class="layer-number">3.</text>
+  <text x="150" y="295" text-anchor="middle" class="layer-name">ネットワーク</text>
+  
+  <!-- OSI Layer 2 -->
+  <rect x="50" y="320" width="200" height="40" class="osi-layer"/>
+  <text x="70" y="335" class="layer-number">2.</text>
+  <text x="150" y="345" text-anchor="middle" class="layer-name">データリンク</text>
+  
+  <!-- OSI Layer 1 -->
+  <rect x="50" y="370" width="200" height="40" class="osi-layer"/>
+  <text x="70" y="385" class="layer-number">1.</text>
+  <text x="150" y="395" text-anchor="middle" class="layer-name">物理</text>
+  
+  <!-- TCP/IP Model -->
+  <text x="400" y="55" text-anchor="middle" class="model-title">TCP/IPモデル</text>
+  
+  <!-- Application Layer -->
+  <rect x="300" y="70" width="200" height="140" class="tcp-layer"/>
+  <text x="400" y="135" text-anchor="middle" class="layer-name">アプリケーション層</text>
+  <text x="400" y="150" text-anchor="middle" class="implementation">HTTP, FTP, SSH</text>
+  
+  <!-- Transport Layer -->
+  <rect x="300" y="220" width="200" height="50" class="tcp-layer"/>
+  <text x="400" y="245" text-anchor="middle" class="layer-name">トランスポート層</text>
+  <text x="400" y="255" text-anchor="middle" class="implementation">TCP, UDP</text>
+  
+  <!-- Internet Layer -->
+  <rect x="300" y="280" width="200" height="50" class="tcp-layer"/>
+  <text x="400" y="305" text-anchor="middle" class="layer-name">インターネット層</text>
+  <text x="400" y="315" text-anchor="middle" class="implementation">IP, ICMP</text>
+  
+  <!-- Network Interface Layer -->
+  <rect x="300" y="340" width="200" height="70" class="tcp-layer"/>
+  <text x="400" y="375" text-anchor="middle" class="layer-name">ネットワーク</text>
+  <text x="400" y="385" text-anchor="middle" class="layer-name">インターフェース層</text>
+  <text x="400" y="395" text-anchor="middle" class="implementation">Ethernet, WiFi</text>
+  
+  <!-- Linux Implementation -->
+  <text x="650" y="55" text-anchor="middle" class="model-title">Linuxでの実装</text>
+  
+  <!-- User Space -->
+  <rect x="550" y="70" width="200" height="140" class="linux-layer"/>
+  <text x="650" y="135" text-anchor="middle" class="layer-name">ユーザー空間</text>
+  <text x="650" y="150" text-anchor="middle" class="implementation">nginx, sshd</text>
+  
+  <!-- Kernel TCP/UDP Stack -->
+  <rect x="550" y="220" width="200" height="50" class="linux-layer"/>
+  <text x="650" y="245" text-anchor="middle" class="layer-name">カーネル空間</text>
+  <text x="650" y="255" text-anchor="middle" class="implementation">TCP/UDPスタック</text>
+  
+  <!-- Kernel IP Stack -->
+  <rect x="550" y="280" width="200" height="50" class="linux-layer"/>
+  <text x="650" y="305" text-anchor="middle" class="layer-name">カーネル空間</text>
+  <text x="650" y="315" text-anchor="middle" class="implementation">IPスタック</text>
+  
+  <!-- Device Driver/NIC -->
+  <rect x="550" y="340" width="200" height="70" class="linux-layer"/>
+  <text x="650" y="375" text-anchor="middle" class="layer-name">カーネル空間</text>
+  <text x="650" y="385" text-anchor="middle" class="implementation">デバイスドライバ/NIC</text>
+  
+  <!-- Mapping lines OSI to TCP/IP -->
+  <line x1="250" y1="90" x2="300" y2="140" class="mapping-line"/>
+  <line x1="250" y1="140" x2="300" y2="140" class="mapping-line"/>
+  <line x1="250" y1="190" x2="300" y2="140" class="mapping-line"/>
+  
+  <line x1="250" y1="240" x2="300" y2="245" class="mapping-line"/>
+  <line x1="250" y1="290" x2="300" y2="305" class="mapping-line"/>
+  
+  <line x1="250" y1="340" x2="300" y2="375" class="mapping-line"/>
+  <line x1="250" y1="390" x2="300" y2="375" class="mapping-line"/>
+  
+  <!-- Mapping lines TCP/IP to Linux -->
+  <line x1="500" y1="140" x2="550" y2="140" class="mapping-line"/>
+  <line x1="500" y1="245" x2="550" y2="245" class="mapping-line"/>
+  <line x1="500" y1="305" x2="550" y2="305" class="mapping-line"/>
+  <line x1="500" y1="375" x2="550" y2="375" class="mapping-line"/>
+  
+  <!-- Key characteristics -->
+  <rect x="50" y="440" width="800" height="80" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="460" class="model-title">📊 モデル比較の特徴</text>
+  
+  <text x="70" y="480" class="layer-name">• OSI参照モデル: 理論的な7層構造、教育・設計での標準</text>
+  <text x="70" y="495" class="layer-name">• TCP/IPモデル: 実用的な4層構造、インターネットの実装標準</text>
+  <text x="70" y="510" class="layer-name">• Linux実装: カーネル/ユーザー空間の分離、実際のシステム構成</text>
+</svg>

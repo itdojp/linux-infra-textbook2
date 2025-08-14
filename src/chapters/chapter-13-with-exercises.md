@@ -38,33 +38,7 @@
 
 #### Software Defined Network（SDN）の概念
 
-```mermaid
-flowchart TB
-    subgraph "物理ネットワーク"
-        SRV1["サーバー1"]
-        SRV2["サーバー2"]
-        PSW["スイッチ"]
-        
-        SRV1 ===|物理ケーブル| PSW
-        SRV2 ===|物理ケーブル| PSW
-    end
-    
-    subgraph "仮想ネットワーク"
-        VM1["VM1"]
-        VM2["VM2"]
-        VSW["仮想スイッチ"]
-        
-        VM1 -.->|ソフトウェア定義| VSW
-        VM2 -.->|ソフトウェア定義| VSW
-    end
-    
-    style SRV1 fill:#ffcccc,stroke:#ff0000
-    style SRV2 fill:#ffcccc,stroke:#ff0000
-    style PSW fill:#e6e6e6,stroke:#333333
-    style VM1 fill:#e1f5fe,stroke:#0066cc
-    style VM2 fill:#e1f5fe,stroke:#0066cc
-    style VSW fill:#c8e6c9,stroke:#4caf50
-```
+![SDN物理・仮想ネットワーク分離]({{ '/assets/images/diagrams/chapter-13/sdn-physical-virtual-network.svg' | relative_url }})
 
 ### AWSにおける実装：VPC
 
@@ -100,30 +74,7 @@ aws ec2 create-route --route-table-id rtb-12345 --destination-cidr-block 0.0.0.0
 
 #### VXLAN（Virtual Extensible LAN）
 
-```mermaid
-graph TB
-    subgraph "VXLANパケット構造"
-        OUTER["外側のIPヘッダー<br/>(物理ネットワーク)"]
-        VXLAN["VXLANヘッダー<br/>(VNI: 仮想NW識別子)"]
-        INNER["内側のイーサネットフレーム<br/>(仮想マシン間の通信)"]
-        
-        OUTER --- VXLAN --- INNER
-    end
-    
-    VM1["VM1<br/>192.168.1.10"] 
-    VM2["VM2<br/>192.168.1.20"]
-    
-    VM1 -.->|元のパケット| INNER
-    INNER -.->|カプセル化| VXLAN
-    VXLAN -.->|物理転送| OUTER
-    OUTER -.->|デカプセル化| VM2
-    
-    style OUTER fill:#ffcccc,stroke:#ff0000
-    style VXLAN fill:#99ccff,stroke:#0066cc
-    style INNER fill:#c8e6c9,stroke:#4caf50
-    style VM1 fill:#e1f5fe,stroke:#0066cc
-    style VM2 fill:#e1f5fe,stroke:#0066cc
-```
+![VXLANパケット構造]({{ '/assets/images/diagrams/chapter-13/vxlan-packet-structure.svg' | relative_url }})
 
 ### 実践的なVPC設計
 
