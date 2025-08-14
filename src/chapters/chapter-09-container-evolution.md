@@ -64,46 +64,7 @@ $ sudo virt-install \
 
 ### コンテナの革新
 
-```mermaid
-graph TB
-    subgraph C1 ["コンテナ1"]
-        CA1["アプリケーション1<br/>Node.js Web App"]
-        CL1["必要なライブラリのみ<br/>20-50MB"]
-    end
-    
-    subgraph C2 ["コンテナ2"]
-        CA2["アプリケーション2<br/>Python API"]
-        CL2["必要なライブラリのみ<br/>30-80MB"]
-    end
-    
-    subgraph C3 ["コンテナ3"]
-        CA3["アプリケーション3<br/>Redis Cache"]
-        CL3["必要なライブラリのみ<br/>10-20MB"]
-    end
-    
-    CR["コンテナランタイム<br/>Docker/Podman/containerd"]
-    COS["ホストOS（共有）<br/>Linux Kernel"]
-    CHWS["物理ハードウェア<br/>CPU/Memory/Storage"]
-    
-    CA1 --- CL1
-    CA2 --- CL2
-    CA3 --- CL3
-    CL1 --- CR
-    CL2 --- CR
-    CL3 --- CR
-    CR --- COS
-    COS --- CHWS
-    
-    style C1 fill:#e8f5e8
-    style C2 fill:#e8f5e8
-    style C3 fill:#e8f5e8
-    style CL1 fill:#c8e6c9
-    style CL2 fill:#c8e6c9
-    style CL3 fill:#c8e6c9
-    style CR fill:#e1f5fe
-    style COS fill:#fff3e0
-    style CHWS fill:#f3e5f5
-```
+![コンテナの革新]({{ '/assets/images/diagrams/chapter-09/container-innovation.svg' | relative_url }})
 
 **利点**：
 - 軽量（数十MB）

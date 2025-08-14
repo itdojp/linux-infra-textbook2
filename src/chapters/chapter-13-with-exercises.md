@@ -94,32 +94,7 @@ aws ec2 create-route --route-table-id rtb-12345 --destination-cidr-block 0.0.0.0
 
 #### 論理的な隔離
 
-```mermaid
-graph TB
-    subgraph "リージョン (AWSデータセンター)"
-        subgraph "VPC A - 会社A専用 (10.0.0.0/16)"
-            PUB_A["Public Subnet<br/>10.0.1.0/24"]
-            PRI_A["Private Subnet<br/>10.0.2.0/24"]
-            DB_A["Database Subnet<br/>10.0.3.0/24"]
-        end
-        
-        subgraph "VPC B - 会社B専用 (172.16.0.0/16)"
-            PUB_B["Public Subnet<br/>172.16.1.0/24"]
-            PRI_B["Private Subnet<br/>172.16.2.0/24"]
-        end
-        
-        subgraph "VPC C - 会社C専用 (192.168.0.0/16)"
-            OTHER_C["その他のサブネット..."]
-        end
-    end
-    
-    style PUB_A fill:#c8e6c9,stroke:#4caf50
-    style PRI_A fill:#fff3e0,stroke:#ff9900
-    style DB_A fill:#ffebee,stroke:#f44336
-    style PUB_B fill:#c8e6c9,stroke:#4caf50
-    style PRI_B fill:#fff3e0,stroke:#ff9900
-    style OTHER_C fill:#e3f2fd,stroke:#2196f3
-```
+![VPCによる論理的隔離]({{ '/assets/images/diagrams/chapter-13/vpc-logical-isolation.svg' | relative_url }})
 
 ### ネットワーク仮想化の技術
 

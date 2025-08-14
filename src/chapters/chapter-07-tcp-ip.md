@@ -24,28 +24,7 @@
 
 複雑なネットワーク通信を理解するため、OSI（Open Systems Interconnection）参照モデルが作られました：
 
-```mermaid
-graph TD
-    subgraph "OSI参照モデル"
-        L7["7. アプリケーション<br/>ユーザーインターフェース<br/>HTTP, FTP, SSH"]
-        L6["6. プレゼンテーション<br/>データ形式の変換<br/>SSL/TLS, JPEG"]
-        L5["5. セッション<br/>通信の開始・終了管理<br/>NetBIOS, SQL"]
-        L4["4. トランスポート<br/>信頼性のある通信<br/>TCP, UDP"]
-        L3["3. ネットワーク<br/>経路選択<br/>IP, ICMP"]
-        L2["2. データリンク<br/>隣接機器間の通信<br/>Ethernet, WiFi"]
-        L1["1. 物理<br/>電気信号<br/>ケーブル、無線電波"]
-    end
-    
-    L7 --> L6 --> L5 --> L4 --> L3 --> L2 --> L1
-    
-    style L7 fill:#e1f5fe
-    style L6 fill:#e8f5e8
-    style L5 fill:#fff3e0
-    style L4 fill:#f3e5f5
-    style L3 fill:#fce4ec
-    style L2 fill:#f0f4c3
-    style L1 fill:#ffecb3
-```
+![OSI参照モデル]({{ '/assets/images/diagrams/chapter-07/osi-reference-model.svg' | relative_url }})
 
 ### TCP/IPモデル：実用的な4層構造
 
@@ -173,63 +152,7 @@ traceroute to google.com (172.217.175.110), 30 hops max
 
 ### カーネル空間でのパケット処理フロー
 
-```mermaid
-graph TB
-    subgraph "ユーザー空間"
-        A1["アプリケーション<br/>nginx, apache, ssh"]
-        A2["システムコール<br/>socket(), send(), recv()"]
-        A3["ライブラリ<br/>libc, OpenSSL"]
-    end
-    
-    subgraph "カーネル空間"
-        B1["ソケット層<br/>AF_INET, AF_INET6"]
-        B2["トランスポート層<br/>TCP/UDP スタック"]
-        B3["ネットワーク層<br/>IPv4/IPv6 ルーティング"]
-        B4["Netfilter/iptables<br/>パケットフィルタリング"]
-        B5["データリンク層<br/>Ethernet, WiFi"]
-        B6["デバイスドライバ<br/>NIC固有ドライバ"]
-    end
-    
-    subgraph "ハードウェア"
-        C1["ネットワークカード<br/>NIC"]
-        C2["DMA<br/>メモリ直接転送"]
-        C3["割り込み処理<br/>IRQ"]
-    end
-    
-    subgraph "パケット処理"
-        D1["受信バッファ<br/>sk_buff構造体"]
-        D2["送信キュー<br/>qdisc"]
-        D3["プロトコル解析<br/>ヘッダ処理"]
-        D4["ルーティング決定<br/>FIB lookup"]
-    end
-    
-    A1 --> A2
-    A2 --> A3
-    A3 --> B1
-    B1 --> B2
-    B2 --> B3
-    B3 --> B4
-    B4 --> B5
-    B5 --> B6
-    B6 --> C1
-    
-    C1 --> D1
-    D1 --> D3
-    D3 --> D4
-    D4 --> D2
-    
-    C1 --> C2
-    C2 --> C3
-    
-    style A1 fill:#e1f5fe
-    style B1 fill:#e8f5e8
-    style B2 fill:#e8f5e8
-    style B3 fill:#e8f5e8
-    style B4 fill:#fff3e0
-    style B5 fill:#f3e5f5
-    style B6 fill:#fce4ec
-    style C1 fill:#f0f4c3
-```
+![LinuxのTCP/IPスタック]({{ '/assets/images/diagrams/chapter-07/linux-tcp-ip-stack.svg' | relative_url }})
 
 ### パケット処理の詳細フロー
 
@@ -295,39 +218,7 @@ ps aux | grep nginx
 
 ### ネットワーク構成図
 
-```mermaid
-graph TB
-    subgraph "クライアント側"
-        C1["アプリケーション<br/>curl, browser"]
-        C2["TCP/UDP層<br/>ポート管理"]
-        C3["IP層<br/>ルーティング"]
-        C4["リンク層<br/>Ethernet"]
-        C5["物理層<br/>NIC"]
-    end
-    
-    subgraph "ネットワーク"
-        N1["ローカルスイッチ"]
-        N2["ルーター/ゲートウェイ"]
-        N3[ISP]
-        N4["インターネット"]
-    end
-    
-    subgraph "サーバー側"
-        S1["物理層<br/>NIC"]
-        S2["リンク層<br/>Ethernet"]
-        S3["IP層<br/>ルーティング"]
-        S4["TCP/UDP層<br/>ポート管理"]
-        S5["アプリケーション<br/>nginx, apache"]
-    end
-    
-    C1 --> C2 --> C3 --> C4 --> C5
-    C5 --> N1 --> N2 --> N3 --> N4
-    N4 --> S1 --> S2 --> S3 --> S4 --> S5
-    
-    style C1 fill:#e1f5fe
-    style S5 fill:#e8f5e8
-    style N4 fill:#fff3e0
-```
+![ネットワーク通信フロー]({{ '/assets/images/diagrams/chapter-07/network-communication-flow.svg' | relative_url }})
 
 ### レイヤー3：トランスポート層（TCP/UDP）
 
@@ -346,26 +237,7 @@ ESTAB  0      0      192.168.1.10:45678  93.184.216.34:80
 
 #### TCPの3ウェイハンドシェイク
 
-```mermaid
-sequenceDiagram
-    participant C as "クライアント"
-    participant S as "サーバー"
-    
-    Note over C, S: "TCP 3ウェイハンドシェイク"
-    
-    C->>S: "1. SYN<br/>seq=1000<br/>「接続要求」"
-    S->>C: "2. SYN+ACK<br/>seq=2000, ack=1001<br/>「接続許可」"
-    C->>S: "3. ACK<br/>ack=2001<br/>「確認」"
-    
-    Note over C, S: "接続確立"
-    
-    C<<->>S: "データ通信"
-    
-    rect rgb(240, 248, 255)
-        Note right of C: "ESTABLISHED状態"
-        Note left of S: "ESTABLISHED状態"
-    end
-```
+![TCP 3ウェイハンドシェイク]({{ '/assets/images/diagrams/chapter-07/tcp-handshake-sequence.svg' | relative_url }})
 
 ### レイヤー4：アプリケーション層
 

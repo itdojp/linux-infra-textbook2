@@ -63,44 +63,7 @@ aws ec2 run-instances \
 
 物理的なハードウェアを意識することなく、必要な計算資源を利用できるサービスモデルです。
 
-```mermaid
-graph TB
-    subgraph "従来のインフラ"
-        APP1["アプリケーション<br/>(管理が必要)"]
-        OS1["OS<br/>(管理が必要)"]
-        VIR1["仮想化層<br/>(管理が必要)"]
-        SRV1["サーバー<br/>(管理が必要)"]
-        STR1["ストレージ<br/>(管理が必要)"]
-        NET1["ネットワーク<br/>(管理が必要)"]
-        
-        APP1 --- OS1 --- VIR1 --- SRV1 --- STR1 --- NET1
-    end
-    
-    subgraph "IaaS (AWS)"
-        APP2["アプリケーション<br/>(ユーザーが管理)"]
-        OS2["OS<br/>(ユーザーが管理)"]
-        VIR2["仮想化層<br/>(AWSが管理)"]
-        SRV2["サーバー<br/>(AWSが管理)"]
-        STR2["ストレージ<br/>(AWSが管理)"]
-        NET2["ネットワーク<br/>(AWSが管理)"]
-        
-        APP2 --- OS2 --- VIR2 --- SRV2 --- STR2 --- NET2
-    end
-    
-    style APP1 fill:#ffcccc,stroke:#ff0000
-    style OS1 fill:#ffcccc,stroke:#ff0000
-    style VIR1 fill:#ffcccc,stroke:#ff0000
-    style SRV1 fill:#ffcccc,stroke:#ff0000
-    style STR1 fill:#ffcccc,stroke:#ff0000
-    style NET1 fill:#ffcccc,stroke:#ff0000
-    
-    style APP2 fill:#ffcccc,stroke:#ff0000
-    style OS2 fill:#ffcccc,stroke:#ff0000
-    style VIR2 fill:#e1f5fe,stroke:#0066cc
-    style SRV2 fill:#e1f5fe,stroke:#0066cc
-    style STR2 fill:#e1f5fe,stroke:#0066cc
-    style NET2 fill:#e1f5fe,stroke:#0066cc
-```
+![従来インフラ vs クラウド(IaaS)比較]({{ '/assets/images/diagrams/chapter-12/cloud-infrastructure-comparison.svg' | relative_url }})
 
 ### EC2（Elastic Compute Cloud）の仕組み
 

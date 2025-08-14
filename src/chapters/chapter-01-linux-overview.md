@@ -65,41 +65,7 @@ Linuxは、これらすべての要件を高いレベルで満たすため、世
 
 Linuxは、サーバーにおいて以下の重要な役割を果たす：
 
-```mermaid
-graph TB
-    subgraph "Linux システムアーキテクチャ"
-        User["ユーザー"]
-        App["アプリケーション層"]
-        Shell["シェル"]
-        Kernel["Linux カーネル"]
-        Hardware["ハードウェア"]
-    end
-    
-    User --> App
-    User --> Shell
-    App --> Kernel
-    Shell --> Kernel
-    Kernel --> Hardware
-    
-    subgraph "カーネルの主要機能"
-        PM["プロセス管理"]
-        MM["メモリ管理"]
-        FS["ファイルシステム"]
-        NET["ネットワーク"]
-        DEV["デバイス管理"]
-    end
-    
-    Kernel --> PM
-    Kernel --> MM
-    Kernel --> FS
-    Kernel --> NET
-    Kernel --> DEV
-    
-    style Kernel fill:#e1f5fe
-    style Hardware fill:#f3e5f5
-    style App fill:#e8f5e8
-    style Shell fill:#fff3e0
-```
+![Linuxシステムアーキテクチャ]({{ '/assets/images/diagrams/chapter-01/linux-system-architecture.svg' | relative_url }})
 
 #### 1. ハードウェアの抽象化
 ```

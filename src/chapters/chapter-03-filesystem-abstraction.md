@@ -71,51 +71,7 @@ echo "緊急メッセージ" > /dev/pts/0
 
 Linuxのファイルシステムは、以下のような階層構造で組織されています：
 
-```mermaid
-graph TD
-    Root[/ ルートディレクトリ]
-    
-    Root --> bin[/bin<br/>基本コマンド]
-    Root --> boot[/boot<br/>起動ファイル]
-    Root --> dev[/dev<br/>デバイスファイル]
-    Root --> etc[/etc<br/>設定ファイル]
-    Root --> home[/home<br/>ユーザーディレクトリ]
-    Root --> lib[/lib<br/>ライブラリ]
-    Root --> proc[/proc<br/>プロセス情報]
-    Root --> root_dir[/root<br/>rootユーザーホーム]
-    Root --> run[/run<br/>実行時データ]
-    Root --> sys[/sys<br/>システム情報]
-    Root --> tmp[/tmp<br/>一時ファイル]
-    Root --> usr[/usr<br/>ユーザープログラム]
-    Root --> var[/var<br/>可変データ]
-    
-    dev --> sda[sda<br/>ハードディスク]
-    dev --> null[null<br/>ブラックホール]
-    dev --> zero[zero<br/>ゼロ生成器]
-    dev --> random[random<br/>乱数生成器]
-    
-    proc --> cpuinfo[cpuinfo<br/>CPU情報]
-    proc --> meminfo[meminfo<br/>メモリ情報]
-    proc --> pid[1234/<br/>プロセス情報]
-    
-    sys --> class[class/<br/>デバイスクラス]
-    sys --> devices[devices/<br/>デバイス情報]
-    
-    usr --> bin_usr[bin/<br/>ユーザーコマンド]
-    usr --> lib_usr[lib/<br/>ライブラリ]
-    usr --> share[share/<br/>共有データ]
-    
-    var --> log[log/<br/>ログファイル]
-    var --> run_var[run/<br/>実行時データ]
-    var --> tmp_var[tmp/<br/>一時ファイル]
-    
-    style Root fill:#ffeb3b
-    style dev fill:#e3f2fd
-    style proc fill:#e8f5e8
-    style sys fill:#f3e5f5
-    style usr fill:#fff3e0
-    style var fill:#fce4ec
-```
+![Linuxファイルシステム階層]({{ '/assets/images/diagrams/chapter-03/linux-filesystem-hierarchy.svg' | relative_url }})
 
 ### /dev - デバイスファイルの世界
 
@@ -580,65 +536,7 @@ sudo mdadm --detail /dev/md0
 
 ### 各RAID構成の特徴比較
 
-```mermaid
-graph TB
-    subgraph "RAID 0 (ストライピング)"
-        R0_D1[データブロック 1]
-        R0_D2[データブロック 2]
-        R0_D3[データブロック 3]
-        R0_D4[データブロック 4]
-        R0_Disk1[ディスク 1]
-        R0_Disk2[ディスク 2]
-        
-        R0_D1 --> R0_Disk1
-        R0_D2 --> R0_Disk2
-        R0_D3 --> R0_Disk1
-        R0_D4 --> R0_Disk2
-    end
-    
-    subgraph "RAID 1 (ミラーリング)"
-        R1_Data[データ]
-        R1_Disk1[ディスク 1<br/>プライマリ]
-        R1_Disk2[ディスク 2<br/>ミラー]
-        
-        R1_Data --> R1_Disk1
-        R1_Data --> R1_Disk2
-    end
-    
-    subgraph "RAID 5 (分散パリティ)"
-        R5_D1[データ 1]
-        R5_D2[データ 2]
-        R5_P1[パリティ P1]
-        R5_D3[データ 3]
-        R5_P2[パリティ P2]
-        R5_D4[データ 4]
-        R5_P3[パリティ P3]
-        R5_D5[データ 5]
-        R5_D6[データ 6]
-        
-        R5_Disk1[ディスク 1]
-        R5_Disk2[ディスク 2]
-        R5_Disk3[ディスク 3]
-        
-        R5_D1 --> R5_Disk1
-        R5_D2 --> R5_Disk2
-        R5_P1 --> R5_Disk3
-        R5_D3 --> R5_Disk1
-        R5_P2 --> R5_Disk2
-        R5_D4 --> R5_Disk3
-        R5_P3 --> R5_Disk1
-        R5_D5 --> R5_Disk2
-        R5_D6 --> R5_Disk3
-    end
-    
-    style R0_Disk1 fill:#e1f5fe
-    style R0_Disk2 fill:#e1f5fe
-    style R1_Disk1 fill:#e8f5e8
-    style R1_Disk2 fill:#e8f5e8
-    style R5_Disk1 fill:#fff3e0
-    style R5_Disk2 fill:#fff3e0
-    style R5_Disk3 fill:#fff3e0
-```
+![RAID構成の特徴比較]({{ '/assets/images/diagrams/chapter-03/raid-comparison.svg' | relative_url }})
 
 ### 特徴比較表
 

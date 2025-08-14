@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="700" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <title>Linuxファイルシステム階層</title>
+  <desc>Linuxファイルシステムの階層構造：ルートディレクトリから各ディレクトリの役割と構成</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .dir-name { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 12px; font-weight: 600; fill: #333; }
+      .dir-desc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #666; }
+      .sub-item { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 400; fill: #555; }
+      
+      .root-box { fill: #ffeb3b; stroke: #f57f17; stroke-width: 3; rx: 8; }
+      .system-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 6; }
+      .proc-box { fill: #e8f5e8; stroke: #388e3c; stroke-width: 2; rx: 6; }
+      .sys-box { fill: #f3e5f5; stroke: #7b1fa2; stroke-width: 2; rx: 6; }
+      .usr-box { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; rx: 6; }
+      .var-box { fill: #fce4ec; stroke: #c2185b; stroke-width: 2; rx: 6; }
+      .standard-box { fill: #f5f5f5; stroke: #616161; stroke-width: 2; rx: 6; }
+      
+      .hierarchy-line { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .subdir-line { stroke: #999; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-sub); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="arrowhead-sub" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#999" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1000" height="700" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="500" y="25" text-anchor="middle" class="title">Linuxファイルシステム階層</text>
+  
+  <!-- Root Directory -->
+  <rect x="450" y="60" width="100" height="50" class="root-box"/>
+  <text x="500" y="82" text-anchor="middle" class="dir-name">/</text>
+  <text x="500" y="96" text-anchor="middle" class="dir-desc">ルートディレクトリ</text>
+  
+  <!-- First Level Directories -->
+  <!-- /bin -->
+  <rect x="50" y="150" width="100" height="40" class="standard-box"/>
+  <text x="100" y="167" text-anchor="middle" class="dir-name">/bin</text>
+  <text x="100" y="181" text-anchor="middle" class="dir-desc">基本コマンド</text>
+  
+  <!-- /boot -->
+  <rect x="170" y="150" width="100" height="40" class="standard-box"/>
+  <text x="220" y="167" text-anchor="middle" class="dir-name">/boot</text>
+  <text x="220" y="181" text-anchor="middle" class="dir-desc">起動ファイル</text>
+  
+  <!-- /dev -->
+  <rect x="290" y="150" width="100" height="40" class="system-box"/>
+  <text x="340" y="167" text-anchor="middle" class="dir-name">/dev</text>
+  <text x="340" y="181" text-anchor="middle" class="dir-desc">デバイスファイル</text>
+  
+  <!-- /etc -->
+  <rect x="410" y="150" width="100" height="40" class="standard-box"/>
+  <text x="460" y="167" text-anchor="middle" class="dir-name">/etc</text>
+  <text x="460" y="181" text-anchor="middle" class="dir-desc">設定ファイル</text>
+  
+  <!-- /home -->
+  <rect x="530" y="150" width="100" height="40" class="standard-box"/>
+  <text x="580" y="167" text-anchor="middle" class="dir-name">/home</text>
+  <text x="580" y="181" text-anchor="middle" class="dir-desc">ユーザーディレクトリ</text>
+  
+  <!-- /lib -->
+  <rect x="650" y="150" width="100" height="40" class="standard-box"/>
+  <text x="700" y="167" text-anchor="middle" class="dir-name">/lib</text>
+  <text x="700" y="181" text-anchor="middle" class="dir-desc">ライブラリ</text>
+  
+  <!-- /proc -->
+  <rect x="770" y="150" width="100" height="40" class="proc-box"/>
+  <text x="820" y="167" text-anchor="middle" class="dir-name">/proc</text>
+  <text x="820" y="181" text-anchor="middle" class="dir-desc">プロセス情報</text>
+  
+  <!-- Second row -->
+  <!-- /root -->
+  <rect x="100" y="220" width="100" height="40" class="standard-box"/>
+  <text x="150" y="237" text-anchor="middle" class="dir-name">/root</text>
+  <text x="150" y="251" text-anchor="middle" class="dir-desc">rootユーザーホーム</text>
+  
+  <!-- /run -->
+  <rect x="220" y="220" width="100" height="40" class="standard-box"/>
+  <text x="270" y="237" text-anchor="middle" class="dir-name">/run</text>
+  <text x="270" y="251" text-anchor="middle" class="dir-desc">実行時データ</text>
+  
+  <!-- /sys -->
+  <rect x="340" y="220" width="100" height="40" class="sys-box"/>
+  <text x="390" y="237" text-anchor="middle" class="dir-name">/sys</text>
+  <text x="390" y="251" text-anchor="middle" class="dir-desc">システム情報</text>
+  
+  <!-- /tmp -->
+  <rect x="460" y="220" width="100" height="40" class="standard-box"/>
+  <text x="510" y="237" text-anchor="middle" class="dir-name">/tmp</text>
+  <text x="510" y="251" text-anchor="middle" class="dir-desc">一時ファイル</text>
+  
+  <!-- /usr -->
+  <rect x="580" y="220" width="100" height="40" class="usr-box"/>
+  <text x="630" y="237" text-anchor="middle" class="dir-name">/usr</text>
+  <text x="630" y="251" text-anchor="middle" class="dir-desc">ユーザープログラム</text>
+  
+  <!-- /var -->
+  <rect x="700" y="220" width="100" height="40" class="var-box"/>
+  <text x="750" y="237" text-anchor="middle" class="dir-name">/var</text>
+  <text x="750" y="251" text-anchor="middle" class="dir-desc">可変データ</text>
+  
+  <!-- /dev subdirectories -->
+  <rect x="200" y="320" width="80" height="30" class="system-box"/>
+  <text x="240" y="340" text-anchor="middle" class="sub-item">sda</text>
+  
+  <rect x="300" y="320" width="80" height="30" class="system-box"/>
+  <text x="340" y="340" text-anchor="middle" class="sub-item">null</text>
+  
+  <rect x="400" y="320" width="80" height="30" class="system-box"/>
+  <text x="440" y="340" text-anchor="middle" class="sub-item">zero</text>
+  
+  <rect x="500" y="320" width="80" height="30" class="system-box"/>
+  <text x="540" y="340" text-anchor="middle" class="sub-item">random</text>
+  
+  <!-- /proc subdirectories -->
+  <rect x="720" y="320" width="80" height="30" class="proc-box"/>
+  <text x="760" y="340" text-anchor="middle" class="sub-item">cpuinfo</text>
+  
+  <rect x="820" y="320" width="80" height="30" class="proc-box"/>
+  <text x="860" y="340" text-anchor="middle" class="sub-item">meminfo</text>
+  
+  <rect x="920" y="320" width="60" height="30" class="proc-box"/>
+  <text x="950" y="340" text-anchor="middle" class="sub-item">1234/</text>
+  
+  <!-- /sys subdirectories -->
+  <rect x="300" y="390" width="80" height="30" class="sys-box"/>
+  <text x="340" y="410" text-anchor="middle" class="sub-item">class/</text>
+  
+  <rect x="400" y="390" width="80" height="30" class="sys-box"/>
+  <text x="440" y="410" text-anchor="middle" class="sub-item">devices/</text>
+  
+  <!-- /usr subdirectories -->
+  <rect x="520" y="390" width="80" height="30" class="usr-box"/>
+  <text x="560" y="410" text-anchor="middle" class="sub-item">bin/</text>
+  
+  <rect x="620" y="390" width="80" height="30" class="usr-box"/>
+  <text x="660" y="410" text-anchor="middle" class="sub-item">lib/</text>
+  
+  <rect x="720" y="390" width="80" height="30" class="usr-box"/>
+  <text x="760" y="410" text-anchor="middle" class="sub-item">share/</text>
+  
+  <!-- /var subdirectories -->
+  <rect x="620" y="460" width="80" height="30" class="var-box"/>
+  <text x="660" y="480" text-anchor="middle" class="sub-item">log/</text>
+  
+  <rect x="720" y="460" width="80" height="30" class="var-box"/>
+  <text x="760" y="480" text-anchor="middle" class="sub-item">run/</text>
+  
+  <rect x="820" y="460" width="80" height="30" class="var-box"/>
+  <text x="860" y="480" text-anchor="middle" class="sub-item">tmp/</text>
+  
+  <!-- Hierarchy lines from root -->
+  <line x1="480" y1="110" x2="100" y2="150" class="hierarchy-line"/>
+  <line x1="490" y1="110" x2="220" y2="150" class="hierarchy-line"/>
+  <line x1="500" y1="110" x2="340" y2="150" class="hierarchy-line"/>
+  <line x1="500" y1="110" x2="460" y2="150" class="hierarchy-line"/>
+  <line x1="500" y1="110" x2="580" y2="150" class="hierarchy-line"/>
+  <line x1="500" y1="110" x2="700" y2="150" class="hierarchy-line"/>
+  <line x1="510" y1="110" x2="820" y2="150" class="hierarchy-line"/>
+  
+  <line x1="480" y1="110" x2="150" y2="220" class="hierarchy-line"/>
+  <line x1="490" y1="110" x2="270" y2="220" class="hierarchy-line"/>
+  <line x1="500" y1="110" x2="390" y2="220" class="hierarchy-line"/>
+  <line x1="500" y1="110" x2="510" y2="220" class="hierarchy-line"/>
+  <line x1="510" y1="110" x2="630" y2="220" class="hierarchy-line"/>
+  <line x1="520" y1="110" x2="750" y2="220" class="hierarchy-line"/>
+  
+  <!-- Subdirectory lines -->
+  <line x1="340" y1="190" x2="240" y2="320" class="subdir-line"/>
+  <line x1="340" y1="190" x2="340" y2="320" class="subdir-line"/>
+  <line x1="340" y1="190" x2="440" y2="320" class="subdir-line"/>
+  <line x1="340" y1="190" x2="540" y2="320" class="subdir-line"/>
+  
+  <line x1="820" y1="190" x2="760" y2="320" class="subdir-line"/>
+  <line x1="820" y1="190" x2="860" y2="320" class="subdir-line"/>
+  <line x1="820" y1="190" x2="950" y2="320" class="subdir-line"/>
+  
+  <line x1="390" y1="260" x2="340" y2="390" class="subdir-line"/>
+  <line x1="390" y1="260" x2="440" y2="390" class="subdir-line"/>
+  
+  <line x1="630" y1="260" x2="560" y2="390" class="subdir-line"/>
+  <line x1="630" y1="260" x2="660" y2="390" class="subdir-line"/>
+  <line x1="630" y1="260" x2="760" y2="390" class="subdir-line"/>
+  
+  <line x1="750" y1="260" x2="660" y2="460" class="subdir-line"/>
+  <line x1="750" y1="260" x2="760" y2="460" class="subdir-line"/>
+  <line x1="750" y1="260" x2="860" y2="460" class="subdir-line"/>
+  
+  <!-- Legend -->
+  <rect x="50" y="580" width="900" height="100" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="600" class="dir-name">📁 ディレクトリの種類:</text>
+  
+  <rect x="70" y="610" width="15" height="15" class="system-box"/>
+  <text x="95" y="622" class="dir-desc">システム関連ディレクトリ (/dev, /proc, /sys)</text>
+  
+  <rect x="70" y="630" width="15" height="15" class="usr-box"/>
+  <text x="95" y="642" class="dir-desc">ユーザープログラム (/usr)</text>
+  
+  <rect x="70" y="650" width="15" height="15" class="var-box"/>
+  <text x="95" y="662" class="dir-desc">可変データ (/var)</text>
+  
+  <rect x="300" y="610" width="15" height="15" class="root-box"/>
+  <text x="325" y="622" class="dir-desc">ルートディレクトリ (/)</text>
+  
+  <rect x="300" y="630" width="15" height="15" class="standard-box"/>
+  <text x="325" y="642" class="dir-desc">標準ディレクトリ</text>
+  
+  <text x="500" y="622" class="dir-desc">• デバイスファイルは /dev にファイルとして存在</text>
+  <text x="500" y="642" class="dir-desc">• プロセス情報は /proc で動的に生成</text>
+  <text x="500" y="662" class="dir-desc">• システム情報は /sys でカーネルが提供</text>
+</svg>

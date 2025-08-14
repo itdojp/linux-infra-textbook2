@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="700" viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg">
+  <title>LinuxのTCP/IPスタック</title>
+  <desc>Linuxカーネルにおけるネットワークスタックのアーキテクチャ</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .layer-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .component-name { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 600; fill: #333; }
+      .description { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #666; }
+      
+      .userspace-box { fill: #e8f5e8; stroke: #388e3c; stroke-width: 2; rx: 8; }
+      .kernelspace-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 8; }
+      .component-box { fill: #ffffff; stroke: #666; stroke-width: 1; rx: 4; }
+      .connection-line { stroke: #666; stroke-width: 2; fill: none; }
+      .arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="700" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="300" y="25" text-anchor="middle" class="title">LinuxのTCP/IPスタック</text>
+  
+  <!-- User Space -->
+  <rect x="50" y="60" width="500" height="180" class="userspace-box"/>
+  <text x="300" y="85" text-anchor="middle" class="layer-title">ユーザー空間</text>
+  
+  <!-- Application Layer -->
+  <rect x="80" y="100" width="440" height="40" class="component-box"/>
+  <text x="300" y="115" text-anchor="middle" class="component-name">アプリケーション</text>
+  <text x="300" y="130" text-anchor="middle" class="description">nginx, apache, ssh</text>
+  
+  <!-- System Calls -->
+  <rect x="80" y="150" width="440" height="40" class="component-box"/>
+  <text x="300" y="165" text-anchor="middle" class="component-name">システムコール</text>
+  <text x="300" y="180" text-anchor="middle" class="description">socket(), send(), recv()</text>
+  
+  <!-- Libraries -->
+  <rect x="80" y="200" width="440" height="30" class="component-box"/>
+  <text x="300" y="215" text-anchor="middle" class="component-name">ライブラリ</text>
+  <text x="300" y="225" text-anchor="middle" class="description">libc, OpenSSL</text>
+  
+  <!-- Kernel Space -->
+  <rect x="50" y="270" width="500" height="380" class="kernelspace-box"/>
+  <text x="300" y="295" text-anchor="middle" class="layer-title">カーネル空間</text>
+  
+  <!-- Socket Layer -->
+  <rect x="80" y="310" width="440" height="40" class="component-box"/>
+  <text x="300" y="325" text-anchor="middle" class="component-name">ソケット層</text>
+  <text x="300" y="340" text-anchor="middle" class="description">AF_INET, AF_INET6</text>
+  
+  <!-- Transport Layer -->
+  <rect x="80" y="360" width="440" height="40" class="component-box"/>
+  <text x="300" y="375" text-anchor="middle" class="component-name">トランスポート層</text>
+  <text x="300" y="390" text-anchor="middle" class="description">TCP/UDP スタック</text>
+  
+  <!-- Network Layer -->
+  <rect x="80" y="410" width="440" height="40" class="component-box"/>
+  <text x="300" y="425" text-anchor="middle" class="component-name">ネットワーク層</text>
+  <text x="300" y="440" text-anchor="middle" class="description">IPv4/IPv6 ルーティング</text>
+  
+  <!-- Netfilter -->
+  <rect x="80" y="460" width="440" height="40" class="component-box"/>
+  <text x="300" y="475" text-anchor="middle" class="component-name">Netfilter/iptables</text>
+  <text x="300" y="490" text-anchor="middle" class="description">パケットフィルタリング</text>
+  
+  <!-- Data Link Layer -->
+  <rect x="80" y="510" width="440" height="40" class="component-box"/>
+  <text x="300" y="525" text-anchor="middle" class="component-name">データリンク層</text>
+  <text x="300" y="540" text-anchor="middle" class="description">Ethernet, WiFi</text>
+  
+  <!-- Device Driver -->
+  <rect x="80" y="560" width="440" height="40" class="component-box"/>
+  <text x="300" y="575" text-anchor="middle" class="component-name">デバイスドライバ</text>
+  <text x="300" y="590" text-anchor="middle" class="description">NIC固有ドライバ</text>
+  
+  <!-- Flow arrows -->
+  <line x1="300" y1="140" x2="300" y2="150" class="arrow"/>
+  <line x1="300" y1="190" x2="300" y2="200" class="arrow"/>
+  <line x1="300" y1="230" x2="300" y2="270" class="arrow"/>
+  <line x1="300" y1="350" x2="300" y2="360" class="arrow"/>
+  <line x1="300" y1="400" x2="300" y2="410" class="arrow"/>
+  <line x1="300" y1="450" x2="300" y2="460" class="arrow"/>
+  <line x1="300" y1="500" x2="300" y2="510" class="arrow"/>
+  <line x1="300" y1="550" x2="300" y2="560" class="arrow"/>
+  
+  <!-- Side annotations -->
+  <text x="560" y="150" class="description">📱 User</text>
+  <text x="560" y="165" class="description">Application</text>
+  <text x="560" y="180" class="description">Interface</text>
+  
+  <line x1="50" y1="260" x2="550" y2="260" stroke="#999" stroke-width="2" stroke-dasharray="10,5"/>
+  
+  <text x="560" y="400" class="description">🐧 Kernel</text>
+  <text x="560" y="415" class="description">Network</text>
+  <text x="560" y="430" class="description">Stack</text>
+  
+  <!-- Hardware interface -->
+  <rect x="80" y="620" width="440" height="30" fill="#f5f5f5" stroke="#999" stroke-width="1" rx="4"/>
+  <text x="300" y="635" text-anchor="middle" class="description">🔌 Physical Network Hardware</text>
+  <text x="300" y="650" text-anchor="middle" class="description">Network Interface Card (NIC)</text>
+  
+  <line x1="300" y1="600" x2="300" y2="620" class="arrow"/>
+  
+  <!-- Information box -->
+  <rect x="50" y="670" width="500" height="25" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="685" class="description">💡 データは上位層から下位層へ順次処理され、ネットワークを経由して送信される</text>
+</svg>

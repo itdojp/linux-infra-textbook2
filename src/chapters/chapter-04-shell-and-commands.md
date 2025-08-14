@@ -605,66 +605,7 @@ done
 
 ### リアルタイム監視システムの構築
 
-```mermaid
-graph TB
-    subgraph "データ収集層"
-        A1["CPU使用率<br/>top, ps, /proc/stat"]
-        A2["メモリ使用量<br/>free, /proc/meminfo"]
-        A3["ディスクI/O<br/>iostat, /proc/diskstats"]
-        A4["ネットワーク<br/>ss, /proc/net/dev"]
-        A5["プロセス情報<br/>ps, /proc/*/status"]
-        A6["ログファイル<br/>tail -f, journalctl"]
-    end
-    
-    subgraph "データ処理層"
-        B1["テキスト処理<br/>grep, awk, sed"]
-        B2["数値計算<br/>bc, expr"]
-        B3["集計・ソート<br/>sort, uniq, wc"]
-        B4["時系列データ<br/>watch, while loop"]
-    end
-    
-    subgraph "出力・アラート層"
-        C1["リアルタイム表示<br/>watch, clear"]
-        C2["ファイル出力<br/>CSV, JSON, LOG"]
-        C3["アラート通知<br/>mail, slack API"]
-        C4["グラフ化<br/>gnuplot, ASCII chart"]
-    end
-    
-    subgraph "自動化層"
-        D1["cron定期実行"]
-        D2["systemd service"]
-        D3["シグナル制御"]
-        D4["プロセス管理"]
-    end
-    
-    A1 --> B1
-    A2 --> B2
-    A3 --> B3
-    A4 --> B1
-    A5 --> B4
-    A6 --> B1
-    
-    B1 --> C1
-    B2 --> C2
-    B3 --> C3
-    B4 --> C4
-    
-    C1 --> D1
-    C2 --> D2
-    C3 --> D3
-    C4 --> D4
-    
-    style A1 fill:#e1f5fe
-    style A2 fill:#e1f5fe
-    style A3 fill:#e1f5fe
-    style A4 fill:#e1f5fe
-    style A5 fill:#e1f5fe
-    style A6 fill:#e1f5fe
-    style C1 fill:#e8f5e8
-    style C2 fill:#e8f5e8
-    style C3 fill:#fff3e0
-    style C4 fill:#f3e5f5
-```
+![リアルタイム監視システムの構築]({{ '/assets/images/diagrams/chapter-04/monitoring-system-architecture.svg' | relative_url }})
 
 ### 統合監視スクリプト実装例
 

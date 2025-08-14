@@ -14,26 +14,7 @@
 
 #### Dockerのアーキテクチャ
 
-```mermaid
-graph LR
-    CLI["Docker CLI<br/>docker run<br/>docker build"]
-    DAEMON["Docker Daemon<br/>dockerd<br/>root権限で常時稼働"]
-    CONTAINERD["containerd<br/>コンテナライフサイクル管理"]
-    RUNC["runc<br/>OCI Runtime<br/>実際のコンテナ実行"]
-    
-    USER["ユーザー<br/>dockerグループ必要"]
-    
-    USER --> CLI
-    CLI -->|REST API| DAEMON
-    DAEMON --> CONTAINERD
-    CONTAINERD --> RUNC
-    
-    style DAEMON fill:#ffcdd2
-    style USER fill:#e3f2fd
-    style CLI fill:#e8f5e8
-    style CONTAINERD fill:#fff3e0
-    style RUNC fill:#f3e5f5
-```
+![Dockerのアーキテクチャ]({{ '/assets/images/diagrams/chapter-10/docker-architecture.svg' | relative_url }})
 
 #### 主な課題
 
@@ -64,22 +45,7 @@ $ sudo systemctl stop docker
 
 #### Podmanのアーキテクチャ
 
-```mermaid
-graph LR
-    USER["ユーザー<br/>一般権限のまま"]
-    CLI["Podman CLI<br/>podman run<br/>podman build"]
-    LIBPOD["libpod<br/>ライブラリ<br/>プロセス内実行"]
-    RUNTIME["OCI Runtime<br/>crun/runc<br/>実際のコンテナ実行"]
-    
-    USER --> CLI
-    CLI -->|直接呼び出し| LIBPOD
-    LIBPOD -->|fork/exec| RUNTIME
-    
-    style USER fill:#c8e6c9
-    style CLI fill:#e8f5e8
-    style LIBPOD fill:#e1f5fe
-    style RUNTIME fill:#f3e5f5
-```
+![Podmanのアーキテクチャ]({{ '/assets/images/diagrams/chapter-10/podman-architecture.svg' | relative_url }})
 
 #### 革新的な特徴
 

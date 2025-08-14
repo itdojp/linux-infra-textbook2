@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="700" height="500" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
+  <title>TCP 3ウェイハンドシェイク</title>
+  <desc>TCPコネクション確立とデータ転送のシーケンス図</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .participant-name { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .phase-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 600; fill: #1976d2; }
+      .message-text { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 11px; font-weight: 600; fill: #d32f2f; }
+      .description { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #666; }
+      .seq-number { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 600; fill: #1976d2; }
+      
+      .participant-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 8; }
+      .timeline { stroke: #999; stroke-width: 2; stroke-dasharray: 5,5; }
+      .message-arrow { stroke: #d32f2f; stroke-width: 2; fill: none; marker-end: url(#message-arrowhead); }
+      .bidirectional-arrow { stroke: #4caf50; stroke-width: 3; fill: none; }
+      .phase-background { fill: #f0f8ff; stroke: #b3d9ff; stroke-width: 1; rx: 4; opacity: 0.8; }
+    </style>
+    
+    <marker id="message-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d32f2f" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="700" height="500" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="350" y="25" text-anchor="middle" class="title">TCP 3ウェイハンドシェイク</text>
+  
+  <!-- Participants -->
+  <rect x="100" y="50" width="120" height="40" class="participant-box"/>
+  <text x="160" y="75" text-anchor="middle" class="participant-name">クライアント</text>
+  
+  <rect x="480" y="50" width="120" height="40" class="participant-box"/>
+  <text x="540" y="75" text-anchor="middle" class="participant-name">サーバー</text>
+  
+  <!-- Timeline -->
+  <line x1="160" y1="90" x2="160" y2="420" class="timeline"/>
+  <line x1="540" y1="90" x2="540" y2="420" class="timeline"/>
+  
+  <!-- Phase 1: TCP 3-way Handshake -->
+  <rect x="50" y="105" width="600" height="130" class="phase-background"/>
+  <text x="350" y="125" text-anchor="middle" class="phase-title">TCP 3ウェイハンドシェイク</text>
+  
+  <!-- Step 1: SYN -->
+  <line x1="160" y1="140" x2="520" y2="150" class="message-arrow"/>
+  <text x="70" y="135" class="seq-number">1.</text>
+  <text x="340" y="135" text-anchor="middle" class="message-text">SYN</text>
+  <text x="340" y="150" text-anchor="middle" class="description">seq=1000</text>
+  <text x="340" y="165" text-anchor="middle" class="description">「接続要求」</text>
+  
+  <!-- Step 2: SYN+ACK -->
+  <line x1="540" y1="180" x2="180" y2="190" class="message-arrow"/>
+  <text x="70" y="175" class="seq-number">2.</text>
+  <text x="360" y="175" text-anchor="middle" class="message-text">SYN+ACK</text>
+  <text x="360" y="190" text-anchor="middle" class="description">seq=2000, ack=1001</text>
+  <text x="360" y="205" text-anchor="middle" class="description">「接続許可」</text>
+  
+  <!-- Step 3: ACK -->
+  <line x1="160" y1="220" x2="520" y2="230" class="message-arrow"/>
+  <text x="70" y="215" class="seq-number">3.</text>
+  <text x="340" y="215" text-anchor="middle" class="message-text">ACK</text>
+  <text x="340" y="230" text-anchor="middle" class="description">ack=2001</text>
+  <text x="340" y="245" text-anchor="middle" class="description">「確認」</text>
+  
+  <!-- Connection Established -->
+  <rect x="50" y="255" width="600" height="60" fill="#e8f5e8" stroke="#4caf50" stroke-width="1" rx="4" opacity="0.8"/>
+  <text x="350" y="280" text-anchor="middle" class="phase-title" fill="#2e7d32">接続確立</text>
+  <text x="350" y="295" text-anchor="middle" class="description">TCPコネクションが正常に確立されました</text>
+  
+  <!-- Data Communication -->
+  <rect x="50" y="325" width="600" height="60" fill="#fff3e0" stroke="#ff9800" stroke-width="1" rx="4" opacity="0.8"/>
+  <text x="350" y="350" text-anchor="middle" class="phase-title" fill="#f57c00">データ通信</text>
+  
+  <!-- Bidirectional data flow -->
+  <line x1="180" y1="360" x2="520" y2="360" class="bidirectional-arrow"/>
+  <line x1="520" y1="370" x2="180" y2="370" class="bidirectional-arrow"/>
+  <text x="350" y="365" text-anchor="middle" class="description" fill="#4caf50">HTTP リクエスト/レスポンス</text>
+  <text x="350" y="375" text-anchor="middle" class="description" fill="#4caf50">双方向データ転送</text>
+  
+  <!-- Technical Details -->
+  <rect x="50" y="400" width="600" height="80" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="420" class="phase-title">🔧 技術的詳細</text>
+  
+  <text x="70" y="440" class="description">• <tspan class="message-text">SYN</tspan>: Synchronize - 接続要求とシーケンス番号の初期化</text>
+  <text x="70" y="455" class="description">• <tspan class="message-text">ACK</tspan>: Acknowledge - 受信確認とシーケンス番号の応答</text>
+  <text x="70" y="470" class="description">• 各パケットにはシーケンス番号が付与され、パケットの順序とデータの整合性を保証</text>
+  
+  <!-- State transitions -->
+  <text x="620" y="140" class="description">CLOSED</text>
+  <text x="620" y="155" class="description">↓</text>
+  <text x="620" y="170" class="description">SYN_SENT</text>
+  
+  <text x="80" y="180" class="description">LISTEN</text>
+  <text x="80" y="195" class="description">↓</text>
+  <text x="80" y="210" class="description">SYN_RCVD</text>
+  
+  <text x="620" y="220" class="description">ESTABLISHED</text>
+  <text x="80" y="250" class="description">ESTABLISHED</text>
+</svg>
