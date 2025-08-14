@@ -3,8 +3,8 @@ description: "コンテナ・クラウド時代に必要なLinuxインフラエ�
 author: "株式会社アイティードゥ"
 lang: "ja"
 url: "https://itdojp.github.io"
-baseurl: "/linux-infra-textbook"
-repository: "https://github.com/itdojp/linux-infra-textbook"
+baseurl: "/linux-infra-textbook2"
+repository: "https://github.com/itdojp/linux-infra-textbook2"
 
 # Jekyll設定
 markdown: kramdown
