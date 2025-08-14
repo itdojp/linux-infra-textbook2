@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <title>名前解決の流れ</title>
+  <desc>Linuxシステムにおける名前解決の順序：/etc/hosts → DNS → mDNS</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .step-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 600; fill: #333; }
+      .file-label { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 11px; font-weight: 400; fill: #388e3c; }
+      .condition { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #d32f2f; }
+      .success { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #2e7d32; }
+      
+      .start-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 8; }
+      .hosts-box { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      .dns-box { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; rx: 6; }
+      .mdns-box { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; rx: 6; }
+      .success-box { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      .fail-box { fill: #ffebee; stroke: #f44336; stroke-width: 2; rx: 6; }
+      
+      .flow-arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .not-found { stroke: #f44336; stroke-width: 2; fill: none; marker-end: url(#arrowhead-red); }
+      .found { stroke: #4caf50; stroke-width: 2; fill: none; marker-end: url(#arrowhead-green); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f44336" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="400" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="title">Linux名前解決の流れ</text>
+  
+  <!-- Start -->
+  <rect x="50" y="80" width="120" height="60" class="start-box"/>
+  <text x="110" y="105" text-anchor="middle" class="step-label">名前解決要求</text>
+  <text x="110" y="120" text-anchor="middle" class="file-label">www.example.com</text>
+  
+  <!-- Step 1: /etc/hosts -->
+  <rect x="220" y="80" width="120" height="60" class="hosts-box"/>
+  <text x="280" y="100" text-anchor="middle" class="step-label">1. /etc/hosts</text>
+  <text x="280" y="115" text-anchor="middle" class="file-label">ローカルファイル</text>
+  <text x="280" y="130" text-anchor="middle" class="file-label">静的エントリ</text>
+  
+  <!-- Step 2: DNS -->
+  <rect x="390" y="80" width="120" height="60" class="dns-box"/>
+  <text x="450" y="100" text-anchor="middle" class="step-label">2. DNSサーバー</text>
+  <text x="450" y="115" text-anchor="middle" class="file-label">/etc/resolv.conf</text>
+  <text x="450" y="130" text-anchor="middle" class="file-label">再帰問い合わせ</text>
+  
+  <!-- Step 3: mDNS -->
+  <rect x="560" y="80" width="120" height="60" class="mdns-box"/>
+  <text x="620" y="100" text-anchor="middle" class="step-label">3. マルチキャスト</text>
+  <text x="620" y="115" text-anchor="middle" class="step-label">DNS (mDNS)</text>
+  <text x="620" y="130" text-anchor="middle" class="file-label">ローカルネットワーク</text>
+  
+  <!-- Success -->
+  <rect x="280" y="220" width="120" height="60" class="success-box"/>
+  <text x="340" y="245" text-anchor="middle" class="step-label">✅ 解決成功</text>
+  <text x="340" y="260" text-anchor="middle" class="success">IPアドレス返却</text>
+  
+  <!-- Fail -->
+  <rect x="600" y="220" width="120" height="60" class="fail-box"/>
+  <text x="660" y="245" text-anchor="middle" class="step-label">❌ 解決失敗</text>
+  <text x="660" y="260" text-anchor="middle" class="condition">NXDOMAIN</text>
+  
+  <!-- Flow arrows -->
+  <line x1="170" y1="110" x2="220" y2="110" class="flow-arrow"/>
+  <line x1="340" y1="110" x2="390" y2="110" class="not-found"/>
+  <line x1="510" y1="110" x2="560" y2="110" class="not-found"/>
+  
+  <!-- Success paths -->
+  <line x1="280" y1="140" x2="340" y2="220" class="found"/>
+  <line x1="450" y1="140" x2="380" y2="220" class="found"/>
+  <line x1="620" y1="140" x2="400" y2="220" class="found"/>
+  
+  <!-- Fail path -->
+  <line x1="680" y1="110" x2="720" y2="110" class="not-found"/>
+  <line x1="720" y1="110" x2="720" y2="180" class="not-found"/>
+  <line x1="720" y1="180" x2="680" y2="220" class="not-found"/>
+  
+  <!-- Labels for conditions -->
+  <text x="375" y="105" text-anchor="middle" class="condition">NOT FOUND</text>
+  <text x="545" y="105" text-anchor="middle" class="condition">NOT FOUND</text>
+  <text x="740" y="150" text-anchor="middle" class="condition">NOT FOUND</text>
+  
+  <text x="310" y="190" text-anchor="middle" class="success">FOUND</text>
+  <text x="415" y="190" text-anchor="middle" class="success">FOUND</text>
+  <text x="510" y="190" text-anchor="middle" class="success">FOUND</text>
+  
+  <!-- Configuration info -->
+  <rect x="50" y="320" width="700" height="60" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="340" class="step-label">📝 設定ファイル:</text>
+  <text x="70" y="355" class="file-label">/etc/nsswitch.conf - 名前解決の順序定義</text>
+  <text x="400" y="355" class="file-label">/etc/hosts - 静的ホスト名マッピング</text>
+  <text x="70" y="370" class="file-label">/etc/resolv.conf - DNSサーバー設定</text>
+  <text x="400" y="370" class="file-label">/etc/systemd/resolved.conf - systemd-resolved設定</text>
+</svg>

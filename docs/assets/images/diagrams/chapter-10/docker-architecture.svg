@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="700" height="300" viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+  <title>Dockerのアーキテクチャ</title>
+  <desc>Docker環境における各コンポーネント間の関係とデータフロー</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .component-name { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 600; fill: #333; }
+      .command { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 400; fill: #7b1fa2; }
+      .description { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #666; }
+      .warning { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #d32f2f; }
+      
+      .user-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 6; }
+      .cli-box { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; rx: 6; }
+      .daemon-box { fill: #ffcdd2; stroke: #f44336; stroke-width: 2; rx: 6; }
+      .containerd-box { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; rx: 6; }
+      .runtime-box { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      
+      .flow-arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .api-arrow { stroke: #1976d2; stroke-width: 2; fill: none; marker-end: url(#arrowhead-blue); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1976d2" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="700" height="300" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="350" y="25" text-anchor="middle" class="title">Dockerのアーキテクチャ</text>
+  
+  <!-- User -->
+  <rect x="50" y="60" width="100" height="80" class="user-box"/>
+  <text x="100" y="85" text-anchor="middle" class="component-name">ユーザー</text>
+  <text x="100" y="100" text-anchor="middle" class="warning">dockerグループ</text>
+  <text x="100" y="115" text-anchor="middle" class="warning">必要</text>
+  <text x="100" y="130" text-anchor="middle" class="description">権限昇格が必要</text>
+  
+  <!-- Docker CLI -->
+  <rect x="180" y="60" width="120" height="80" class="cli-box"/>
+  <text x="240" y="80" text-anchor="middle" class="component-name">Docker CLI</text>
+  <text x="240" y="95" text-anchor="middle" class="command">docker run</text>
+  <text x="240" y="110" text-anchor="middle" class="command">docker build</text>
+  <text x="240" y="125" text-anchor="middle" class="description">クライアントツール</text>
+  
+  <!-- Docker Daemon -->
+  <rect x="330" y="60" width="120" height="80" class="daemon-box"/>
+  <text x="390" y="80" text-anchor="middle" class="component-name">Docker Daemon</text>
+  <text x="390" y="95" text-anchor="middle" class="command">dockerd</text>
+  <text x="390" y="110" text-anchor="middle" class="warning">root権限で</text>
+  <text x="390" y="125" text-anchor="middle" class="warning">常時稼働</text>
+  
+  <!-- containerd -->
+  <rect x="480" y="60" width="120" height="80" class="containerd-box"/>
+  <text x="540" y="80" text-anchor="middle" class="component-name">containerd</text>
+  <text x="540" y="95" text-anchor="middle" class="description">コンテナ</text>
+  <text x="540" y="110" text-anchor="middle" class="description">ライフサイクル管理</text>
+  <text x="540" y="125" text-anchor="middle" class="description">イメージ管理</text>
+  
+  <!-- OCI Runtime -->
+  <rect x="480" y="170" width="120" height="80" class="runtime-box"/>
+  <text x="540" y="190" text-anchor="middle" class="component-name">OCI Runtime</text>
+  <text x="540" y="205" text-anchor="middle" class="command">runc</text>
+  <text x="540" y="220" text-anchor="middle" class="description">実際のコンテナ</text>
+  <text x="540" y="235" text-anchor="middle" class="description">実行</text>
+  
+  <!-- Flow arrows -->
+  <line x1="150" y1="100" x2="180" y2="100" class="flow-arrow"/>
+  <line x1="300" y1="100" x2="330" y2="100" class="api-arrow"/>
+  <line x1="450" y1="100" x2="480" y2="100" class="flow-arrow"/>
+  <line x1="540" y1="140" x2="540" y2="170" class="flow-arrow"/>
+  
+  <!-- Arrow labels -->
+  <text x="165" y="95" text-anchor="middle" class="description">利用</text>
+  <text x="315" y="95" text-anchor="middle" class="command">REST API</text>
+  <text x="465" y="95" text-anchor="middle" class="description">制御</text>
+  <text x="560" y="155" text-anchor="middle" class="description">実行</text>
+  
+  <!-- Problem description -->
+  <rect x="50" y="260" width="600" height="30" fill="#ffebee" stroke="#f44336" stroke-width="1" rx="4"/>
+  <text x="60" y="275" class="warning">⚠️ 問題点:</text>
+  <text x="60" y="285" class="warning">デーモンプロセスが常時稼働 • root権限必要 • dockerグループへの追加が必要</text>
+</svg>

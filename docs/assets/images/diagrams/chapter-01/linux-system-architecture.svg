@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <title>Linuxシステムアーキテクチャ</title>
+  <desc>Linuxシステムの階層構造：ユーザー、アプリケーション、シェル、カーネル、ハードウェアの関係</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .layer-name { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 600; fill: #333; }
+      .function-name { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #1976d2; }
+      .section-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 500; fill: #666; }
+      
+      .user-layer { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; rx: 6; }
+      .app-layer { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      .shell-layer { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; rx: 6; }
+      .kernel-layer { fill: #e1f5fe; stroke: #03a9f4; stroke-width: 2; rx: 6; }
+      .hardware-layer { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; rx: 6; }
+      .function-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 1.5; rx: 4; }
+      
+      .arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .kernel-arrow { stroke: #1976d2; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-blue); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1976d2" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="400" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="300" y="25" text-anchor="middle" class="title">Linuxシステムアーキテクチャ</text>
+  
+  <!-- User Layer -->
+  <rect x="50" y="60" width="100" height="40" class="user-layer"/>
+  <text x="100" y="85" text-anchor="middle" class="layer-name">ユーザー</text>
+  
+  <!-- Application Layer -->
+  <rect x="200" y="60" width="120" height="40" class="app-layer"/>
+  <text x="260" y="85" text-anchor="middle" class="layer-name">アプリケーション層</text>
+  
+  <!-- Shell Layer -->
+  <rect x="370" y="60" width="100" height="40" class="shell-layer"/>
+  <text x="420" y="85" text-anchor="middle" class="layer-name">シェル</text>
+  
+  <!-- Kernel Layer -->
+  <rect x="200" y="140" width="120" height="50" class="kernel-layer"/>
+  <text x="260" y="160" text-anchor="middle" class="layer-name">Linux カーネル</text>
+  <text x="260" y="175" text-anchor="middle" class="section-title">システムの中核</text>
+  
+  <!-- Hardware Layer -->
+  <rect x="200" y="230" width="120" height="40" class="hardware-layer"/>
+  <text x="260" y="255" text-anchor="middle" class="layer-name">ハードウェア</text>
+  
+  <!-- Kernel Functions -->
+  <rect x="380" y="140" width="180" height="120" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="6"/>
+  <text x="470" y="155" text-anchor="middle" class="section-title">カーネルの主要機能</text>
+  
+  <rect x="390" y="165" width="70" height="25" class="function-box"/>
+  <text x="425" y="182" text-anchor="middle" class="function-name">プロセス管理</text>
+  
+  <rect x="480" y="165" width="70" height="25" class="function-box"/>
+  <text x="515" y="182" text-anchor="middle" class="function-name">メモリ管理</text>
+  
+  <rect x="390" y="200" width="70" height="25" class="function-box"/>
+  <text x="425" y="217" text-anchor="middle" class="function-name">ファイルシステム</text>
+  
+  <rect x="480" y="200" width="70" height="25" class="function-box"/>
+  <text x="515" y="217" text-anchor="middle" class="function-name">ネットワーク</text>
+  
+  <rect x="435" y="235" width="70" height="25" class="function-box"/>
+  <text x="470" y="252" text-anchor="middle" class="function-name">デバイス管理</text>
+  
+  <!-- Main flow arrows -->
+  <line x1="150" y1="80" x2="200" y2="80" class="arrow"/>
+  <line x1="150" y1="80" x2="370" y2="80" class="arrow"/>
+  
+  <line x1="260" y1="100" x2="260" y2="140" class="arrow"/>
+  <line x1="420" y1="100" x2="260" y2="140" class="arrow"/>
+  
+  <line x1="260" y1="190" x2="260" y2="230" class="arrow"/>
+  
+  <!-- Kernel function arrows -->
+  <line x1="320" y1="165" x2="390" y2="177" class="kernel-arrow"/>
+  <line x1="320" y1="165" x2="480" y2="177" class="kernel-arrow"/>
+  <line x1="320" y1="175" x2="390" y2="212" class="kernel-arrow"/>
+  <line x1="320" y1="175" x2="480" y2="212" class="kernel-arrow"/>
+  <line x1="320" y1="185" x2="435" y2="247" class="kernel-arrow"/>
+  
+  <!-- Labels for arrows -->
+  <text x="175" y="75" text-anchor="middle" class="section-title">利用</text>
+  <text x="295" y="75" text-anchor="middle" class="section-title">操作</text>
+  <text x="275" y="120" text-anchor="middle" class="section-title">システムコール</text>
+  <text x="275" y="215" text-anchor="middle" class="section-title">ハードウェア制御</text>
+</svg>

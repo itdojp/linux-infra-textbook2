@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <title>プロセスの誕生：fork()とexec()</title>
+  <desc>Linuxにおけるプロセス生成の流れ：fork()による分裂からexec()による実行まで</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .process-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 600; fill: #333; }
+      .syscall { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 11px; font-weight: 600; fill: #7b1fa2; }
+      .description { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #666; }
+      .condition { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 500; fill: #1976d2; }
+      
+      .parent-box { fill: #e1f5fe; stroke: #0288d1; stroke-width: 2; rx: 6; }
+      .parent-final-box { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      .child-box { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; rx: 6; }
+      .exec-box { fill: #f3e5f5; stroke: #7b1fa2; stroke-width: 2; rx: 6; }
+      .decision-box { fill: #fce4ec; stroke: #e91e63; stroke-width: 2; rx: 15; }
+      .syscall-box { fill: #fff9c4; stroke: #fbc02d; stroke-width: 2; rx: 6; }
+      
+      .flow-arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .parent-arrow { stroke: #0288d1; stroke-width: 2; fill: none; marker-end: url(#arrowhead-blue); }
+      .child-arrow { stroke: #f57c00; stroke-width: 2; fill: none; marker-end: url(#arrowhead-orange); }
+      .signal-arrow { stroke: #e91e63; stroke-width: 2; stroke-dasharray: 5,5; fill: none; marker-end: url(#arrowhead-pink); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0288d1" />
+    </marker>
+    <marker id="arrowhead-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f57c00" />
+    </marker>
+    <marker id="arrowhead-pink" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e91e63" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="400" y="25" text-anchor="middle" class="title">プロセスの誕生：fork()とexec()</text>
+  
+  <!-- Parent Process -->
+  <rect x="300" y="60" width="200" height="50" class="parent-box"/>
+  <text x="400" y="80" text-anchor="middle" class="process-label">親プロセス</text>
+  <text x="400" y="95" text-anchor="middle" class="syscall">bash</text>
+  
+  <!-- fork() System Call -->
+  <rect x="320" y="140" width="160" height="40" class="syscall-box"/>
+  <text x="400" y="157" text-anchor="middle" class="syscall">fork()システムコール</text>
+  <text x="400" y="172" text-anchor="middle" class="description">実行</text>
+  
+  <!-- Process Split Decision -->
+  <ellipse cx="400" cy="220" rx="80" ry="30" class="decision-box"/>
+  <text x="400" y="215" text-anchor="middle" class="process-label">プロセス分裂</text>
+  <text x="400" y="228" text-anchor="middle" class="description">同一メモリ空間をコピー</text>
+  
+  <!-- Parent Path -->
+  <rect x="80" y="290" width="180" height="70" class="parent-box"/>
+  <text x="170" y="310" text-anchor="middle" class="process-label">親プロセス</text>
+  <text x="170" y="325" text-anchor="middle" class="condition">PID = child_pid</text>
+  <text x="170" y="340" text-anchor="middle" class="syscall">wait()</text>
+  <text x="170" y="355" text-anchor="middle" class="description">子プロセス終了を待機</text>
+  
+  <!-- Child Path -->
+  <rect x="520" y="290" width="180" height="70" class="child-box"/>
+  <text x="610" y="310" text-anchor="middle" class="process-label">子プロセス</text>
+  <text x="610" y="325" text-anchor="middle" class="condition">PID = 0</text>
+  <text x="610" y="340" text-anchor="middle" class="description">親のメモリ空間を</text>
+  <text x="610" y="355" text-anchor="middle" class="description">コピー</text>
+  
+  <!-- exec() System Call -->
+  <rect x="530" y="390" width="160" height="40" class="syscall-box"/>
+  <text x="610" y="407" text-anchor="middle" class="syscall">exec()システムコール</text>
+  <text x="610" y="422" text-anchor="middle" class="description">実行</text>
+  
+  <!-- New Program -->
+  <rect x="520" y="460" width="180" height="70" class="exec-box"/>
+  <text x="610" y="480" text-anchor="middle" class="process-label">新しいプログラム</text>
+  <text x="610" y="495" text-anchor="middle" class="syscall">ls -la</text>
+  <text x="610" y="510" text-anchor="middle" class="description">元のメモリ空間を</text>
+  <text x="610" y="525" text-anchor="middle" class="description">置き換え</text>
+  
+  <!-- Process Exit -->
+  <rect x="430" y="560" width="120" height="30" class="syscall-box"/>
+  <text x="490" y="572" text-anchor="middle" class="syscall">exit()</text>
+  <text x="490" y="585" text-anchor="middle" class="description">プロセス終了</text>
+  
+  <!-- Parent Wait Return -->
+  <rect x="80" y="480" width="180" height="70" class="parent-final-box"/>
+  <text x="170" y="500" text-anchor="middle" class="process-label">親プロセス</text>
+  <text x="170" y="515" text-anchor="middle" class="syscall">wait()</text>
+  <text x="170" y="530" text-anchor="middle" class="description">から復帰</text>
+  <text x="170" y="545" text-anchor="middle" class="description">子の終了コード取得</text>
+  
+  <!-- Flow arrows -->
+  <line x1="400" y1="110" x2="400" y2="140" class="flow-arrow"/>
+  <line x1="400" y1="180" x2="400" y2="190" class="flow-arrow"/>
+  
+  <!-- Fork split arrows -->
+  <line x1="350" y1="240" x2="220" y2="290" class="parent-arrow"/>
+  <line x1="450" y1="240" x2="580" y2="290" class="child-arrow"/>
+  
+  <!-- Child process flow -->
+  <line x1="610" y1="360" x2="610" y2="390" class="child-arrow"/>
+  <line x1="610" y1="430" x2="610" y2="460" class="child-arrow"/>
+  <line x1="590" y1="530" x2="530" y2="560" class="child-arrow"/>
+  
+  <!-- Signal arrow from child to parent -->
+  <path d="M 430 575 Q 350 520 260 515" stroke="#e91e63" stroke-width="2" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowhead-pink)"/>
+  
+  <!-- Labels for branches -->
+  <text x="280" y="265" text-anchor="middle" class="condition">親プロセス側</text>
+  <text x="520" y="265" text-anchor="middle" class="condition">子プロセス側</text>
+  
+  <!-- Signal label -->
+  <text x="350" y="545" text-anchor="middle" class="condition">SIGCHLD</text>
+  <text x="350" y="558" text-anchor="middle" class="description">終了通知</text>
+  
+  <!-- System call explanation -->
+  <rect x="50" y="30" width="200" height="80" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="60" y="50" class="process-label">🔧 システムコール</text>
+  <text x="60" y="65" class="description">fork() - プロセス複製</text>
+  <text x="60" y="80" class="description">exec() - プログラム実行</text>
+  <text x="60" y="95" class="description">wait() - 子プロセス待機</text>
+  
+  <!-- Memory explanation -->
+  <rect x="550" y="30" width="200" height="80" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="560" y="50" class="process-label">💾 メモリ管理</text>
+  <text x="560" y="65" class="description">fork()後：Copy-on-Write</text>
+  <text x="560" y="80" class="description">exec()後：完全置換</text>
+  <text x="560" y="95" class="description">効率的なメモリ使用</text>
+</svg>

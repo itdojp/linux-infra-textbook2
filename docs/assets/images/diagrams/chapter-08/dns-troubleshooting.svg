@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="700" viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg">
+  <title>DNS問題の体系的診断手順</title>
+  <desc>DNS問題発生時の段階的トラブルシューティングフローチャート</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .step-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 600; fill: #333; }
+      .action-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #1976d2; }
+      .decision-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #7b1fa2; }
+      .command { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 400; fill: #388e3c; }
+      .result-ok { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #2e7d32; }
+      .result-ng { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #d32f2f; }
+      
+      .start-node { fill: #ffebee; stroke: #f44336; stroke-width: 2; rx: 8; }
+      .decision-node { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; rx: 20; }
+      .action-node { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 6; }
+      .check-node { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; rx: 6; }
+      .solution-node { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      
+      .flow-arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .ok-flow { stroke: #4caf50; stroke-width: 2; fill: none; marker-end: url(#arrowhead-green); }
+      .ng-flow { stroke: #f44336; stroke-width: 2; fill: none; marker-end: url(#arrowhead-red); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50" />
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f44336" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="700" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" class="title">DNS問題の体系的診断手順</text>
+  
+  <!-- Start -->
+  <rect x="380" y="60" width="140" height="50" class="start-node"/>
+  <text x="450" y="80" text-anchor="middle" class="step-label">🚨 DNS問題発生</text>
+  <text x="450" y="95" text-anchor="middle" class="action-label">名前解決できない</text>
+  
+  <!-- Step 1: Basic connectivity -->
+  <ellipse cx="450" cy="160" rx="70" ry="30" class="decision-node"/>
+  <text x="450" y="155" text-anchor="middle" class="step-label">基本的な</text>
+  <text x="450" y="168" text-anchor="middle" class="step-label">接続確認</text>
+  
+  <!-- Step 1 OK: Name resolution test -->
+  <rect x="200" y="230" width="140" height="60" class="action-node"/>
+  <text x="270" y="250" text-anchor="middle" class="step-label">名前解決テスト</text>
+  <text x="270" y="265" text-anchor="middle" class="command">nslookup/dig</text>
+  <text x="270" y="280" text-anchor="middle" class="command">host/getent</text>
+  
+  <!-- Step 1 NG: Network check -->
+  <rect x="560" y="230" width="140" height="60" class="check-node"/>
+  <text x="630" y="250" text-anchor="middle" class="step-label">ネットワーク</text>
+  <text x="630" y="265" text-anchor="middle" class="step-label">接続を確認</text>
+  <text x="630" y="280" text-anchor="middle" class="command">ping, traceroute</text>
+  
+  <!-- Step 2: DNS resolution result -->
+  <ellipse cx="270" cy="350" rx="60" ry="25" class="decision-node"/>
+  <text x="270" y="350" text-anchor="middle" class="step-label">解決結果</text>
+  
+  <!-- Step 2 Success: Cache investigation -->
+  <rect x="50" y="420" width="120" height="60" class="check-node"/>
+  <text x="110" y="440" text-anchor="middle" class="step-label">キャッシュ問題</text>
+  <text x="110" y="455" text-anchor="middle" class="step-label">可能性を調査</text>
+  <text x="110" y="470" text-anchor="middle" class="command">systemd-resolve</text>
+  
+  <!-- Step 2 Fail: DNS server reachability -->
+  <ellipse cx="270" cy="440" rx="70" ry="30" class="decision-node"/>
+  <text x="270" y="435" text-anchor="middle" class="step-label">DNSサーバー</text>
+  <text x="270" y="448" text-anchor="middle" class="step-label">到達可能？</text>
+  
+  <!-- DNS server reachable: Config check -->
+  <rect x="400" y="420" width="140" height="60" class="check-node"/>
+  <text x="470" y="440" text-anchor="middle" class="step-label">DNS設定確認</text>
+  <text x="470" y="455" text-anchor="middle" class="command">/etc/resolv.conf</text>
+  <text x="470" y="470" text-anchor="middle" class="command">/etc/nsswitch.conf</text>
+  
+  <!-- DNS server unreachable: IP check -->
+  <rect x="200" y="520" width="140" height="60" class="solution-node"/>
+  <text x="270" y="540" text-anchor="middle" class="step-label">DNSサーバーIP</text>
+  <text x="270" y="555" text-anchor="middle" class="step-label">確認・変更</text>
+  <text x="270" y="570" text-anchor="middle" class="command">8.8.8.8, 1.1.1.1</text>
+  
+  <!-- Authority server check -->
+  <ellipse cx="470" cy="530" rx="70" ry="30" class="decision-node"/>
+  <text x="470" y="525" text-anchor="middle" class="step-label">権威サーバー</text>
+  <text x="470" y="538" text-anchor="middle" class="step-label">応答確認</text>
+  
+  <!-- Authority server OK: TTL/Cache -->
+  <rect x="600" y="420" width="140" height="60" class="check-node"/>
+  <text x="670" y="440" text-anchor="middle" class="step-label">TTL/キャッシュ</text>
+  <text x="670" y="455" text-anchor="middle" class="step-label">問題調査</text>
+  <text x="670" y="470" text-anchor="middle" class="command">dig +trace</text>
+  
+  <!-- Authority server NG: Server failure -->
+  <rect x="400" y="600" width="140" height="60" class="solution-node"/>
+  <text x="470" y="620" text-anchor="middle" class="step-label">権威サーバー</text>
+  <text x="470" y="635" text-anchor="middle" class="step-label">障害確認</text>
+  <text x="470" y="650" text-anchor="middle" class="command">別DNSで確認</text>
+  
+  <!-- Final solution -->
+  <rect x="600" y="520" width="140" height="60" class="solution-node"/>
+  <text x="670" y="545" text-anchor="middle" class="step-label">✅ 解決策実装</text>
+  <text x="670" y="560" text-anchor="middle" class="action-label">問題を修正</text>
+  
+  <!-- Flow arrows -->
+  <line x1="450" y1="110" x2="450" y2="130" class="flow-arrow"/>
+  
+  <!-- From basic connectivity check -->
+  <line x1="400" y1="170" x2="320" y2="240" class="ok-flow"/>
+  <line x1="500" y1="170" x2="580" y2="240" class="ng-flow"/>
+  
+  <!-- From name resolution test -->
+  <line x1="270" y1="290" x2="270" y2="325" class="flow-arrow"/>
+  
+  <!-- From resolution result -->
+  <line x1="230" y1="365" x2="150" y2="420" class="ok-flow"/>
+  <line x1="270" y1="375" x2="270" y2="410" class="ng-flow"/>
+  
+  <!-- From DNS server reachability -->
+  <line x1="340" y1="450" x2="400" y2="450" class="ok-flow"/>
+  <line x1="270" y1="470" x2="270" y2="520" class="ng-flow"/>
+  
+  <!-- From config check -->
+  <line x1="470" y1="480" x2="470" y2="500" class="flow-arrow"/>
+  
+  <!-- From authority server check -->
+  <line x1="540" y1="520" x2="620" y2="460" class="ok-flow"/>
+  <line x1="470" y1="560" x2="470" y2="600" class="ng-flow"/>
+  
+  <!-- To final solution -->
+  <line x1="670" y1="480" x2="670" y2="520" class="flow-arrow"/>
+  
+  <!-- Labels for flow conditions -->
+  <text x="360" y="210" class="result-ok">OK</text>
+  <text x="540" y="210" class="result-ng">NG</text>
+  <text x="180" y="395" class="result-ok">成功</text>
+  <text x="275" y="395" class="result-ng">失敗</text>
+  <text x="365" y="435" class="result-ok">到達可</text>
+  <text x="275" y="495" class="result-ng">到達不可</text>
+  <text x="585" y="485" class="result-ok">応答あり</text>
+  <text x="475" y="585" class="result-ng">応答なし</text>
+  
+  <!-- Command examples at bottom -->
+  <rect x="50" y="600" width="800" height="80" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="620" class="step-label">🛠️ 主要な診断コマンド:</text>
+  <text x="70" y="635" class="command">ping 8.8.8.8                    # 基本接続確認</text>
+  <text x="70" y="650" class="command">nslookup example.com            # 名前解決テスト</text>
+  <text x="70" y="665" class="command">dig @8.8.8.8 example.com        # 特定DNSサーバーでテスト</text>
+  
+  <text x="450" y="635" class="command">systemd-resolve --status        # DNS設定確認</text>
+  <text x="450" y="650" class="command">dig +trace example.com          # 権威サーバーまで追跡</text>
+  <text x="450" y="665" class="command">getent hosts example.com        # システム設定での解決</text>
+</svg>

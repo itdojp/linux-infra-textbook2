@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="700" height="600" viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg">
+  <title>Linuxカーネル空間でのパケット処理フロー</title>
+  <desc>ユーザー空間からハードウェアまでのネットワークパケット処理の流れ</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .section-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .component-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 600; fill: #1976d2; }
+      .description { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #666; }
+      .protocols { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 400; fill: #7b1fa2; }
+      
+      .userspace-bg { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 8; }
+      .kernelspace-bg { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; rx: 8; }
+      .hardware-bg { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; rx: 8; }
+      
+      .user-component { fill: #c8e6c9; stroke: #388e3c; stroke-width: 1.5; rx: 4; }
+      .kernel-component { fill: #ffcc02; stroke: #f57c00; stroke-width: 1.5; rx: 4; }
+      .hardware-component { fill: #e1bee7; stroke: #7b1fa2; stroke-width: 1.5; rx: 4; }
+      
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .data-flow { stroke: #1976d2; stroke-width: 2; fill: none; marker-end: url(#arrowhead-blue); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1976d2" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="700" height="600" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="350" y="30" text-anchor="middle" class="title">Linuxネットワークスタック</text>
+  
+  <!-- User Space -->
+  <rect x="50" y="60" width="600" height="120" class="userspace-bg"/>
+  <text x="70" y="80" class="section-title">ユーザー空間</text>
+  
+  <!-- Applications -->
+  <rect x="80" y="90" width="120" height="70" class="user-component"/>
+  <text x="140" y="110" text-anchor="middle" class="component-label">アプリケーション</text>
+  <text x="140" y="125" text-anchor="middle" class="protocols">nginx, apache</text>
+  <text x="140" y="140" text-anchor="middle" class="protocols">ssh, curl</text>
+  <text x="140" y="155" text-anchor="middle" class="protocols">web browser</text>
+  
+  <!-- System Calls -->
+  <rect x="220" y="90" width="120" height="70" class="user-component"/>
+  <text x="280" y="110" text-anchor="middle" class="component-label">システムコール</text>
+  <text x="280" y="125" text-anchor="middle" class="protocols">socket()</text>
+  <text x="280" y="140" text-anchor="middle" class="protocols">send(), recv()</text>
+  <text x="280" y="155" text-anchor="middle" class="protocols">bind(), listen()</text>
+  
+  <!-- Libraries -->
+  <rect x="360" y="90" width="120" height="70" class="user-component"/>
+  <text x="420" y="110" text-anchor="middle" class="component-label">ライブラリ</text>
+  <text x="420" y="125" text-anchor="middle" class="protocols">libc</text>
+  <text x="420" y="140" text-anchor="middle" class="protocols">OpenSSL</text>
+  <text x="420" y="155" text-anchor="middle" class="protocols">libcurl</text>
+  
+  <!-- Process Control -->
+  <rect x="500" y="90" width="120" height="70" class="user-component"/>
+  <text x="560" y="110" text-anchor="middle" class="component-label">プロセス制御</text>
+  <text x="560" y="125" text-anchor="middle" class="protocols">systemd</text>
+  <text x="560" y="140" text-anchor="middle" class="protocols">init</text>
+  <text x="560" y="155" text-anchor="middle" class="protocols">shell</text>
+  
+  <!-- Kernel Space -->
+  <rect x="50" y="200" width="600" height="240" class="kernelspace-bg"/>
+  <text x="70" y="220" class="section-title">カーネル空間</text>
+  
+  <!-- Socket Layer -->
+  <rect x="80" y="230" width="240" height="50" class="kernel-component"/>
+  <text x="200" y="245" text-anchor="middle" class="component-label">ソケット層</text>
+  <text x="200" y="260" text-anchor="middle" class="protocols">AF_INET, AF_INET6, AF_UNIX</text>
+  <text x="200" y="275" text-anchor="middle" class="description">プロトコルファミリー管理</text>
+  
+  <!-- Transport Layer -->
+  <rect x="360" y="230" width="240" height="50" class="kernel-component"/>
+  <text x="480" y="245" text-anchor="middle" class="component-label">トランスポート層</text>
+  <text x="480" y="260" text-anchor="middle" class="protocols">TCP/UDP スタック</text>
+  <text x="480" y="275" text-anchor="middle" class="description">信頼性制御・ポート管理</text>
+  
+  <!-- Network Layer -->
+  <rect x="80" y="290" width="240" height="50" class="kernel-component"/>
+  <text x="200" y="305" text-anchor="middle" class="component-label">ネットワーク層</text>
+  <text x="200" y="320" text-anchor="middle" class="protocols">IPv4/IPv6 ルーティング</text>
+  <text x="200" y="335" text-anchor="middle" class="description">パケットルーティング・転送</text>
+  
+  <!-- Netfilter -->
+  <rect x="360" y="290" width="240" height="50" class="kernel-component"/>
+  <text x="480" y="305" text-anchor="middle" class="component-label">Netfilter/iptables</text>
+  <text x="480" y="320" text-anchor="middle" class="protocols">パケットフィルタリング</text>
+  <text x="480" y="335" text-anchor="middle" class="description">ファイアウォール・NAT</text>
+  
+  <!-- Data Link Layer -->
+  <rect x="80" y="350" width="240" height="50" class="kernel-component"/>
+  <text x="200" y="365" text-anchor="middle" class="component-label">データリンク層</text>
+  <text x="200" y="380" text-anchor="middle" class="protocols">Ethernet, WiFi, PPP</text>
+  <text x="200" y="395" text-anchor="middle" class="description">フレーム構築・エラー検出</text>
+  
+  <!-- Device Driver -->
+  <rect x="360" y="350" width="240" height="50" class="kernel-component"/>
+  <text x="480" y="365" text-anchor="middle" class="component-label">デバイスドライバ</text>
+  <text x="480" y="380" text-anchor="middle" class="protocols">NIC固有ドライバ</text>
+  <text x="480" y="395" text-anchor="middle" class="description">ハードウェア制御</text>
+  
+  <!-- Hardware -->
+  <rect x="50" y="460" width="600" height="100" class="hardware-bg"/>
+  <text x="70" y="480" class="section-title">ハードウェア</text>
+  
+  <!-- NIC -->
+  <rect x="100" y="490" width="150" height="50" class="hardware-component"/>
+  <text x="175" y="510" text-anchor="middle" class="component-label">ネットワークカード</text>
+  <text x="175" y="525" text-anchor="middle" class="description">物理的な信号送受信</text>
+  
+  <!-- CPU -->
+  <rect x="275" y="490" width="150" height="50" class="hardware-component"/>
+  <text x="350" y="510" text-anchor="middle" class="component-label">CPU</text>
+  <text x="350" y="525" text-anchor="middle" class="description">パケット処理・割り込み</text>
+  
+  <!-- Memory -->
+  <rect x="450" y="490" width="150" height="50" class="hardware-component"/>
+  <text x="525" y="510" text-anchor="middle" class="component-label">メモリ</text>
+  <text x="525" y="525" text-anchor="middle" class="description">バッファ・キュー管理</text>
+  
+  <!-- Data flow arrows -->
+  <line x1="200" y1="180" x2="200" y2="230" class="data-flow"/>
+  <line x1="480" y1="180" x2="480" y2="230" class="data-flow"/>
+  
+  <line x1="200" y1="280" x2="200" y2="290" class="data-flow"/>
+  <line x1="480" y1="280" x2="480" y2="290" class="data-flow"/>
+  
+  <line x1="200" y1="340" x2="200" y2="350" class="data-flow"/>
+  <line x1="480" y1="340" x2="480" y2="350" class="data-flow"/>
+  
+  <line x1="350" y1="400" x2="350" y2="460" class="data-flow"/>
+  
+  <!-- Horizontal connections in kernel -->
+  <line x1="320" y1="255" x2="360" y2="255" class="arrow"/>
+  <line x1="320" y1="315" x2="360" y2="315" class="arrow"/>
+  <line x1="320" y1="375" x2="360" y2="375" class="arrow"/>
+</svg>

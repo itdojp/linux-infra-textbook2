@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="700" height="300" viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+  <title>Podmanのアーキテクチャ</title>
+  <desc>Podman環境における各コンポーネント間の関係とデータフロー</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .component-name { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 600; fill: #333; }
+      .command { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 400; fill: #7b1fa2; }
+      .description { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #666; }
+      .benefit { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 9px; font-weight: 400; fill: #2e7d32; }
+      
+      .user-box { fill: #c8e6c9; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      .cli-box { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 6; }
+      .libpod-box { fill: #e1f5fe; stroke: #03a9f4; stroke-width: 2; rx: 6; }
+      .runtime-box { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; rx: 6; }
+      
+      .flow-arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .direct-arrow { stroke: #4caf50; stroke-width: 2; fill: none; marker-end: url(#arrowhead-green); }
+      .fork-arrow { stroke: #9c27b0; stroke-width: 2; fill: none; marker-end: url(#arrowhead-purple); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50" />
+    </marker>
+    <marker id="arrowhead-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9c27b0" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="700" height="300" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="350" y="25" text-anchor="middle" class="title">Podmanのアーキテクチャ</text>
+  
+  <!-- User -->
+  <rect x="50" y="60" width="120" height="80" class="user-box"/>
+  <text x="110" y="80" text-anchor="middle" class="component-name">ユーザー</text>
+  <text x="110" y="95" text-anchor="middle" class="benefit">一般権限のまま</text>
+  <text x="110" y="110" text-anchor="middle" class="description">グループ追加不要</text>
+  <text x="110" y="125" text-anchor="middle" class="description">セキュアな実行</text>
+  
+  <!-- Podman CLI -->
+  <rect x="200" y="60" width="120" height="80" class="cli-box"/>
+  <text x="260" y="80" text-anchor="middle" class="component-name">Podman CLI</text>
+  <text x="260" y="95" text-anchor="middle" class="command">podman run</text>
+  <text x="260" y="110" text-anchor="middle" class="command">podman build</text>
+  <text x="260" y="125" text-anchor="middle" class="description">統合クライアント</text>
+  
+  <!-- libpod -->
+  <rect x="350" y="60" width="120" height="80" class="libpod-box"/>
+  <text x="410" y="80" text-anchor="middle" class="component-name">libpod</text>
+  <text x="410" y="95" text-anchor="middle" class="description">ライブラリ</text>
+  <text x="410" y="110" text-anchor="middle" class="description">プロセス内実行</text>
+  <text x="410" y="125" text-anchor="middle" class="benefit">デーモンレス</text>
+  
+  <!-- OCI Runtime -->
+  <rect x="500" y="60" width="120" height="80" class="runtime-box"/>
+  <text x="560" y="80" text-anchor="middle" class="component-name">OCI Runtime</text>
+  <text x="560" y="95" text-anchor="middle" class="command">crun/runc</text>
+  <text x="560" y="110" text-anchor="middle" class="description">実際のコンテナ</text>
+  <text x="560" y="125" text-anchor="middle" class="description">実行</text>
+  
+  <!-- Flow arrows -->
+  <line x1="170" y1="100" x2="200" y2="100" class="flow-arrow"/>
+  <line x1="320" y1="100" x2="350" y2="100" class="direct-arrow"/>
+  <line x1="470" y1="100" x2="500" y2="100" class="fork-arrow"/>
+  
+  <!-- Arrow labels -->
+  <text x="185" y="95" text-anchor="middle" class="description">利用</text>
+  <text x="335" y="95" text-anchor="middle" class="benefit">直接呼び出し</text>
+  <text x="485" y="90" text-anchor="middle" class="command">fork/exec</text>
+  
+  <!-- Benefits description -->
+  <rect x="50" y="170" width="600" height="90" fill="#e8f5e8" stroke="#4caf50" stroke-width="1" rx="4"/>
+  <text x="60" y="185" class="benefit">✅ Podmanの利点:</text>
+  <text x="60" y="200" class="benefit">• デーモンプロセス不要 - 必要なときだけリソース使用</text>
+  <text x="60" y="215" class="benefit">• 一般ユーザー権限で実行可能 - セキュリティリスク軽減</text>
+  <text x="60" y="230" text-anchor="start" class="benefit">• systemdとのネイティブ統合 - サービス管理が容易</text>
+  <text x="60" y="245" text-anchor="start" class="benefit">• Docker CLIと互換性あり - 学習コスト最小</text>
+</svg>

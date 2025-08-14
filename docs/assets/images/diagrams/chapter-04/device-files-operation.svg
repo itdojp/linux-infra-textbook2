@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <title>Linux特殊デバイスファイルの動作</title>
+  <desc>/dev/null、/dev/zero、/dev/urandom の機能と使用例を視覚的に説明</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .section-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 400; fill: #333; }
+      .device-label { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 12px; font-weight: 600; fill: #d32f2f; }
+      .annotation { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #666; }
+      .command { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 10px; font-weight: 400; fill: #0066cc; }
+      .data { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 400; fill: #388e3c; }
+      
+      .null-box { fill: #263238; stroke: #37474f; stroke-width: 2; rx: 8; }
+      .zero-box { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 8; }
+      .random-box { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; rx: 8; }
+      .app-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 1.5; rx: 4; }
+      .output-box { fill: #fce4ec; stroke: #e91e63; stroke-width: 1.5; rx: 4; }
+      
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .data-flow { stroke: #4caf50; stroke-width: 2; fill: none; marker-end: url(#arrowhead-green); }
+      .destroy-flow { stroke: #f44336; stroke-width: 2; fill: none; marker-end: url(#arrowhead-red); stroke-dasharray: 4,4; }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50" />
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f44336" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="title">Linux特殊デバイスファイルの動作</text>
+  
+  <!-- /dev/null Section -->
+  <text x="50" y="70" class="section-title">1. /dev/null - ブラックホール</text>
+  
+  <rect x="50" y="80" width="120" height="80" class="app-box"/>
+  <text x="110" y="100" text-anchor="middle" class="label">📝 アプリケーション</text>
+  <text x="110" y="115" text-anchor="middle" class="label">出力</text>
+  <text x="110" y="130" text-anchor="middle" class="annotation">大量のログ</text>
+  <text x="110" y="145" text-anchor="middle" class="annotation">エラーメッセージ</text>
+  
+  <rect x="220" y="80" width="120" height="80" class="null-box"/>
+  <text x="280" y="105" text-anchor="middle" class="device-label" fill="white">/dev/null</text>
+  <text x="280" y="120" text-anchor="middle" class="annotation" fill="white">🗑️ ブラックホール</text>
+  <text x="280" y="135" text-anchor="middle" class="annotation" fill="white">すべてのデータを</text>
+  <text x="280" y="150" text-anchor="middle" class="annotation" fill="white">破棄</text>
+  
+  <path d="M 380 120 Q 420 120 420 140 Q 420 160 460 160" class="destroy-flow"/>
+  <text x="470" y="165" class="annotation">💨 消失</text>
+  
+  <line x1="170" y1="120" x2="220" y2="120" class="arrow"/>
+  <text x="195" y="115" text-anchor="middle" class="annotation">リダイレクト</text>
+  
+  <rect x="50" y="180" width="290" height="30" fill="#f5f5f5" stroke="#ddd" stroke-width="1" rx="4"/>
+  <text x="60" y="200" class="command">command > /dev/null 2>&1</text>
+  
+  <!-- /dev/zero Section -->
+  <text x="50" y="240" class="section-title">2. /dev/zero - 無限のゼロ供給源</text>
+  
+  <rect x="50" y="250" width="120" height="80" class="zero-box"/>
+  <text x="110" y="275" text-anchor="middle" class="device-label">/dev/zero</text>
+  <text x="110" y="290" text-anchor="middle" class="annotation">🔢 無限のゼロ</text>
+  <text x="110" y="305" text-anchor="middle" class="data">00000000</text>
+  <text x="110" y="320" text-anchor="middle" class="data">00000000...</text>
+  
+  <rect x="220" y="250" width="120" height="80" class="output-box"/>
+  <text x="280" y="275" text-anchor="middle" class="label">📄 ファイル作成</text>
+  <text x="280" y="290" text-anchor="middle" class="annotation">初期化</text>
+  <text x="280" y="305" text-anchor="middle" class="annotation">速度測定</text>
+  <text x="280" y="320" text-anchor="middle" class="annotation">領域確保</text>
+  
+  <line x1="170" y1="290" x2="220" y2="290" class="data-flow"/>
+  <text x="195" y="285" text-anchor="middle" class="annotation">読み取り</text>
+  
+  <rect x="50" y="350" width="290" height="30" fill="#f5f5f5" stroke="#ddd" stroke-width="1" rx="4"/>
+  <text x="60" y="370" class="command">dd if=/dev/zero of=bigfile bs=1M count=1024</text>
+  
+  <!-- /dev/urandom Section -->
+  <text x="400" y="240" class="section-title">3. /dev/urandom - 乱数生成器</text>
+  
+  <rect x="400" y="250" width="120" height="80" class="random-box"/>
+  <text x="460" y="275" text-anchor="middle" class="device-label">/dev/urandom</text>
+  <text x="460" y="290" text-anchor="middle" class="annotation">🎯 疑似乱数</text>
+  <text x="460" y="305" text-anchor="middle" class="data">A7F9B2C4</text>
+  <text x="460" y="320" text-anchor="middle" class="data">3E8D1F95...</text>
+  
+  <rect x="570" y="250" width="120" height="80" class="output-box"/>
+  <text x="630" y="275" text-anchor="middle" class="label">📝 パスワード生成</text>
+  <text x="630" y="290" text-anchor="middle" class="annotation">暗号鍵作成</text>
+  <text x="630" y="305" text-anchor="middle" class="annotation">セッションID</text>
+  <text x="630" y="320" text-anchor="middle" class="annotation">ランダムデータ</text>
+  
+  <line x1="520" y1="290" x2="570" y2="290" class="data-flow"/>
+  <text x="545" y="285" text-anchor="middle" class="annotation">読み取り</text>
+  
+  <rect x="400" y="350" width="290" height="30" fill="#f5f5f5" stroke="#ddd" stroke-width="1" rx="4"/>
+  <text x="410" y="370" class="command">tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12</text>
+  
+  <!-- /dev/random vs /dev/urandom comparison -->
+  <text x="400" y="410" class="section-title">乱数デバイス比較</text>
+  
+  <rect x="400" y="420" width="140" height="100" fill="#fff3e0" stroke="#ff9800" stroke-width="1" rx="4"/>
+  <text x="470" y="440" text-anchor="middle" class="device-label">/dev/random</text>
+  <text x="470" y="455" text-anchor="middle" class="annotation">🔐 真の乱数</text>
+  <text x="470" y="470" text-anchor="middle" class="annotation">高品質・低速</text>
+  <text x="470" y="485" text-anchor="middle" class="annotation">暗号用途</text>
+  <text x="470" y="500" text-anchor="middle" class="annotation">エントロピー依存</text>
+  
+  <rect x="560" y="420" width="140" height="100" fill="#e8f5e8" stroke="#4caf50" stroke-width="1" rx="4"/>
+  <text x="630" y="440" text-anchor="middle" class="device-label">/dev/urandom</text>
+  <text x="630" y="455" text-anchor="middle" class="annotation">🎯 疑似乱数</text>
+  <text x="630" y="470" text-anchor="middle" class="annotation">高速・実用的</text>
+  <text x="630" y="485" text-anchor="middle" class="annotation">一般用途</text>
+  <text x="630" y="500" text-anchor="middle" class="annotation">常時利用可能</text>
+  
+  <!-- Key principle at bottom -->
+  <rect x="50" y="540" width="700" height="40" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="70" y="555" class="section-title">統一原理:</text>
+  <text x="70" y="570" class="label">すべてが「ファイル」として扱えるため、同じコマンド（cat、echo、cp等）で操作可能</text>
+</svg>

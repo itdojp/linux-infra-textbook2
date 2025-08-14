@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <title>OSI参照モデル vs TCP/IPモデル</title>
+  <desc>OSI 7層モデルとTCP/IP 4層モデルの対応関係</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 18px; font-weight: 600; fill: #1a1a1a; }
+      .model-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #333; }
+      .layer-number { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 600; fill: #1976d2; }
+      .layer-name { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 400; fill: #333; }
+      .protocols { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 9px; font-weight: 400; fill: #7b1fa2; }
+      .comparison-arrow { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 14px; font-weight: 600; fill: #f57c00; }
+      
+      .osi-layer { fill: #e3f2fd; stroke: #1976d2; stroke-width: 1.5; }
+      .tcp-layer { fill: #e8f5e8; stroke: #388e3c; stroke-width: 1.5; }
+      .mapping-line { stroke: #ff9800; stroke-width: 2; stroke-dasharray: 5,5; fill: none; }
+      
+      .vs-circle { fill: #fff3e0; stroke: #ff9800; stroke-width: 3; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="500" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="title">OSI参照モデル vs TCP/IPモデル</text>
+  
+  <!-- VS Symbol -->
+  <circle cx="400" cy="250" r="30" class="vs-circle"/>
+  <text x="400" y="258" text-anchor="middle" class="comparison-arrow">VS</text>
+  
+  <!-- OSI Model -->
+  <text x="200" y="70" text-anchor="middle" class="model-title">OSI参照モデル（7層）</text>
+  
+  <!-- OSI Layer 7 -->
+  <rect x="50" y="90" width="300" height="40" rx="4" class="osi-layer"/>
+  <text x="70" y="105" class="layer-number">7</text>
+  <text x="90" y="105" class="layer-name">アプリケーション</text>
+  <text x="70" y="120" class="protocols">HTTP, FTP, SSH, DNS</text>
+  
+  <!-- OSI Layer 6 -->
+  <rect x="50" y="140" width="300" height="40" rx="4" class="osi-layer"/>
+  <text x="70" y="155" class="layer-number">6</text>
+  <text x="90" y="155" class="layer-name">プレゼンテーション</text>
+  <text x="70" y="170" class="protocols">SSL/TLS, JPEG</text>
+  
+  <!-- OSI Layer 5 -->
+  <rect x="50" y="190" width="300" height="40" rx="4" class="osi-layer"/>
+  <text x="70" y="205" class="layer-number">5</text>
+  <text x="90" y="205" class="layer-name">セッション</text>
+  <text x="70" y="220" class="protocols">NetBIOS, SQL</text>
+  
+  <!-- OSI Layer 4 -->
+  <rect x="50" y="240" width="300" height="40" rx="4" class="osi-layer"/>
+  <text x="70" y="255" class="layer-number">4</text>
+  <text x="90" y="255" class="layer-name">トランスポート</text>
+  <text x="70" y="270" class="protocols">TCP, UDP</text>
+  
+  <!-- OSI Layer 3 -->
+  <rect x="50" y="290" width="300" height="40" rx="4" class="osi-layer"/>
+  <text x="70" y="305" class="layer-number">3</text>
+  <text x="90" y="305" class="layer-name">ネットワーク</text>
+  <text x="70" y="320" class="protocols">IP, ICMP, ARP</text>
+  
+  <!-- OSI Layer 2 -->
+  <rect x="50" y="340" width="300" height="40" rx="4" class="osi-layer"/>
+  <text x="70" y="355" class="layer-number">2</text>
+  <text x="90" y="355" class="layer-name">データリンク</text>
+  <text x="70" y="370" class="protocols">Ethernet, WiFi</text>
+  
+  <!-- OSI Layer 1 -->
+  <rect x="50" y="390" width="300" height="40" rx="4" class="osi-layer"/>
+  <text x="70" y="405" class="layer-number">1</text>
+  <text x="90" y="405" class="layer-name">物理</text>
+  <text x="70" y="420" class="protocols">ケーブル, 無線電波</text>
+  
+  <!-- TCP/IP Model -->
+  <text x="600" y="70" text-anchor="middle" class="model-title">TCP/IPモデル（4層）</text>
+  
+  <!-- TCP/IP Layer 4 -->
+  <rect x="450" y="110" width="300" height="80" rx="4" class="tcp-layer"/>
+  <text x="470" y="130" class="layer-number">4</text>
+  <text x="490" y="130" class="layer-name">アプリケーション層</text>
+  <text x="470" y="145" class="protocols">HTTP, HTTPS, FTP, SSH</text>
+  <text x="470" y="160" class="protocols">SMTP, DNS, DHCP</text>
+  <text x="470" y="175" class="protocols">（OSI 5-7層に対応）</text>
+  
+  <!-- TCP/IP Layer 3 -->
+  <rect x="450" y="200" width="300" height="60" rx="4" class="tcp-layer"/>
+  <text x="470" y="220" class="layer-number">3</text>
+  <text x="490" y="220" class="layer-name">トランスポート層</text>
+  <text x="470" y="235" class="protocols">TCP, UDP</text>
+  <text x="470" y="250" class="protocols">（OSI 4層に対応）</text>
+  
+  <!-- TCP/IP Layer 2 -->
+  <rect x="450" y="270" width="300" height="60" rx="4" class="tcp-layer"/>
+  <text x="470" y="290" class="layer-number">2</text>
+  <text x="490" y="290" class="layer-name">インターネット層</text>
+  <text x="470" y="305" class="protocols">IP, ICMP, ARP</text>
+  <text x="470" y="320" class="protocols">（OSI 3層に対応）</text>
+  
+  <!-- TCP/IP Layer 1 -->
+  <rect x="450" y="340" width="300" height="80" rx="4" class="tcp-layer"/>
+  <text x="470" y="360" class="layer-number">1</text>
+  <text x="490" y="360" class="layer-name">ネットワーク</text>
+  <text x="490" y="375" class="layer-name">インターフェース層</text>
+  <text x="470" y="390" class="protocols">Ethernet, WiFi, PPP</text>
+  <text x="470" y="405" class="protocols">（OSI 1-2層に対応）</text>
+  
+  <!-- Mapping Lines -->
+  <line x1="350" y1="150" x2="450" y2="150" class="mapping-line"/>
+  <line x1="350" y1="260" x2="450" y2="230" class="mapping-line"/>
+  <line x1="350" y1="310" x2="450" y2="300" class="mapping-line"/>
+  <line x1="350" y1="380" x2="450" y2="380" class="mapping-line"/>
+  
+  <!-- Key Point -->
+  <rect x="200" y="450" width="400" height="40" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="4"/>
+  <text x="220" y="465" class="layer-name">📌 重要：</text>
+  <text x="220" y="480" class="layer-name">実際のネットワーク実装はTCP/IPモデルベース。OSIは理論的参考モデル。</text>
+</svg>

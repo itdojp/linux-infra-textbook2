@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="700" height="500" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
+  <title>Linuxカーネル・ユーザーランドアーキテクチャ</title>
+  <desc>Linuxシステムの階層構造：ユーザーランド空間、カーネル空間、ハードウェア層の関係とシステムコールによる通信</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .section-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 14px; font-weight: 600; fill: #333; }
+      .label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 400; fill: #333; }
+      .app-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 400; fill: #0066cc; }
+      .kernel-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 400; fill: #d32f2f; }
+      .hardware-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 11px; font-weight: 400; fill: #388e3c; }
+      .annotation { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #666; }
+      .syscall-label { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 10px; font-weight: 400; fill: #7b1fa2; }
+      
+      .userland-bg { fill: #e8f5e8; stroke: #4caf50; stroke-width: 2; rx: 8; }
+      .kernel-bg { fill: #fff3e0; stroke: #ff9800; stroke-width: 2; rx: 8; }
+      .hardware-bg { fill: #f3e5f5; stroke: #9c27b0; stroke-width: 2; rx: 8; }
+      
+      .app-box { fill: #bbdefb; stroke: #1976d2; stroke-width: 1.5; rx: 4; }
+      .kernel-box { fill: #ffcdd2; stroke: #d32f2f; stroke-width: 1.5; rx: 4; }
+      .hardware-box { fill: #c8e6c9; stroke: #388e3c; stroke-width: 1.5; rx: 4; }
+      
+      .arrow { stroke: #7b1fa2; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .bidirectional { stroke: #7b1fa2; stroke-width: 2; fill: none; marker-end: url(#arrowhead); marker-start: url(#arrowhead); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7b1fa2" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="700" height="500" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="350" y="30" text-anchor="middle" class="title">Linux システムアーキテクチャ</text>
+  
+  <!-- Userland Space -->
+  <rect x="50" y="60" width="600" height="120" class="userland-bg"/>
+  <text x="70" y="80" class="section-title">ユーザーランド空間</text>
+  
+  <!-- Applications -->
+  <rect x="80" y="90" width="100" height="70" class="app-box"/>
+  <text x="130" y="110" text-anchor="middle" class="app-label">🌐 Firefox</text>
+  <text x="130" y="125" text-anchor="middle" class="annotation">(ブラウザ)</text>
+  <text x="130" y="140" text-anchor="middle" class="annotation">Webページ表示</text>
+  <text x="130" y="155" text-anchor="middle" class="annotation">ネットワーク通信</text>
+  
+  <rect x="200" y="90" width="100" height="70" class="app-box"/>
+  <text x="250" y="110" text-anchor="middle" class="app-label">🚀 nginx</text>
+  <text x="250" y="125" text-anchor="middle" class="annotation">(Webサーバ)</text>
+  <text x="250" y="140" text-anchor="middle" class="annotation">HTTP処理</text>
+  <text x="250" y="155" text-anchor="middle" class="annotation">ファイル配信</text>
+  
+  <rect x="320" y="90" width="100" height="70" class="app-box"/>
+  <text x="370" y="110" text-anchor="middle" class="app-label">🐍 Python</text>
+  <text x="370" y="125" text-anchor="middle" class="annotation">(プログラム)</text>
+  <text x="370" y="140" text-anchor="middle" class="annotation">データ処理</text>
+  <text x="370" y="155" text-anchor="middle" class="annotation">計算実行</text>
+  
+  <rect x="440" y="90" width="100" height="70" class="app-box"/>
+  <text x="490" y="110" text-anchor="middle" class="app-label">📊 PostgreSQL</text>
+  <text x="490" y="125" text-anchor="middle" class="annotation">(データベース)</text>
+  <text x="490" y="140" text-anchor="middle" class="annotation">データ保存</text>
+  <text x="490" y="155" text-anchor="middle" class="annotation">クエリ処理</text>
+  
+  <rect x="560" y="90" width="80" height="70" class="app-box"/>
+  <text x="600" y="110" text-anchor="middle" class="app-label">🛠️ あなたの</text>
+  <text x="600" y="125" text-anchor="middle" class="app-label">プログラム</text>
+  <text x="600" y="140" text-anchor="middle" class="annotation">カスタム</text>
+  <text x="600" y="155" text-anchor="middle" class="annotation">アプリケーション</text>
+  
+  <!-- System Call Interface -->
+  <line x1="130" y1="180" x2="130" y2="200" class="arrow"/>
+  <line x1="250" y1="180" x2="250" y2="200" class="arrow"/>
+  <line x1="370" y1="180" x2="370" y2="200" class="arrow"/>
+  <line x1="490" y1="180" x2="490" y2="200" class="arrow"/>
+  <line x1="600" y1="180" x2="600" y2="200" class="arrow"/>
+  
+  <text x="350" y="195" text-anchor="middle" class="syscall-label">システムコール (open, read, write, close, socket, fork...)</text>
+  
+  <!-- Kernel Space -->
+  <rect x="50" y="210" width="600" height="160" class="kernel-bg"/>
+  <text x="70" y="230" class="section-title">カーネル空間</text>
+  
+  <!-- Linux Kernel -->
+  <rect x="80" y="240" width="560" height="110" class="kernel-box"/>
+  <text x="360" y="260" text-anchor="middle" class="kernel-label">Linuxカーネル</text>
+  
+  <!-- Kernel Subsystems -->
+  <rect x="100" y="270" width="90" height="60" fill="#ffebee" stroke="#d32f2f" stroke-width: 1 rx="4"/>
+  <text x="145" y="290" text-anchor="middle" class="kernel-label">プロセス</text>
+  <text x="145" y="305" text-anchor="middle" class="kernel-label">管理</text>
+  <text x="145" y="320" text-anchor="middle" class="annotation">実行制御</text>
+  
+  <rect x="210" y="270" width="90" height="60" fill="#ffebee" stroke="#d32f2f" stroke-width: 1 rx="4"/>
+  <text x="255" y="290" text-anchor="middle" class="kernel-label">メモリ</text>
+  <text x="255" y="305" text-anchor="middle" class="kernel-label">管理</text>
+  <text x="255" y="320" text-anchor="middle" class="annotation">領域割当</text>
+  
+  <rect x="320" y="270" width="90" height="60" fill="#ffebee" stroke="#d32f2f" stroke-width: 1 rx="4"/>
+  <text x="365" y="290" text-anchor="middle" class="kernel-label">ファイル</text>
+  <text x="365" y="305" text-anchor="middle" class="kernel-label">システム</text>
+  <text x="365" y="320" text-anchor="middle" class="annotation">データ管理</text>
+  
+  <rect x="430" y="270" width="90" height="60" fill="#ffebee" stroke="#d32f2f" stroke-width: 1 rx="4"/>
+  <text x="475" y="290" text-anchor="middle" class="kernel-label">デバイス</text>
+  <text x="475" y="305" text-anchor="middle" class="kernel-label">ドライバ</text>
+  <text x="475" y="320" text-anchor="middle" class="annotation">HW制御</text>
+  
+  <rect x="540" y="270" width="90" height="60" fill="#ffebee" stroke="#d32f2f" stroke-width: 1 rx="4"/>
+  <text x="585" y="290" text-anchor="middle" class="kernel-label">ネットワーク</text>
+  <text x="585" y="305" text-anchor="middle" class="kernel-label">管理</text>
+  <text x="585" y="320" text-anchor="middle" class="annotation">通信制御</text>
+  
+  <!-- Hardware Interface -->
+  <line x1="200" y1="370" x2="200" y2="390" class="arrow"/>
+  <line x1="350" y1="370" x2="350" y2="390" class="arrow"/>
+  <line x1="500" y1="370" x2="500" y2="390" class="arrow"/>
+  
+  <text x="350" y="385" text-anchor="middle" class="annotation">ハードウェア制御</text>
+  
+  <!-- Hardware Space -->
+  <rect x="50" y="400" width="600" height="80" class="hardware-bg"/>
+  <text x="70" y="420" class="section-title">ハードウェア</text>
+  
+  <!-- Hardware Components -->
+  <rect x="80" y="430" width="100" height="40" class="hardware-box"/>
+  <text x="130" y="445" text-anchor="middle" class="hardware-label">📱 CPU</text>
+  <text x="130" y="460" text-anchor="middle" class="annotation">計算処理</text>
+  
+  <rect x="200" y="430" width="100" height="40" class="hardware-box"/>
+  <text x="250" y="445" text-anchor="middle" class="hardware-label">💾 メモリ</text>
+  <text x="250" y="460" text-anchor="middle" class="annotation">データ保存</text>
+  
+  <rect x="320" y="430" width="100" height="40" class="hardware-box"/>
+  <text x="370" y="445" text-anchor="middle" class="hardware-label">💿 ディスク</text>
+  <text x="370" y="460" text-anchor="middle" class="annotation">永続保存</text>
+  
+  <rect x="440" y="430" width="100" height="40" class="hardware-box"/>
+  <text x="490" y="445" text-anchor="middle" class="hardware-label">🌐 NIC</text>
+  <text x="490" y="460" text-anchor="middle" class="annotation">ネットワーク</text>
+  
+  <rect x="560" y="430" width="80" height="40" class="hardware-box"/>
+  <text x="600" y="445" text-anchor="middle" class="hardware-label">🔌 その他</text>
+  <text x="600" y="460" text-anchor="middle" class="annotation">周辺機器</text>
+</svg>

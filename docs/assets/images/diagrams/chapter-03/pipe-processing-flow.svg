@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <title>パイプ処理の流れ図 - ログ解析の例</title>
+  <desc>Webサーバーのログファイルから404エラーを抽出し、特定日付でフィルターして件数をカウントする処理フロー</desc>
+  
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+      .label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 12px; font-weight: 400; fill: #333; }
+      .command { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 11px; font-weight: 400; fill: #0066cc; }
+      .annotation { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; font-size: 10px; font-weight: 400; fill: #666; }
+      .result { font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace; font-size: 14px; font-weight: 600; fill: #e85d00; }
+      
+      .file-box { fill: #f8f9fa; stroke: #d1d9e0; stroke-width: 2; rx: 4; }
+      .process-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 4; }
+      .result-box { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; rx: 4; }
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .data-flow { stroke: #666; stroke-width: 1; stroke-dasharray: 3,3; fill: none; }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="600" height="400" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="300" y="30" text-anchor="middle" class="title">パイプ処理による段階的ログ解析</text>
+  
+  <!-- Source File -->
+  <rect x="50" y="60" width="140" height="60" class="file-box"/>
+  <text x="120" y="80" text-anchor="middle" class="label">📁 access.log</text>
+  <text x="120" y="95" text-anchor="middle" class="annotation">大量のログデータ</text>
+  <text x="120" y="110" text-anchor="middle" class="annotation">(数万行)</text>
+  
+  <!-- Step 1: grep "404" -->
+  <rect x="50" y="160" width="140" height="60" class="process-box"/>
+  <text x="120" y="180" text-anchor="middle" class="command">grep "404"</text>
+  <text x="120" y="195" text-anchor="middle" class="annotation">ステップ1:</text>
+  <text x="120" y="210" text-anchor="middle" class="annotation">404エラーのみ抽出</text>
+  
+  <!-- Step 2: grep date -->
+  <rect x="230" y="160" width="140" height="60" class="process-box"/>
+  <text x="300" y="180" text-anchor="middle" class="command">grep "2024-03-14"</text>
+  <text x="300" y="195" text-anchor="middle" class="annotation">ステップ2:</text>
+  <text x="300" y="210" text-anchor="middle" class="annotation">特定日付でフィルター</text>
+  
+  <!-- Step 3: wc -l -->
+  <rect x="410" y="160" width="140" height="60" class="process-box"/>
+  <text x="480" y="180" text-anchor="middle" class="command">wc -l</text>
+  <text x="480" y="195" text-anchor="middle" class="annotation">ステップ3:</text>
+  <text x="480" y="210" text-anchor="middle" class="annotation">行数をカウント</text>
+  
+  <!-- Result -->
+  <rect x="410" y="260" width="140" height="60" class="result-box"/>
+  <text x="480" y="280" text-anchor="middle" class="label">🎯 結果</text>
+  <text x="480" y="300" text-anchor="middle" class="result">42件</text>
+  
+  <!-- Arrows showing main flow -->
+  <line x1="120" y1="120" x2="120" y2="160" class="arrow"/>
+  <line x1="190" y1="190" x2="230" y2="190" class="arrow"/>
+  <line x1="370" y1="190" x2="410" y2="190" class="arrow"/>
+  <line x1="480" y1="220" x2="480" y2="260" class="arrow"/>
+  
+  <!-- Data flow annotations -->
+  <text x="200" y="140" text-anchor="middle" class="annotation">404を含む行のみ</text>
+  <text x="200" y="150" text-anchor="middle" class="annotation">(約100行)</text>
+  
+  <text x="390" y="140" text-anchor="middle" class="annotation">昨日の404エラーのみ</text>
+  <text x="390" y="150" text-anchor="middle" class="annotation">(42行)</text>
+  
+  <!-- Pipe symbols -->
+  <text x="210" y="195" text-anchor="middle" class="command">|</text>
+  <text x="390" y="195" text-anchor="middle" class="command">|</text>
+  
+  <!-- Command line at bottom -->
+  <rect x="50" y="340" width="500" height="40" fill="#f5f5f5" stroke="#ddd" stroke-width="1" rx="4"/>
+  <text x="70" y="355" class="annotation">コマンドライン:</text>
+  <text x="70" y="370" class="command">grep "404" access.log | grep "2024-03-14" | wc -l</text>
+</svg>
