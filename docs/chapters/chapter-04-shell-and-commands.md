@@ -88,7 +88,7 @@ ls photo_*.jpg
 
 ```bash
 # 危険：最後のファイル以外すべて消える
-mv *.jpg photo.jpg
+mv *.jpg photo_backup.jpg
 
 # 正解：ループで1つずつ処理
 for file in *.jpg; do

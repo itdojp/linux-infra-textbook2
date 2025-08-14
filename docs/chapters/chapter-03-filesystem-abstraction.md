@@ -58,7 +58,7 @@ echo "Hello, World!" > test.txt
 cat test.txt
 
 # 特殊ファイルでも同じ操作
-echo "test" > /dev/null   # データを捨てる
+echo "test" > /dev/null   # /dev/null: 書き込んだデータをすべて破棄する特殊ファイル
 cat /dev/zero | head -c 10  # ゼロデータを10バイト読む
 ```
 
