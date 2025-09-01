@@ -23,4 +23,4 @@ title: "はじめに"
 
 ## 次の章へ
 
-[第1章: 基本機能](../chapters/01-basic-features.md)に進みましょう。
+[第1章: Linuxの概要]({{ '/chapters/chapter-01-linux-overview.html' | relative_url }})に進みましょう。
