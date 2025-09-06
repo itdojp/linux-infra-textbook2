@@ -1,3 +1,47 @@
+introduction:
+- title: 序章
+  path: /introduction/
+chapters:
+- title: chapter-01-linux-overview
+  path: /chapters/chapter-01-linux-overview/
+- title: 第2章：基本コマンドでLinuxを探検しよう
+  path: /chapters/chapter-02-basic-commands-exploration/
+- title: chapter-02-linux-philosophy
+  path: /chapters/chapter-02-linux-philosophy/
+- title: chapter-03-filesystem-abstraction
+  path: /chapters/chapter-03-filesystem-abstraction/
+- title: 第3章：ITインフラにおけるLinuxの役割
+  path: /chapters/chapter-03-linux-philosophy/
+- title: 第4章：ファイルシステムという抽象化の威力
+  path: /chapters/chapter-04-filesystem-abstraction/
+- title: chapter-04-shell-and-commands
+  path: /chapters/chapter-04-shell-and-commands/
+- title: chapter-05-process-and-signals
+  path: /chapters/chapter-05-process-and-signals/
+- title: 第5章：シェルとコマンド - 対話的管理の基礎
+  path: /chapters/chapter-05-shell-and-commands/
+- title: chapter-06-permissions
+  path: /chapters/chapter-06-permissions/
+- title: chapter-07-tcp-ip
+  path: /chapters/chapter-07-tcp-ip/
+- title: chapter-08-name-resolution
+  path: /chapters/chapter-08-name-resolution/
+- title: chapter-09-container-evolution
+  path: /chapters/chapter-09-container-evolution/
+- title: chapter-10-podman
+  path: /chapters/chapter-10-podman/
+- title: chapter-11-with-exercises
+  path: /chapters/chapter-11-with-exercises/
+- title: chapter-12-with-exercises
+  path: /chapters/chapter-12-with-exercises/
+- title: chapter-13-with-exercises
+  path: /chapters/chapter-13-with-exercises/
+- title: chapter-14-with-exercises
+  path: /chapters/chapter-14-with-exercises/
+- title: chapter-15-infrastructure-as-code
+  path: /chapters/chapter-15-infrastructure-as-code/
 appendices:
 - title: '付録A: 設定リファレンス'
   path: /appendices/appendix-a/
+- title: merged-exercise-answers
+  path: /appendices/merged-exercise-answers/
