@@ -131,7 +131,6 @@ drwxr-xr-x  5 alice developers  4096 Mar 15 10:00 project/
 #### ディレクトリに対する権限の意味
 
 ```bash
-# ディレクトリの権限は特殊な意味を持つ
 mkdir test_dir
 chmod 755 test_dir  # rwxr-xr-x
 
@@ -144,6 +143,8 @@ chmod 644 test_dir  # rw-r--r--
 cd test_dir  # Permission denied
 ls test_dir  # ファイル名は見えるが詳細は見えない
 ```
+
+上記のコマンドは、権限の違いを体感するための「実験用」の例です。実際の業務ディレクトリで同様の chmod を行うと、思わぬアクセス障害につながる可能性があります。必ず自分のホームディレクトリ配下にテスト用ディレクトリ（例：`~/permission-test`）を作成し、その中でのみ試してください。
 
 ### 特殊な権限ビット
 
