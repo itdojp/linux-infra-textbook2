@@ -457,8 +457,8 @@ echo "Uptime: $(uptime -p)"
 
 # CPU情報
 echo -e "\n--- CPU Information ---"
-	echo "Model: $(grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2)"
-	echo "Cores: $(grep -c 'processor' /proc/cpuinfo)"
+echo "Model: $(grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2)"
+echo "Cores: $(grep -c 'processor' /proc/cpuinfo)"
 echo "Load Average: $(cat /proc/loadavg | cut -d' ' -f1-3)"
 
 # メモリ情報
