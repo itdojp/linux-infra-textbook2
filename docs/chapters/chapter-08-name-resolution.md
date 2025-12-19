@@ -587,7 +587,7 @@ echo "Run ./test_lb.sh to test load balancing"
 EOF
 ```
 
-## 8.8 基本的な診断の流れ
+## 8.6 基本的な診断の流れ
 
 ### DNS問題の体系的診断手順
 
@@ -692,7 +692,7 @@ echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
 # 解決策: DNS設定最適化、キャッシュ調整
 ```
 
-## 8.9 トラブルシューティングガイド
+## 8.7 トラブルシューティングガイド
 
 ### よくある問題と解決方法
 
@@ -756,7 +756,7 @@ search internal.local example.com
 EOF
 ```
 
-## 8.7 まとめ：名前が繋ぐネットワーク
+## 8.8 まとめ：名前が繋ぐネットワーク
 
 ### 名前解決の重要性
 
