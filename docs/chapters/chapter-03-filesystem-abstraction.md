@@ -12,7 +12,7 @@ Linuxの「すべてはファイル」という思想は、コンピュータの
 
 1960年代のコンピュータは、新しいデバイスが登場するたびに、専用のプログラムを書く必要があった：
 
-```
+```text
 プリンタA用プログラム → プリンタAを制御
 プリンタB用プログラム → プリンタBを制御
 テープドライブ用プログラム → テープを制御
@@ -25,7 +25,7 @@ Linuxの「すべてはファイル」という思想は、コンピュータの
 
 UNIXの開発者たちは画期的な解決策を思いついた：
 
-```
+```text
 あらゆるデバイス
     ↓ 「ファイル」として抽象化
 統一的な操作（open、read、write、close）
@@ -69,7 +69,7 @@ echo "緊急メッセージ" > /dev/pts/0
 
 ### Linuxファイルシステム階層
 
-Linuxのファイルシステムは、以下のような階層構造で組織されています：
+Linuxのファイルシステムは、以下のような階層構造で組織されている：
 
 ![Linuxファイルシステム階層]({{ '/assets/images/diagrams/chapter-03/linux-filesystem-hierarchy.svg' | relative_url }})
 
@@ -245,7 +245,7 @@ done
 
 #### 標準入出力もファイル
 
-```
+```text
 標準入力（stdin）  = ファイルディスクリプタ 0
 標準出力（stdout） = ファイルディスクリプタ 1
 標準エラー（stderr）= ファイルディスクリプタ 2
@@ -457,8 +457,8 @@ echo "Uptime: $(uptime -p)"
 
 # CPU情報
 echo -e "\n--- CPU Information ---"
-echo "Model: $(grep "model name" /proc/cpuinfo | head -1 | cut -d: -f2)"
-echo "Cores: $(grep -c "processor" /proc/cpuinfo)"
+	echo "Model: $(grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2)"
+	echo "Cores: $(grep -c 'processor' /proc/cpuinfo)"
 echo "Load Average: $(cat /proc/loadavg | cut -d' ' -f1-3)"
 
 # メモリ情報
@@ -501,7 +501,7 @@ ps aux --sort=-%mem | head -6 | tail -5 | awk '{printf "%-20s %5s%%\n", $11, $4}
 
 ### RAID - 冗長性とパフォーマンスの両立
 
-RAID（Redundant Array of Independent Disks）は、複数のハードディスクを組み合わせて、信頼性やパフォーマンスを向上させる技術です。
+RAID（Redundant Array of Independent Disks）は、複数のハードディスクを組み合わせて、信頼性やパフォーマンスを向上させる技術である。
 
 ```bash
 # 現在のRAID状況を確認
