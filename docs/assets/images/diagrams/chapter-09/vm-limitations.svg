@@ -108,7 +108,7 @@
   
   <rect x="80" y="190" width="120" height="50" class="guest-os"/>
   <text x="140" y="210" class="annotation">ゲストOS</text>
-  <text x="140" y="225" class="annotation">2-4GB</text>
+  <text x="140" y="225" class="annotation">2〜4GB</text>
   
   <rect x="80" y="250" width="120" height="40" class="vm-component"/>
   <text x="140" y="270" class="annotation">仮想ハードウェア</text>
@@ -123,7 +123,7 @@
   
   <rect x="280" y="190" width="120" height="50" class="guest-os"/>
   <text x="340" y="210" class="annotation">ゲストOS</text>
-  <text x="340" y="225" class="annotation">2-4GB</text>
+  <text x="340" y="225" class="annotation">2〜4GB</text>
   
   <rect x="280" y="250" width="120" height="40" class="vm-component"/>
   <text x="340" y="270" class="annotation">仮想ハードウェア</text>
@@ -138,7 +138,7 @@
   
   <rect x="480" y="190" width="120" height="50" class="guest-os"/>
   <text x="540" y="210" class="annotation">ゲストOS</text>
-  <text x="540" y="225" class="annotation">2-4GB</text>
+  <text x="540" y="225" class="annotation">2〜4GB</text>
   
   <rect x="480" y="250" width="120" height="40" class="vm-component"/>
   <text x="540" y="270" class="annotation">仮想ハードウェア</text>
