@@ -24,13 +24,13 @@
 #### 原因2: .nojekyllファイル
 - **問題**: `.nojekyll`ファイルがあるとJekyllビルドが無効化される
 - **事実**: GitHub PagesはデフォルトでJekyllを使用する
-- **対処**: 
+- **対処**
   - 通常のMarkdownサイト → `.nojekyll`を削除
   - 静的HTMLのみ → `.nojekyll`を保持
 
 #### 原因3: ディレクトリ名の大文字小文字
 - **問題**: Windowsでは`Docs`と`docs`が同じだが、GitHubでは異なる
-- **対処**: 
+- **対処**
   ```bash
   # 正しい手順
   git rm -r --cached Docs
@@ -46,7 +46,7 @@
 ### 2. GitHub Pages デプロイメント方式
 
 #### "Deploy from a branch" vs "GitHub Actions"
-- **違い**: 
+- **違い**
   - Branch: GitHubが自動的にJekyllビルド
   - Actions: カスタムビルドプロセスを使用可能
 - **選択基準**
