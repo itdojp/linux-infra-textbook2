@@ -158,7 +158,7 @@
   <text x="735" y="320" text-anchor="middle" class="disk-label">RAID 5 (分散パリティ)</text>
   <text x="620" y="340" class="feature">✅ 冗長性あり（1台故障OK）</text>
   <text x="620" y="355" class="feature">✅ バランスの取れた性能</text>
-  <text x="620" y="370" class="feature">✅ 容量効率 67-94%</text>
+  <text x="620" y="370" class="feature">✅ 容量効率 67〜94%</text>
   <text x="620" y="385" class="description">用途：サーバー・エンタープライズ</text>
   
   <!-- Comparison Table -->
@@ -235,7 +235,7 @@
   <text x="400" y="542" text-anchor="middle" class="description">バランス</text>
   
   <rect x="450" y="525" width="80" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
-  <text x="490" y="542" text-anchor="middle" class="description">67-94%</text>
+  <text x="490" y="542" text-anchor="middle" class="description">67〜94%</text>
   
   <rect x="530" y="525" width="120" height="25" fill="#ffffff" stroke="#ccc" stroke-width="1"/>
   <text x="590" y="542" text-anchor="middle" class="description">サーバー</text>

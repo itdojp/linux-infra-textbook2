@@ -35,7 +35,7 @@
   <text x="150" y="107" text-anchor="middle" class="app-label">アプリケーション1 - Node.js Web App</text>
   
   <rect x="70" y="120" width="160" height="20" class="library-box"/>
-  <text x="150" y="135" text-anchor="middle" class="description">必要なライブラリのみ 20-50MB</text>
+  <text x="150" y="135" text-anchor="middle" class="description">必要なライブラリのみ 20〜50MB</text>
   
   <!-- Container 2 -->
   <rect x="300" y="60" width="200" height="90" class="container-box"/>
@@ -45,7 +45,7 @@
   <text x="400" y="107" text-anchor="middle" class="app-label">アプリケーション2 - Python API</text>
   
   <rect x="320" y="120" width="160" height="20" class="library-box"/>
-  <text x="400" y="135" text-anchor="middle" class="description">必要なライブラリのみ 30-80MB</text>
+  <text x="400" y="135" text-anchor="middle" class="description">必要なライブラリのみ 30〜80MB</text>
   
   <!-- Container 3 -->
   <rect x="550" y="60" width="200" height="90" class="container-box"/>
@@ -55,7 +55,7 @@
   <text x="650" y="107" text-anchor="middle" class="app-label">アプリケーション3 - Redis Cache</text>
   
   <rect x="570" y="120" width="160" height="20" class="library-box"/>
-  <text x="650" y="135" text-anchor="middle" class="description">必要なライブラリのみ 10-20MB</text>
+  <text x="650" y="135" text-anchor="middle" class="description">必要なライブラリのみ 10〜20MB</text>
   
   <!-- Container Runtime -->
   <rect x="200" y="180" width="400" height="50" class="runtime-box"/>
