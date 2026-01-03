@@ -6,7 +6,8 @@
 
 - **BOOK-PROPOSAL.md** - 書籍企画書
 - **CLAUDE_TROUBLESHOOTING.md** - Claude Code用トラブルシューティングガイド
-- **README.md** - プロジェクトの概要とセットアップ手順
+- **README.md** - 読者・学習者の入口（公開ページ・目次・フィードバック窓口）
+- **QUICK-START.md** - 執筆・開発者向けセットアップ手順
 
 ## 注意事項
 
