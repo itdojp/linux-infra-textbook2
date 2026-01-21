@@ -49,6 +49,8 @@ $ sudo systemctl stop docker
 
 ### Podmanの設計思想
 
+Podmanはコンテナを管理するためのツールである。Dockerと似た操作感を維持しつつ、デーモンに依存しない（daemonless）、一般ユーザー権限で動かせる（rootless）という設計で、単一障害点や権限リスクを下げることを狙う。
+
 #### Podmanのアーキテクチャ
 
 ![Podmanのアーキテクチャ]({{ '/assets/images/diagrams/chapter-10/podman-architecture.svg' | relative_url }})
