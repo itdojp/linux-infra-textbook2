@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Linuxインフラ教本 - サーバー構築・運用の基礎",
   "author": "ITDO Inc.（株式会社アイティードゥ）",
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "engines": {
     "node": ">=18.0.0"
   },
