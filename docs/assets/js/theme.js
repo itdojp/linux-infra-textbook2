@@ -75,7 +75,7 @@
             } else if (mq.addListener) {
                 mq.addListener(handler);
             }
-        });
+        }
     }
     
     // Initialize when DOM is ready
