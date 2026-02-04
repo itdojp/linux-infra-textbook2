@@ -18,4 +18,4 @@
 
 ## 次の章へ
 
-[第1章: 基本機能](../chapters/01-basic-features.md)に進みましょう。
+[第1章：ITインフラの全体像とLinuxの位置づけ](../chapters/chapter-01-linux-overview.md)に進みましょう。

@@ -453,4 +453,4 @@ SEE ALSO    - 関連コマンド
 
 ---
 
-**次章へ**: [第3章 ITインフラにおけるLinuxの役割](../chapter-03-linux-philosophy/)
+**次章へ**: [第3章 ITインフラにおけるLinuxの役割](chapter-03-linux-philosophy.md)
