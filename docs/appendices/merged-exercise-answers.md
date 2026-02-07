@@ -2834,6 +2834,8 @@ groups:
       - alert: HighErrorRate
         expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
         for: 5m
+```
+
 # 第14章 演習問題 解答集
 
 ## 問題1：基本理解の確認
