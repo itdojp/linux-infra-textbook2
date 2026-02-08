@@ -3741,28 +3741,22 @@ resource "aws_security_group" "alb" {
 
 修正後：
 ```hcl
-# データソースでAMIを動的に取得
-data "aws_ami" "amazon_linux_2" {
-  most_recent = true
-  owners      = ["amazon"]
-  
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
+# SSM Public Parameter から最新のAmazon Linux 2023 AMIを取得
+data "aws_ssm_parameter" "amazon_linux_2023_ami" {
+  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 }
 
 resource "aws_instance" "web" {
   instance_type = "t3.micro"
-  ami           = data.aws_ami.amazon_linux_2.id
+  ami           = data.aws_ssm_parameter.amazon_linux_2023_ami.value
   
   vpc_security_group_ids = [aws_security_group.web.id]
   
   user_data = <<-EOF
     #!/bin/bash
-    yum update -y
-    yum install -y nginx
-    echo "Web Server ${aws_instance.web.id}" > /var/www/nginx-default/index.html
+    dnf update -y
+    dnf install -y nginx
+    echo "Web Server ${aws_instance.web.id}" > /usr/share/nginx/html/index.html
     systemctl start nginx
     systemctl enable nginx
   EOF
