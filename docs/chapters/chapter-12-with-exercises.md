@@ -296,12 +296,17 @@ AWSとユーザーの責任範囲は明確に分かれています：
 #!/bin/bash
 # os_update.sh - 定期的なOSアップデート
 
-# Amazon Linux 2の場合
-sudo yum update -y
-
-# Ubuntu/Debianの場合
-sudo apt-get update
-sudo apt-get upgrade -y
+if command -v dnf >/dev/null 2>&1; then
+    # Amazon Linux 2023（dnf）
+    sudo dnf update -y
+elif command -v apt-get >/dev/null 2>&1; then
+    # Ubuntu/Debian（apt）
+    sudo apt-get update
+    sudo apt-get upgrade -y
+else
+    echo "Unsupported OS (no dnf/apt-get found)" >&2
+    exit 1
+fi
 
 # 再起動が必要な場合の判定
 if [ -f /var/run/reboot-required ]; then
@@ -355,6 +360,9 @@ KEY_NAME="my-key"
 SECURITY_GROUP="my-sg"
 INSTANCE_TYPE="t3.micro"
 
+# 全コマンドで同一リージョンを使用
+export AWS_DEFAULT_REGION="$REGION"
+
 # 1. キーペアの作成（初回のみ）
 echo "Creating key pair..."
 aws ec2 create-key-pair \
@@ -378,20 +386,19 @@ aws ec2 authorize-security-group-ingress \
     --port 22 \
     --cidr 0.0.0.0/0
 
-# 3. 最新のAmazon Linux 2 AMIを取得
+# 3. 最新のAmazon Linux 2023 AMIを取得
 echo "Getting latest AMI..."
-AMI_ID=$(aws ec2 describe-images \
-    --owners amazon \
-    --filters "Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2" \
-              "Name=state,Values=available" \
-    --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
+AMI_ID=$(aws ssm get-parameter \
+    --region $REGION \
+    --name "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64" \
+    --query 'Parameter.Value' \
     --output text)
 
 # 4. ユーザーデータスクリプトの作成
 cat > userdata.sh << 'USERDATA'
 #!/bin/bash
-yum update -y
-yum install -y nginx
+dnf update -y
+dnf install -y nginx
 systemctl start nginx
 systemctl enable nginx
 echo "<h1>Hello from AWS EC2</h1>" > /usr/share/nginx/html/index.html
@@ -1046,27 +1053,25 @@ chmod +x infrastructure_as_code.sh
 
 ## 12.7 AWSとLinuxの融合
 
-### Amazon Linux 2
+### Amazon Linux 2023
 
 AWSが提供する、AWS環境に最適化されたLinuxディストリビューション：
 
 ```bash
-# Amazon Linux 2の特徴
-# 1. AWS CLIがプリインストール
-$ aws --version
-aws-cli/2.x.x Python/3.x.x Linux/4.14.x-xxx.xxx.amzn2.x86_64
+# Amazon Linux 2023の特徴（例）
+# 1. OS情報の確認
+$ cat /etc/os-release
 
-# 2. EC2インスタンスメタデータへの簡単アクセス
-$ ec2-metadata --instance-id
-instance-id: i-1234567890abcdef0
+# 2. AWS CLI（AMIによりプリインストール）
+$ aws --version
 
 # 3. cloud-initによる初期設定
 $ cat /etc/cloud/cloud.cfg
 # EC2用に最適化された設定
 
-# 4. amazon-linux-extrasでの追加パッケージ
-$ amazon-linux-extras list
-$ amazon-linux-extras install docker
+# 4. dnf（RPM）によるパッケージ管理
+$ sudo dnf update -y
+$ sudo dnf install -y nginx
 ```
 
 ### Systems Manager（SSM）
@@ -1083,7 +1088,7 @@ $ aws ssm start-session --target i-1234567890abcdef0
 # パッチ管理
 $ aws ssm create-patch-baseline \
     --name "CustomLinuxPatchBaseline" \
-    --operating-system "AMAZON_LINUX_2" \
+    --operating-system "AMAZON_LINUX_2023" \
     --approval-rules file://approval-rules.json
 ```
 
