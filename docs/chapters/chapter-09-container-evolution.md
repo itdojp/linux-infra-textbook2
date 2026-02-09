@@ -50,7 +50,7 @@ $ sudo virt-install \
     --network bridge=br0 \
     --graphics none \
     --console pty,target_type=serial \
-    --location 'http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/'
+    --location 'http://archive.ubuntu.com/ubuntu/dists/jammy/main/installer-amd64/'
 ```
 
 ### 仮想マシンの限界
