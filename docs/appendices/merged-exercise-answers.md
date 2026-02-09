@@ -3756,7 +3756,8 @@ resource "aws_instance" "web" {
     #!/bin/bash
     dnf update -y
     dnf install -y nginx
-    echo "Web Server ${aws_instance.web.id}" > /usr/share/nginx/html/index.html
+    INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+    echo "Web Server $INSTANCE_ID" > /usr/share/nginx/html/index.html
     systemctl start nginx
     systemctl enable nginx
   EOF

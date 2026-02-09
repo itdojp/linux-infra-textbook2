@@ -296,12 +296,17 @@ AWSとユーザーの責任範囲は明確に分かれています：
 #!/bin/bash
 # os_update.sh - 定期的なOSアップデート
 
-# Amazon Linux 2023の場合
-sudo dnf update -y
-
-# Ubuntu/Debianの場合
-sudo apt-get update
-sudo apt-get upgrade -y
+if command -v dnf >/dev/null 2>&1; then
+    # Amazon Linux 2023（dnf）
+    sudo dnf update -y
+elif command -v apt-get >/dev/null 2>&1; then
+    # Ubuntu/Debian（apt）
+    sudo apt-get update
+    sudo apt-get upgrade -y
+else
+    echo "Unsupported OS (no dnf/apt-get found)" >&2
+    exit 1
+fi
 
 # 再起動が必要な場合の判定
 if [ -f /var/run/reboot-required ]; then
@@ -354,6 +359,9 @@ REGION="ap-northeast-1"
 KEY_NAME="my-key"
 SECURITY_GROUP="my-sg"
 INSTANCE_TYPE="t3.micro"
+
+# 全コマンドで同一リージョンを使用
+export AWS_DEFAULT_REGION="$REGION"
 
 # 1. キーペアの作成（初回のみ）
 echo "Creating key pair..."
