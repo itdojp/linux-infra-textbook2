@@ -721,7 +721,7 @@ COMPOSE
 # 起動スクリプト
 cat > start_monitoring.sh << 'START'
 #!/bin/bash
-docker-compose -f docker-compose-monitoring.yml up -d
+docker compose -f docker-compose-monitoring.yml up -d
 echo "Monitoring stack is starting..."
 echo "Prometheus: http://localhost:9090"
 echo "Grafana: http://localhost:3000 (admin/admin)"
