@@ -2122,7 +2122,7 @@ deploy:
 
 1. **Dockerfileの最適化**
    ```dockerfile
-   FROM node:16-alpine
+   FROM node:20-alpine
    WORKDIR /app
    # 依存関係を先にコピー
    COPY package*.json ./
@@ -2146,7 +2146,7 @@ deploy:
 
 1. **latestタグの使用**
    - 問題：予期しない変更の可能性
-   - 改善：`FROM node:16.20.2-alpine`
+   - 改善：`FROM node:20-alpine`
 
 2. **rootユーザーでの実行**
    - 問題：コンテナエスケープ時のリスク
@@ -2162,7 +2162,7 @@ deploy:
 
 改善後：
 ```dockerfile
-FROM node:16.20.2-alpine
+FROM node:20-alpine
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 WORKDIR /app
 COPY package*.json ./

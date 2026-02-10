@@ -167,7 +167,7 @@ EOF
 #### レイヤーキャッシュの仕組み
 ```dockerfile
 # 効率的なDockerfile
-FROM node:16-alpine
+FROM node:20-alpine
 
 # 依存関係を先にコピー（変更頻度：低）
 COPY package*.json ./
@@ -183,14 +183,14 @@ CMD ["node", "server.js"]
 ```bash
 # 初回ビルド
 $ podman build -t myapp:v1 .
-[1/4] FROM node:16-alpine                    # 50MB ダウンロード
+[1/4] FROM node:20-alpine                    # 50MB ダウンロード
 [2/4] COPY package*.json ./                  # 新規レイヤー
 [3/4] RUN npm ci --only=production          # 時間がかかる
 [4/4] COPY . .                              # 新規レイヤー
 
 # コード変更後の2回目のビルド
 $ podman build -t myapp:v2 .
-[1/4] FROM node:16-alpine                    # キャッシュ使用
+[1/4] FROM node:20-alpine                    # キャッシュ使用
 [2/4] COPY package*.json ./                  # キャッシュ使用
 [3/4] RUN npm ci --only=production          # キャッシュ使用
 [4/4] COPY . .                              # 新規レイヤー（変更部分のみ）
@@ -304,7 +304,7 @@ FROM ubuntu:22.04              # 77MB
 
 # 良い例：目的特化型イメージ
 FROM python:3.10-slim          # 45MB
-FROM node:16-alpine            # 39MB
+FROM node:20-alpine            # 39MB
 FROM nginx:alpine              # 23MB
 FROM scratch                   # 0MB（静的バイナリ用）
 ```
@@ -329,7 +329,7 @@ RUN apt-get update && \
 #### 3. ビルドキャッシュの活用
 ```dockerfile
 # 変更頻度の低いものを先に
-FROM node:16-alpine
+FROM node:20-alpine
 
 # package.jsonは頻繁に変更されない
 COPY package*.json ./
@@ -345,7 +345,7 @@ CMD ["node", "server.js"]
 
 #### 非rootユーザーでの実行
 ```dockerfile
-FROM node:16-alpine
+FROM node:20-alpine
 
 # アプリケーション用ユーザーの作成
 RUN addgroup -g 1001 -S nodejs && \
@@ -526,7 +526,7 @@ JS
 
 # 非効率的なDockerfile
 cat > Dockerfile.inefficient << 'DOCKERFILE'
-FROM node:16-alpine
+FROM node:20-alpine
 COPY . .
 RUN npm install
 CMD ["node", "app.js"]
@@ -534,7 +534,7 @@ DOCKERFILE
 
 # 効率的なDockerfile
 cat > Dockerfile.efficient << 'DOCKERFILE'
-FROM node:16-alpine
+FROM node:20-alpine
 COPY package*.json ./
 RUN npm install
 COPY . .
@@ -641,7 +641,7 @@ scan_image() {
 images=(
     "alpine:latest"
     "ubuntu:latest"
-    "node:16"
+    "node:20"
     "python:3.11"
 )
 
