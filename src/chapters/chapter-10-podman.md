@@ -223,7 +223,7 @@ $ podman pod create --name mypod -p 8080:80
 
 # Pod内でコンテナを実行
 $ podman run --pod mypod -d --name web nginx
-$ podman run --pod mypod -d --name app python:3.9
+$ podman run --pod mypod -d --name app python:3.11
 
 # Podの管理
 $ podman pod ps
