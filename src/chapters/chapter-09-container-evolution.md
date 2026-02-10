@@ -252,7 +252,7 @@ EOF
 #### Dockerfileによる環境の定義
 ```dockerfile
 # Dockerfile
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 # 依存関係のインストール
 COPY requirements.txt .
@@ -586,7 +586,7 @@ echo
 echo "Creating Layer 2: Runtime"
 cp -r layer1 layer2
 mkdir -p layer2/usr/bin
-echo "#!/bin/sh\necho 'Python 3.9 runtime'" > layer2/usr/bin/python3
+echo "#!/bin/sh\necho 'Python 3.11 runtime'" > layer2/usr/bin/python3
 chmod +x layer2/usr/bin/python3
 echo "Layer 2 size: $(du -sh layer2 | cut -f1)"
 echo "Layer 2 diff: $(diff -r layer1 layer2 | wc -l) changes"

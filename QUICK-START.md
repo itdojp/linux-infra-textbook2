@@ -4,7 +4,7 @@
 
 ## 前提
 
-- Node.js 18 以上（`package.json` の `engines.node` を参照）
+- Node.js 20 以上（`package.json` の `engines.node` を参照）
 - Ruby と Bundler（`docs/Gemfile` を参照）
 
 ## セットアップ

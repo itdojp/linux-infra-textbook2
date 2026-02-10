@@ -45,7 +45,7 @@ $ ls -lh
 #### 完全な実行環境の定義
 ```dockerfile
 # Dockerfile - 環境の完全な定義
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 # システムパッケージ
 RUN apt-get update && apt-get install -y \
@@ -642,7 +642,7 @@ images=(
     "alpine:latest"
     "ubuntu:latest"
     "node:16"
-    "python:3.9"
+    "python:3.11"
 )
 
 for img in "${images[@]}"; do
