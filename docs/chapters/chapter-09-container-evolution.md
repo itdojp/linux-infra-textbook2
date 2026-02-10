@@ -627,7 +627,9 @@ EOF
 ```bash
 # セキュリティスキャン
 docker scan myimage:latest
+```
 
+```dockerfile
 # 非rootユーザーでの実行
 FROM node:20
 RUN useradd -m appuser
