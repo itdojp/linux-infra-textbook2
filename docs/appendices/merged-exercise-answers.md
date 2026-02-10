@@ -3963,7 +3963,7 @@ jobs:
   format-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - uses: hashicorp/setup-terraform@v2
         with:
@@ -3977,7 +3977,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: format-check
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - uses: hashicorp/setup-terraform@v2
         with:
@@ -3995,7 +3995,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@master
@@ -4013,7 +4013,7 @@ jobs:
     needs: security-scan
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - uses: hashicorp/setup-terraform@v2
         with:
@@ -4069,7 +4069,7 @@ jobs:
     environment:
       name: production
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - uses: hashicorp/setup-terraform@v2
         with:
