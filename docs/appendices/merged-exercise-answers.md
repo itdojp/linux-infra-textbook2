@@ -1838,7 +1838,7 @@ echo "  VM memory overhead: ~512MB"
    
    # 各コンテナの起動
    podman run -d --pod webapp --name frontend nginx
-   podman run -d --pod webapp --name backend node:14
+   podman run -d --pod webapp --name backend node:20
    podman run -d --pod webapp --name db postgres:13
    ```
 
@@ -1897,7 +1897,7 @@ podman run -d \
   --pod webapp-stack \
   --name app \
   -v ./app:/app \
-  node:14 npm start
+  node:20 npm start
 
 # Redis
 podman run -d \
