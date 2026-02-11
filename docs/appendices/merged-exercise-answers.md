@@ -3998,7 +3998,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Run Checkov
-        uses: bridgecrewio/checkov-action@master
+        uses: bridgecrewio/checkov-action@v12.3080.0
         with:
           directory: terraform/
           framework: terraform
