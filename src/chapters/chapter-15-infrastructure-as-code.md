@@ -272,7 +272,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v3
       
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
