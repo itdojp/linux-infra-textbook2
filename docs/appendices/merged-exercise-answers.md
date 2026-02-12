@@ -4271,7 +4271,7 @@ resource "aws_lambda_function" "dr_failover" {
   function_name = "dr-failover-automation"
   role          = aws_iam_role.lambda.arn
   handler       = "index.handler"
-  runtime       = "python3.9"
+  runtime       = "python3.12"
   
   environment {
     variables = {
