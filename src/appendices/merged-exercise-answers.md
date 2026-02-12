@@ -2650,9 +2650,11 @@ Failover Process:
      - Amazon QuickSightで可視化
    ```
 
-## 第14章：監視とログ - システムの可観測性 演習問題解答
+## 第14章 演習問題 解答集
 
 ### 問題1：基本理解の確認
+
+### 解答
 
 1. システムの可観測性（Observability）は、（**メトリクス**）、（**ログ**）、（**トレース**）の三本柱で構成されています。
 
@@ -2661,6 +2663,8 @@ Failover Process:
 3. 分散トレーシングにおいて、一つのリクエストの処理全体を（**トレース**）と呼び、その中の個々の処理単位を（**スパン**）と呼びます。
 
 ### 問題2：概念の理解
+
+### 解答
 
 **1. 従来の閾値ベースの監視と機械学習を使った異常検知の違い**
 
@@ -2718,188 +2722,6 @@ Failover Process:
    - データベースのコネクションプールが枯渇していたことが判明
 
 ### 問題3：実践的な課題
-
-**マイクロサービス監視システムの設計：**
-
-```yaml
-# docker-compose-monitoring.yml
-version: '3.8'
-
-services:
-  # メトリクス収集
-  prometheus:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-
-  # 各サービスのメトリクスエクスポーター
-  node-exporter:
-    image: prom/node-exporter:latest
-    ports:
-      - "9100:9100"
-
-  # ログ収集
-  elasticsearch:
-    image: elasticsearch:7.15.0
-    environment:
-      - discovery.type=single-node
-    ports:
-      - "9200:9200"
-
-  logstash:
-    image: logstash:7.15.0
-    volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-    ports:
-      - "5044:5044"
-
-  kibana:
-    image: kibana:7.15.0
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
-
-  # 分散トレーシング
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    ports:
-      - "16686:16686"
-      - "6831:6831/udp"
-
-  # アラート
-  alertmanager:
-    image: prom/alertmanager:latest
-    volumes:
-      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
-    ports:
-      - "9093:9093"
-
-  # 可視化
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-```
-
-**Prometheus設定：**
-
-```yaml
-# prometheus.yml
-global:
-  scrape_interval: 15s
-
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets: ['alertmanager:9093']
-
-rule_files:
-  - 'alert_rules.yml'
-
-scrape_configs:
-  - job_name: 'api-gateway'
-    static_configs:
-      - targets: ['api-gateway:8080']
-    metrics_path: '/metrics'
-
-  - job_name: 'user-service'
-    static_configs:
-      - targets: ['user-service:8081']
-
-  - job_name: 'order-service'
-    static_configs:
-      - targets: ['order-service:8082']
-
-  - job_name: 'product-service'
-    static_configs:
-      - targets: ['product-service:8083']
-```
-
-**アラートルール：**
-
-```yaml
-# alert_rules.yml
-groups:
-  - name: microservices
-    rules:
-      - alert: HighErrorRate
-        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
-        for: 5m
-# 第14章 演習問題 解答集
-
-## 問題1：基本理解の確認
-
-### 解答
-
-1. システムの可観測性（Observability）は、（**メトリクス**）、（**ログ**）、（**トレース**）の三本柱で構成されています。
-
-2. Prometheusは（**プル**）型のメトリクス収集システムで、定期的にターゲットから（**スクレイプ**）してデータを収集します。
-
-3. 分散トレーシングにおいて、一つのリクエストの処理全体を（**トレース**）と呼び、その中の個々の処理単位を（**スパン**）と呼びます。
-
-## 問題2：概念の理解
-
-### 解答
-
-**1. 従来の閾値ベースの監視と機械学習を使った異常検知の違い**
-
-**閾値ベースの監視：**
-- **仕組み**：事前に定めた固定値を超えたらアラート
-- **利点**：
-  - シンプルで理解しやすい
-  - 設定が簡単
-  - 誤検知の原因が明確
-- **欠点**：
-  - 動的な環境に対応困難
-  - 季節性や時間帯の考慮が難しい
-  - 複数メトリクスの相関を見られない
-
-**機械学習による異常検知：**
-- **仕組み**：過去のパターンを学習し、統計的に異常を検出
-- **利点**：
-  - 動的な閾値の自動調整
-  - 複雑なパターンの検出
-  - 未知の異常も検出可能
-- **欠点**：
-  - ブラックボックス化しやすい
-  - 学習データの質に依存
-  - 計算リソースが必要
-
-**2. 構造化ログの利点**
-
-1. **検索・分析の効率化**：
-   - JSONやKey-Value形式により、特定フィールドで高速検索可能
-   - 集計や統計処理が容易
-
-2. **自動処理の実現**：
-   - プログラムによる自動解析が可能
-   - アラートルールの設定が簡単
-
-3. **コンテキスト情報の保持**：
-   - user_id、request_id等の関連情報を構造的に保存
-   - トラブルシューティング時の追跡が容易
-
-**3. メトリクス、ログ、トレースの使い分け**
-
-**シナリオ：ECサイトで「注文完了が遅い」という報告**
-
-1. **メトリクス**で全体像を把握：
-   - レスポンスタイムの推移を確認
-   - CPU/メモリ使用率をチェック
-   - 「14時頃から遅延が発生」と特定
-
-2. **トレース**で処理フローを追跡：
-   - 遅い注文処理のトレースを確認
-   - 「在庫確認API」で3秒かかっていることを発見
-
-3. **ログ**で詳細を調査：
-   - 在庫確認サービスのログを確認
-   - データベースのコネクションプールが枯渇していたことが判明
-
-## 問題3：実践的な課題
 
 ### 解答：マイクロサービス監視システムの設計
 
@@ -3019,7 +2841,7 @@ groups:
           description: "Service {{ $labels.job }} has error rate of {{ $value | humanizePercentage }}"
 ```
 
-## 問題4：アラート設計
+### 問題4：アラート設計
 
 ### 解答
 
@@ -3103,7 +2925,7 @@ groups:
     severity: critical
 ```
 
-## 問題5：ログ分析
+### 問題5：ログ分析
 
 ### 解答
 
@@ -3166,7 +2988,7 @@ connection_config = {
 }
 ```
 
-## 問題6：パフォーマンス分析
+### 問題6：パフォーマンス分析
 
 ### 解答
 
@@ -3230,7 +3052,7 @@ response = requests.post(
 )
 ```
 
-## 問題7：予測的監視
+### 問題7：予測的監視
 
 ### 解答：予測的スケーリング戦略
 
@@ -3368,7 +3190,7 @@ class PredictiveScaler:
         return recommendations
 ```
 
-## 問題8：発展的課題
+### 問題8：発展的課題
 
 ### 解答
 
