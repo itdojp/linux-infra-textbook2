@@ -49,7 +49,7 @@ fi
 - 根本原因の特定が困難
 
 #### 第3世代：可観測性（2010年代〜）
-```
+```text
 Observability = Metrics + Logs + Traces
 
 システムの内部状態を、外部からの観測によって理解できる能力
@@ -1538,7 +1538,7 @@ Infrastructure as Codeによって、手作業を排除し、再現可能で監�
 ### 問題5：ログ分析
 
 以下のようなログエントリがあります：
-```
+```text
 2024-03-15 10:23:45 ERROR [user-service] Failed to connect to database: Connection timeout
 2024-03-15 10:23:46 WARN [api-gateway] Retry attempt 1 for user-service
 2024-03-15 10:23:47 ERROR [user-service] Failed to connect to database: Connection timeout

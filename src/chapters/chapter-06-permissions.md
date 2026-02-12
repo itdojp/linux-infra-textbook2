@@ -16,7 +16,7 @@ Linuxシステムも同じです。複数のユーザーとプロセスが同じ
 
 1970年代、コンピュータは非常に高価でした：
 
-```
+```text
 1台のメインフレーム：数億円
 ↓
 複数の端末を接続
@@ -736,7 +736,7 @@ TCP/IPスタックという、インターネットの基礎技術をLinuxがど
 ### 問題4：セキュリティ診断
 以下のls -laの出力を見て、セキュリティ上の問題点を指摘し、修正方法を提案してください。
 
-```
+```text
 drwxrwxrwx  5 root     root      4096 Mar 15 10:00 /etc/app-config/
 -rwsr-xr-x  1 root     root     12288 Mar 15 09:00 /usr/local/bin/user-script.sh
 -rw-rw-rw-  1 webapp   webapp     512 Mar 15 11:00 /var/www/database.conf

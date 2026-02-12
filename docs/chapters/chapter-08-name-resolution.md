@@ -77,7 +77,7 @@ graph TB
 
 ### DNS（Domain Name System）の階層構造
 
-```
+```text
                     .(root)
                    /   |   \
                 .com  .org  .jp
@@ -89,7 +89,7 @@ graph TB
 
 #### DNSクエリの流れ
 
-```
+```text
 # www.example.comを解決する流れ（簡略化した例）
 1. クライアント → ローカルDNSサーバー：「www.example.comのIPは？」
 2. ローカルDNS → ルートサーバー：「.comを管理しているのは？」
