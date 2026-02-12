@@ -110,7 +110,7 @@ Email: [knowledge@itdo.jp](mailto:knowledge@itdo.jp)
 "[書籍タイトル]" by 株式会社アイティードゥ (ITDO Inc.) is licensed under CC BY-NC-SA 4.0
 Original work: https://github.com/[organization]/[repository-name]
 License details: https://github.com/itdojp/it-engineer-knowledge-architecture/blob/main/LICENSE.md
-```
+```text
 
 ## 免責事項
 
@@ -411,7 +411,7 @@ git push origin feature/corporate-license-update
 ### Step 6: プルリクエスト作成
 
 **プルリクエストのタイトル：**
-```
+```text
 feat: 企業向けCreative Commons BY-NC-SA 4.0ライセンス適用
 ```
 

@@ -590,7 +590,7 @@ podman run --rm \
 
 ### 選択の基準
 
-```
+```text
 Docker を選ぶべき場合：
 - 既存のDocker環境が確立されている
 - Docker特有の機能に依存している
@@ -643,7 +643,7 @@ Podman を選ぶべき場合：
 ### 問題5：Pod機能の活用
 以下の構成をPodman Podで実現してください。
 
-```
+```text
 Pod名: webapp-stack
 含まれるコンテナ：
 - Nginx（フロントエンド）
@@ -669,7 +669,7 @@ Podmanコンテナのセキュリティを最大化する設定を作成して�
 ### 問題7：トラブルシューティング
 以下のエラーメッセージが表示された場合の対処法を説明してください。
 
-```
+```text
 Error: error creating container storage: the container name "webapp" is already in use
 Error: OCI runtime error: permission denied
 Error: cannot set up namespace using newuidmap

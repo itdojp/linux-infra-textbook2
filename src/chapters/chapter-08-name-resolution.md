@@ -76,7 +76,7 @@ graph TB
 
 ### DNS（Domain Name System）の階層構造
 
-```
+```text
                     .(root)
                    /   |   \
                 .com  .org  .jp
