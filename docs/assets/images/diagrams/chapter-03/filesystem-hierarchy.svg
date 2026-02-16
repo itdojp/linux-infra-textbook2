@@ -9,8 +9,8 @@
       .usr { fill: #fff3e0; stroke: #333; stroke-width: 1; }
       .var { fill: #fce4ec; stroke: #333; stroke-width: 1; }
       .default { fill: #f9f9f9; stroke: #333; stroke-width: 1; }
-      .text { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
-      .small-text { font-family: Arial, sans-serif; font-size: 10px; text-anchor: middle; }
+      .text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-size: 12px; text-anchor: middle; }
+      .small-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-size: 10px; text-anchor: middle; }
       .line { stroke: #333; stroke-width: 1; }
     </style>
   </defs>
