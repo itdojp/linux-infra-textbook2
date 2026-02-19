@@ -488,7 +488,7 @@ echo "Created VPC: $VPC_ID"
 # DNSホスト名を有効化（必要に応じてDNSサポートも有効化）
 aws ec2 modify-vpc-attribute \
     --vpc-id $VPC_ID \
-    --enable-dns-hostnames Value=true
+    --enable-dns-hostnames '{"Value":true}'
 
 # 2. サブネットの作成
 echo "Creating subnets..."
@@ -1045,7 +1045,7 @@ optimize_vpc_peering() {
     # DNSホスト名を有効化（例）
     aws ec2 modify-vpc-attribute \
         --vpc-id vpc-12345 \
-        --enable-dns-hostnames Value=true
+        --enable-dns-hostnames '{"Value":true}'
     
     # ルーティングの最適化
     echo "Optimizing routing tables for VPC peering..."

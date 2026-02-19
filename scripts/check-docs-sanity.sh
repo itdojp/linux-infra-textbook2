@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
 # Lightweight, repo-local checks for common copy/paste breaking typos.
@@ -11,9 +11,17 @@ fail=0
 check() {
   local pattern="$1"
   local label="$2"
-  if rg -n -P -- "$pattern" "$scan_dir" >/dev/null; then
+
+  # ripgrep (rg) is fast, but may not be preinstalled in all environments.
+  # Fall back to grep to keep CI reliable on fresh runners.
+  local search_cmd=(rg -n -P --)
+  if ! command -v rg >/dev/null 2>&1; then
+    search_cmd=(grep -R -n -P --)
+  fi
+
+  if "${search_cmd[@]}" "$pattern" "$scan_dir" >/dev/null; then
     echo "::error::Found forbidden pattern: ${label}"
-    rg -n -P -- "$pattern" "$scan_dir" | head -n 50
+    "${search_cmd[@]}" "$pattern" "$scan_dir" | head -n 50
     fail=1
   fi
 }
@@ -32,4 +40,3 @@ if [ "$fail" -ne 0 ]; then
 fi
 
 echo "docs sanity check: OK"
-
