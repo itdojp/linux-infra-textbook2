@@ -132,6 +132,8 @@ def metrics():
 # structured_logging.py
 import json
 import logging
+import time
+import uuid
 from datetime import datetime
 
 class StructuredLogger:
@@ -157,6 +159,8 @@ class StructuredLogger:
             # 追加のコンテキスト情報
             if hasattr(record, 'user_id'):
                 log_obj['user_id'] = record.user_id
+            if hasattr(record, 'order_id'):
+                log_obj['order_id'] = record.order_id
             if hasattr(record, 'request_id'):
                 log_obj['request_id'] = record.request_id
             if hasattr(record, 'duration'):
@@ -166,6 +170,11 @@ class StructuredLogger:
 
 # 使用例
 logger = StructuredLogger(__name__).logger
+
+def perform_order_processing(order_id):
+    # デモ用のスタブ（実運用ではビジネスロジックに置き換える）
+    time.sleep(0.1)
+    return {"order_id": order_id, "status": "ok"}
 
 def process_order(order_id, user_id):
     start_time = time.time()
@@ -195,6 +204,9 @@ def process_order(order_id, user_id):
             'status': 'failed'
         })
         raise
+
+if __name__ == "__main__":
+    process_order(order_id="order-123", user_id="user-456")
 ```
 
 #### ログ集約システム（ELK Stack）

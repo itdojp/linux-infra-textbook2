@@ -24,18 +24,19 @@
 $ ps aux | grep dockerd
 root  1234  0.5  1.2  1234567  123456  ?  Ssl  09:00  0:30 /usr/bin/dockerd
 
-# （解説用の擬似例・絶対に実行しないこと）
-# ユーザーが docker グループに属していると、ホスト上のファイルを
-# root と同等の権限で操作できてしまうことを示す例です。
-# システムを破壊する危険があるため、以下のコマンドは決して実行しないでください。
-$ docker run -v /:/host ubuntu rm -rf /host/etc  # 実行禁止・危険な例
+# （安全なデモ）ホスト側ディレクトリをマウントすると、コンテナから変更できる
+# docker グループは実質root相当の権限になり得るため、最小権限の観点で注意する
+$ mkdir -p /tmp/host-demo && echo "before" > /tmp/host-demo/file.txt
+$ docker run --rm -v /tmp/host-demo:/host ubuntu bash -c 'ls -l /host && echo after > /host/file.txt'
+$ cat /tmp/host-demo/file.txt
 ```
 
 2. **単一障害点**
 ```bash
 # Dockerデーモンが停止すると、すべてのコンテナに影響
 $ sudo systemctl stop docker
-# すべてのコンテナ操作が不可能に
+# コンテナの管理操作（起動/停止/ログ取得 等）ができなくなる
+# 既存コンテナのプロセスは直ちに停止しないことが多い（環境/設定による）
 ```
 
 3. **システムサービスとの統合の難しさ**
@@ -116,10 +117,14 @@ $ podman run -d --name web nginx
 $ podman run -d --name db postgres
 
 # systemdに直接統合される
-$ systemctl --user status podman-web.service
+# systemd への統合（後述）により、コンテナをサービスとして管理できる
+# 例: podman generate systemd ... -> systemctl --user enable --now ...
+# （ユニットを作成していない場合、podman-*.service は存在しない）
 
 # 一つのコンテナの問題が他に影響しない
-$ kill -9 $(pgrep -f "podman.*web")  # webコンテナのみ影響
+$ podman stop web
+$ podman ps
+# 出力例: db
 ```
 
 #### リソースの効率的な利用
@@ -166,14 +171,9 @@ $ podman run -v /shared:/shared:z nginx  # 共有ラベル
 
 #### 3. セキュリティスキャン
 ```bash
-# イメージの脆弱性スキャン
-$ podman image scan nginx:latest
-Scanning nginx:latest...
-✓ Vulnerabilities found: 23
-  Critical: 2
-  High: 5
-  Medium: 10
-  Low: 6
+# イメージの脆弱性スキャン（例：Trivy）
+# ※Podman本体のサブコマンドとしてscanが提供されるかは、バージョン/拡張/依存により異なる
+$ trivy image nginx:latest
 ```
 
 ### 運用性の向上

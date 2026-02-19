@@ -149,8 +149,8 @@ $ cat /sys/fs/cgroup/cgroup.controllers
 cpu io memory pids
 
 # CPU使用率を50%に制限
+$ echo "+cpu" | sudo tee /sys/fs/cgroup/cgroup.subtree_control
 $ sudo mkdir /sys/fs/cgroup/mylimit
-$ echo "+cpu" | sudo tee /sys/fs/cgroup/mylimit/cgroup.subtree_control
 $ echo "50000 100000" | sudo tee /sys/fs/cgroup/mylimit/cpu.max
 # 100000マイクロ秒中50000マイクロ秒使用可能 = 50%
 
@@ -193,7 +193,8 @@ gcc memory_hog.c -o memory_hog
 
 # cgroup内で実行
 echo $$ | sudo tee /sys/fs/cgroup/memlimit/cgroup.procs
-./memory_hog  # OOM Killerにより終了される
+./memory_hog  # OOM Killerでkillされる場合がある（環境/overcommit設定で挙動が変わる）
+# 例: malloc失敗で終了する場合もある。確認: dmesg / journalctl -k
 EOF
 ```
 
@@ -209,7 +210,7 @@ ROOTFS="/tmp/container_root"
 mkdir -p $ROOTFS
 
 # 最小限のLinux環境をコピー（Alpine Linuxを使用）
-wget -O alpine.tar.gz http://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.0-x86_64.tar.gz
+wget -O alpine.tar.gz https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.0-x86_64.tar.gz
 tar -xzf alpine.tar.gz -C $ROOTFS
 
 # 2. 名前空間を分離してchrootで起動
