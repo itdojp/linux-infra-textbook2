@@ -285,6 +285,9 @@ jobs:
       
       - name: Terraform Plan
         run: terraform plan -out=tfplan
+
+      - name: Convert plan to text
+        run: terraform show -no-color tfplan > tfplan.txt
       
       - name: Post Plan to PR
         uses: actions/github-script@v6

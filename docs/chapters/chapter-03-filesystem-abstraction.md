@@ -108,8 +108,9 @@ noisy_command > /dev/null 2>&1
 # 1GBのファイルを作成（すべてゼロで埋める）
 dd if=/dev/zero of=bigfile bs=1M count=1024
 
-# ディスクの速度測定
-dd if=/dev/zero of=testfile bs=1M count=1000
+# （簡易）ディスクの書き込み性能を測定（ページキャッシュの影響に注意）
+dd if=/dev/zero of=testfile bs=1M count=1000 conv=fdatasync
+# ※より厳密にキャッシュ影響を避けたい場合は oflag=direct 等（環境依存）を検討する
 ```
 
 #### /dev/random と /dev/urandom - 乱数生成器
@@ -156,7 +157,8 @@ ls /proc/1234/
 実用例：プロセスが開いているファイルを調べる
 ```bash
 # nginxが開いているファイルを見る
-sudo ls -la /proc/$(pgrep nginx)/fd/
+# nginxはmaster/workerで複数PIDになることがあるため、例では最新の1PIDを選ぶ
+sudo ls -la /proc/$(pgrep -n -x nginx)/fd/
 ```
 
 ### /sys - カーネルパラメータへの窓
@@ -170,9 +172,11 @@ cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
 # ネットワークインターフェースの状態
 cat /sys/class/net/eth0/operstate
 
-# LEDを制御（Raspberry Piなど）
-echo 1 > /sys/class/leds/led0/brightness
+# LEDを制御（Raspberry Piなど。書き込みはroot権限が必要）
+echo 1 | sudo tee /sys/class/leds/led0/brightness > /dev/null
 ```
+
+※ `sudo echo 1 > ...` はシェルのリダイレクトが先に評価されるため、意図通りに書き込めない。書き込みは `sudo tee` や `sudo sh -c 'echo ... > ...'` を使う。
 
 ## 3.4 統一的なインターフェースがもたらす運用の簡潔性
 
@@ -194,7 +198,10 @@ echo "AT" > /dev/ttyUSB0   # シリアルポートに書く
 
 # システム情報
 cat /proc/loadavg          # 負荷を読む
-echo 3 > /proc/sys/vm/drop_caches  # キャッシュをクリア
+# [危険] ページキャッシュを破棄する（検証環境のみ）
+# 影響: I/Oが増え、性能が一時的に低下する可能性がある
+sync
+echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
 ```
 
 #### 2. ツールの再利用
@@ -313,10 +320,12 @@ tail -f /var/log/app/application.log
 tail -f /var/log/syslog
 
 # カーネルメッセージ
-tail -f /proc/kmsg
+# /proc/kmsg はroot権限や設定により読めない場合がある（代替: dmesg -w / journalctl -k -f）
+sudo tail -f /proc/kmsg
 
 # すべてを統合
-tail -f /var/log/app/application.log /var/log/syslog /proc/kmsg > /var/log/combined.log
+mkdir -p ~/logs
+sudo tail -F /var/log/app/application.log /var/log/syslog /proc/kmsg | tee -a ~/logs/combined.log
 ```
 
 すべてが「ファイル」なので、同じコマンドで扱える。
@@ -329,7 +338,21 @@ tail -f /var/log/app/application.log /var/log/syslog /proc/kmsg > /var/log/combi
 
 while true; do
     # CPU使用率
-    cpu_usage=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}')
+    # /proc/stat は累積値なので、2点間差分で算出する
+    read -r _ user1 nice1 system1 idle1 iowait1 irq1 softirq1 steal1 _ < /proc/stat
+    sleep 1
+    read -r _ user2 nice2 system2 idle2 iowait2 irq2 softirq2 steal2 _ < /proc/stat
+
+    idle1=$((idle1 + iowait1))
+    idle2=$((idle2 + iowait2))
+    non_idle1=$((user1 + nice1 + system1 + irq1 + softirq1 + steal1))
+    non_idle2=$((user2 + nice2 + system2 + irq2 + softirq2 + steal2))
+    total1=$((idle1 + non_idle1))
+    total2=$((idle2 + non_idle2))
+
+    total_diff=$((total2 - total1))
+    idle_diff=$((idle2 - idle1))
+    cpu_usage=$(awk -v t="$total_diff" -v i="$idle_diff" 'BEGIN { if (t<=0) {print 0} else {printf "%.0f", (t-i)*100/t} }')
     
     # メモリ使用率
     mem_info=$(cat /proc/meminfo)

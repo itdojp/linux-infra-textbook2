@@ -44,6 +44,10 @@ jobs:
             echo "dir=." >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Docs sanity check (copy/paste breaking typos)
+        shell: bash
+        run: bash scripts/check-docs-sanity.sh "${{ steps.scan.outputs.dir }}"
+
       - name: Unicode check (fail on warnings)
         run: node book-formatter/scripts/check-unicode.js "${{ steps.scan.outputs.dir }}" --allowlist .book-formatter/unicode-allowlist.json --fail-on warn
 

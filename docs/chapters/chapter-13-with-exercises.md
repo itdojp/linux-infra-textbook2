@@ -357,7 +357,9 @@ aws ec2 create-network-acl-entry \
     --port-range From=443,To=443 \
     --cidr-block 0.0.0.0/0
 
-# エフェメラルポート（戻りトラフィック用）
+# エフェメラルポート（インスタンスが外部へ発信した通信の戻り用）
+# ※NACLはステートレスのため、戻りトラフィック側も明示的に許可が必要
+# ※0.0.0.0/0 は簡略化例。実運用では送信元/宛先を要件に合わせて最小化する
 aws ec2 create-network-acl-entry \
     --network-acl-id $PUBLIC_NACL \
     --rule-number 200 \
@@ -369,6 +371,7 @@ aws ec2 create-network-acl-entry \
 
 # アウトバウンドルール
 # すべて許可（簡略化のため）
+# 実運用では、必要な宛先とポート（例: 443/80/DNS/NTP/戻り用エフェメラル等）に絞る
 aws ec2 create-network-acl-entry \
     --network-acl-id $PUBLIC_NACL \
     --rule-number 100 \
@@ -482,10 +485,10 @@ VPC_ID=$(aws ec2 create-vpc \
 
 echo "Created VPC: $VPC_ID"
 
-# DNSサポートを有効化
+# DNSホスト名を有効化（必要に応じてDNSサポートも有効化）
 aws ec2 modify-vpc-attribute \
     --vpc-id $VPC_ID \
-    --enable-dns-hostnames
+    --enable-dns-hostnames '{"Value":true}'
 
 # 2. サブネットの作成
 echo "Creating subnets..."
@@ -1039,10 +1042,10 @@ USERDATA
 
 # VPCピアリング最適化
 optimize_vpc_peering() {
-    # Jumbo Framesの有効化
+    # DNSホスト名を有効化（例）
     aws ec2 modify-vpc-attribute \
         --vpc-id vpc-12345 \
-        --enable-dns-hostnames
+        --enable-dns-hostnames '{"Value":true}'
     
     # ルーティングの最適化
     echo "Optimizing routing tables for VPC peering..."
