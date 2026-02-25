@@ -1825,11 +1825,11 @@ echo "  VM memory overhead: ~512MB"
    
    # イメージの移行
    docker save myapp:latest | podman load
-   
-	   # Docker Compose（docker compose）互換の代替（podman-compose）
-	   pip3 install podman-compose
-	   podman-compose up
-	   ```
+
+   # Docker Compose（docker compose）互換の代替（podman-compose）
+   pip3 install podman-compose
+   podman-compose up
+   ```
 
 2. **マルチコンテナアプリケーション構築**
    ```bash
