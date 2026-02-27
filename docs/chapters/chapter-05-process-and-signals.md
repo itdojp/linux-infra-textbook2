@@ -266,7 +266,7 @@ pkill nginx         # nginxという名前のプロセスすべて
 killall firefox     # firefoxという名前のプロセスすべて
 
 # 条件付きkill
-pgrep -f "python script.py" | xargs kill
+pgrep -f "python script.py" | xargs -r kill
 ```
 
 ※ SIGKILL（`-KILL` / `-9`）はプロセスが捕捉できないため、基本はSIGTERMで終了要求し、猶予後に必要ならSIGKILLを使う。

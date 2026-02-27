@@ -155,8 +155,10 @@ cgroup2 on /sys/fs/cgroup type cgroup2
 $ cat /sys/fs/cgroup/cgroup.controllers
 cpu io memory pids
 
-# NOTE: cgroup v2 では、親ディレクトリの cgroup.subtree_control で「子で使うコントローラー」を有効化する必要がある
-# （systemd 管理下では既に有効化済み/書き込み不可の場合がある。その場合は既存設定を確認する）
+# NOTE: cgroup v2 では、親ディレクトリの cgroup.subtree_control で「子で使うコントローラー」を有効化する必要がある。
+#       ただし no internal processes ルールにより、「親 cgroup にまだプロセスが残っている状態」で有効化しようとすると EBUSY などで失敗する。
+#       -> 失敗する場合は、まず `cat /sys/fs/cgroup/cgroup.procs` が空か確認し、空でなければ一時的に別 cgroup へ退避させてから再試行する。
+#       （systemd 管理下では既に有効化済み/書き込み不可の場合がある。その場合は既存設定を確認するか、systemd により委譲された cgroup 内で実験する）
 
 # CPU使用率を50%に制限
 $ echo "+cpu" | sudo tee /sys/fs/cgroup/cgroup.subtree_control

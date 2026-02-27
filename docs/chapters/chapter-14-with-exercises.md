@@ -259,7 +259,9 @@ services:
     user: root
     volumes:
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      # NOTE: Docker のパス。Podman など別ランタイムでは配置/収集方法が異なる
+      # NOTE: ここでは Docker Engine 前提のパス (/var/lib/docker, /var/run/docker.sock) をマウントしている。
+      #       Podman など別のコンテナランタイムでは、ストレージパスやソケットの場所/有無が異なるため、
+      #       対応するパスや設定に置き換えること。
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
