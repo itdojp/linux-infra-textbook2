@@ -219,7 +219,7 @@ if __name__ == "__main__":
 
 #### ログ集約システム（ELK Stack）
 ```yaml
-# docker-compose-elk.yml
+# compose-elk.yml
 version: '3.7'
 
 services:
@@ -675,7 +675,7 @@ cat > dashboard.json << 'DASHBOARD'
 DASHBOARD
 
 # Docker Composeファイル
-cat > docker-compose-monitoring.yml << 'COMPOSE'
+cat > compose-monitoring.yml << 'COMPOSE'
 version: '3.8'
 
 services:
@@ -741,7 +741,7 @@ COMPOSE
 # 起動スクリプト
 cat > start_monitoring.sh << 'START'
 #!/bin/bash
-docker compose -f docker-compose-monitoring.yml up -d
+docker compose -f compose-monitoring.yml up -d
 echo "Monitoring stack is starting..."
 echo "Prometheus: http://localhost:9090"
 echo "Grafana: http://localhost:3000 (admin/admin)"
