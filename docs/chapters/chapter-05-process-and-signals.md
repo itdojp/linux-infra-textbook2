@@ -257,8 +257,8 @@ kill -l
 #### シグナルの送信
 ```bash
 # 基本的な使い方
-kill -TERM 1234     # プロセス1234に終了要求
-kill -9 1234        # 強制終了
+kill -TERM 1234     # まずは終了要求（通常はこちら）
+kill -KILL 1234     # 最終手段（後片付け不可。データ破損の可能性がある）
 kill -HUP 1234      # 設定再読み込み
 
 # プロセス名でkill
@@ -268,6 +268,8 @@ killall firefox     # firefoxという名前のプロセスすべて
 # 条件付きkill
 pgrep -f "python script.py" | xargs kill
 ```
+
+※ SIGKILL（`-KILL` / `-9`）はプロセスが捕捉できないため、基本はSIGTERMで終了要求し、猶予後に必要ならSIGKILLを使う。
 
 #### シグナルハンドラの例（Bashスクリプト）
 ```bash
