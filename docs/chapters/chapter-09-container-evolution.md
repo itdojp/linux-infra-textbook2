@@ -211,19 +211,20 @@ EOF
 # manual_container.sh - 手動でコンテナ環境を作成
 cat > manual_container.sh << 'EOF'
 #!/bin/bash
+set -euo pipefail
 
 # 1. ルートファイルシステムの準備
 ROOTFS="/tmp/container_root"
-mkdir -p $ROOTFS
+mkdir -p "$ROOTFS"
 
 # 最小限のLinux環境をコピー（Alpine Linuxを使用）
 wget -O alpine.tar.gz https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.0-x86_64.tar.gz
-tar -xzf alpine.tar.gz -C $ROOTFS
+tar -xzf alpine.tar.gz -C "$ROOTFS"
 
 # 2. 名前空間を分離してchrootで起動
 sudo unshare --mount --uts --ipc --net --pid --fork \
-    --mount-proc=$ROOTFS/proc \
-    chroot $ROOTFS /bin/sh -c '
+    --mount-proc="$ROOTFS/proc" \
+    chroot "$ROOTFS" /bin/sh -c '
     # コンテナ内での作業
     hostname container
     echo "Welcome to manual container!"
@@ -235,7 +236,7 @@ sudo unshare --mount --uts --ipc --net --pid --fork \
 '
 
 # クリーンアップ
-sudo rm -rf $ROOTFS alpine.tar.gz
+sudo rm -rf -- "$ROOTFS" alpine.tar.gz
 EOF
 ```
 
@@ -447,31 +448,32 @@ EOF
 # mini_container.sh - 最小限のコンテナランタイム
 cat > mini_container.sh << 'EOF'
 #!/bin/bash
+set -euo pipefail
 
 CONTAINER_ID="mini_$(date +%s)"
 ROOTFS="/tmp/containers/$CONTAINER_ID"
 
 # コンテナイメージの作成関数
 create_rootfs() {
-    mkdir -p $ROOTFS/{bin,lib,lib64,etc,proc,sys,dev,tmp}
+    mkdir -p "$ROOTFS"/{bin,lib,lib64,etc,proc,sys,dev,tmp}
     
     # 必要なバイナリをコピー
     for bin in sh ls cat echo ps mount umount; do
-        cp /bin/$bin $ROOTFS/bin/ 2>/dev/null || \
-        cp /usr/bin/$bin $ROOTFS/bin/ 2>/dev/null
+        cp "/bin/$bin" "$ROOTFS/bin/" 2>/dev/null || \
+        cp "/usr/bin/$bin" "$ROOTFS/bin/" 2>/dev/null
     done
     
     # 共有ライブラリをコピー
-    for bin in $ROOTFS/bin/*; do
-        ldd $bin 2>/dev/null | grep -oE '/[^ ]+' | while read lib; do
-            mkdir -p $ROOTFS$(dirname $lib)
-            cp $lib $ROOTFS$lib 2>/dev/null
+    for bin in "$ROOTFS"/bin/*; do
+        ldd "$bin" 2>/dev/null | grep -oE '/[^ ]+' | while read -r lib; do
+            mkdir -p "$ROOTFS$(dirname "$lib")"
+            cp "$lib" "$ROOTFS$lib" 2>/dev/null
         done
     done
     
     # 基本的な設定ファイル
-    echo "container" > $ROOTFS/etc/hostname
-    echo "127.0.0.1 localhost" > $ROOTFS/etc/hosts
+    echo "container" > "$ROOTFS/etc/hostname"
+    echo "127.0.0.1 localhost" > "$ROOTFS/etc/hosts"
 }
 
 # コンテナ実行関数
@@ -481,11 +483,11 @@ run_container() {
     sudo unshare --mount --uts --ipc --net --pid --fork \
         bash -c "
         # procとsysをマウント
-        mount -t proc proc $ROOTFS/proc
-        mount -t sysfs sys $ROOTFS/sys
+        mount -t proc proc \"$ROOTFS/proc\"
+        mount -t sysfs sys \"$ROOTFS/sys\"
         
         # ルートファイルシステムを変更
-        chroot $ROOTFS /bin/sh -c '
+        chroot \"$ROOTFS\" /bin/sh -c '
             hostname \$(cat /etc/hostname)
             echo \"Welcome to mini container!\"
             echo \"Container ID: $CONTAINER_ID\"
@@ -496,8 +498,8 @@ run_container() {
         '
         
         # クリーンアップ
-        umount $ROOTFS/proc
-        umount $ROOTFS/sys
+        umount \"$ROOTFS/proc\"
+        umount \"$ROOTFS/sys\"
     "
 }
 
@@ -506,7 +508,7 @@ create_rootfs
 run_container
 
 # 後片付け
-sudo rm -rf $ROOTFS
+sudo rm -rf -- "$ROOTFS"
 EOF
 ```
 
@@ -576,12 +578,13 @@ EOF
 # layer_demo.sh
 cat > layer_demo.sh << 'EOF'
 #!/bin/bash
+set -euo pipefail
 
 echo "=== Container Image Layers Demo ==="
 
 WORK_DIR="/tmp/layer_demo"
-mkdir -p $WORK_DIR
-cd $WORK_DIR
+mkdir -p "$WORK_DIR"
+cd "$WORK_DIR"
 
 # レイヤー1：ベースシステム
 echo "Creating Layer 1: Base System"
@@ -624,7 +627,7 @@ echo "Merged filesystem contents:"
 ls -la overlay/merged/
 
 sudo umount overlay/merged
-rm -rf $WORK_DIR
+rm -rf -- "$WORK_DIR"
 EOF
 ```
 
