@@ -158,6 +158,9 @@ noisy_command > /dev/null 2>&1
 **`/dev/zero` - 無限のゼロ:**
 ```bash
 # 1GBのファイルを作成（すべてゼロで埋める）
+# [注意] `dd` は引数を誤るとブロックデバイス等を上書きし、データを破壊する。
+# 本書ではカレントディレクトリ配下の「通常ファイル」にのみ書き込む例に限定する。
+# 実行前に `of=` を必ず確認し、検証環境でのみ実行する（I/O負荷・空き容量にも注意）。
 dd if=/dev/zero of=bigfile bs=1M count=1024
 
 # （簡易）ディスクの書き込み性能を測定（ページキャッシュの影響に注意）
@@ -165,7 +168,7 @@ dd if=/dev/zero of=testfile bs=1M count=1000 conv=fdatasync
 # ※より厳密にキャッシュ影響を避けたい場合は oflag=direct 等（環境依存）を検討する
 ```
 
-**`/dev/urandom` - 乱数生成器:**
+**`/dev/random` と `/dev/urandom` - 乱数生成器:**
 ```bash
 # パスワード生成
 tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12
@@ -173,6 +176,8 @@ tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12
 # 暗号鍵の生成  
 dd if=/dev/random of=secret.key bs=1 count=32
 ```
+
+※ `/dev/random` は環境によってはエントロピー枯渇でブロックする。停止する場合は `/dev/urandom` や `openssl rand` の利用を検討する。
 
 ### /proc - プロセス情報の可視化
 
@@ -372,12 +377,16 @@ tail -f /var/log/app/application.log
 tail -f /var/log/syslog
 
 # カーネルメッセージ
-# /proc/kmsg はroot権限や設定により読めない場合がある（代替: dmesg -w / journalctl -k -f）
-sudo tail -f /proc/kmsg
+# /proc/kmsg はroot権限・kernel.dmesg_restrict等の設定により読めない場合がある。
+# さらに読み取りがカーネルリングバッファの消費に影響しうるため、学習用途以外では推奨しない。
+# 代替: journald（推奨） / dmesg
+sudo journalctl -k -f
 
 # すべてを統合
 mkdir -p ~/logs
-sudo tail -F /var/log/app/application.log /var/log/syslog /proc/kmsg | tee -a ~/logs/combined.log
+sudo tail -F /var/log/app/application.log /var/log/syslog | tee -a ~/logs/combined.log
+# カーネルログも同じファイルに追記したい場合は、別ターミナルで以下を実行:
+# sudo journalctl -k -f | tee -a ~/logs/combined.log
 ```
 
 すべてが「ファイル」なので、同じコマンドで扱える。
@@ -407,10 +416,9 @@ while true; do
     cpu_usage=$(awk -v t="$total_diff" -v i="$idle_diff" 'BEGIN { if (t<=0) {print 0} else {printf "%.0f", (t-i)*100/t} }')
     
     # メモリ使用率
-    mem_info=$(cat /proc/meminfo)
-    mem_total=$(echo "$mem_info" | grep MemTotal | awk '{print $2}')
-    mem_free=$(echo "$mem_info" | grep MemAvailable | awk '{print $2}')
-    mem_usage=$((100 - (mem_free * 100 / mem_total)))
+    mem_total=$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)
+    mem_available=$(awk '/^MemAvailable:/ {print $2}' /proc/meminfo)
+    mem_usage=$((100 - (mem_available * 100 / mem_total)))
     
     # ディスク使用率
     disk_usage=$(df -h / | tail -1 | awk '{print $5}' | sed 's/%//')
@@ -429,16 +437,18 @@ done
 
 ```bash
 # プロセスが何をしているか調査
-strace -p $(pgrep problematic_app) 2>&1 | tee debug.log
+# pgrep はデフォルトでは「プロセス名」一致（引数まで含めたい場合は -f）。
+# また複数PIDが返ることがあるため、必要に応じて -n（最新）や -d,（区切り）を使う。
+strace -p "$(pgrep -n -f 'problematic_app')" 2>&1 | tee debug.log
 
 # ネットワーク接続を確認
 cat /proc/net/tcp
 
 # 開いているファイルを確認
-lsof -p $(pgrep nginx)
+lsof -p "$(pgrep -d, -x nginx)"
 
 # システムコールの統計
-perf stat -p $(pgrep mysql)
+perf stat -p "$(pgrep -d, -x mysql)"
 ```
 
 ## 4.6 演習：/proc、/dev、/sysを探索して抽象化を実感
@@ -457,7 +467,7 @@ uptime_days=$(echo "$uptime_seconds / 86400" | bc)
 echo "システムは ${uptime_days} 日間稼働している"
 
 # 3. 1秒ごとにメモリ使用量を観察
-watch -n 1 'cat /proc/meminfo | grep -E "MemTotal|MemFree|MemAvailable"'
+watch -n 1 'grep -E "^(MemTotal|MemFree|MemAvailable):" /proc/meminfo'
 ```
 
 **課題**：別のターミナルで大きなアプリケーション（Firefoxなど）を起動し、メモリ使用量の変化を観察してください。
