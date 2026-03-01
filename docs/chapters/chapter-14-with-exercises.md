@@ -6,6 +6,7 @@
 - シェル: bash
 - 権限: 章内で `sudo` を付けた操作は管理者権限が必要
 - ネットワーク: 章によりインターネット接続が必要（例: パッケージ導入、クラウド操作）
+- コンテナ/Compose: 本章の例は Docker Engine + `docker compose`（Compose v2）を前提とする（Podmanで置換する場合は、章10の差分とランタイム固有パスに注意）
 - 演習（第11章以降）: AWS などの外部サービスを扱うため、アカウント/認証情報が必要（章内の前提に従う）
 
 ## 14.1 はじめに：見えないものは管理できない
@@ -258,6 +259,9 @@ services:
     user: root
     volumes:
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      # NOTE: ここでは Docker Engine 前提のパス (/var/lib/docker, /var/run/docker.sock) をマウントしている。
+      #       Podman など別のコンテナランタイムでは、ストレージパスやソケットの場所/有無が異なるため、
+      #       対応するパスや設定に置き換えること。
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
@@ -730,6 +734,7 @@ services:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
+      # NOTE: Docker のパス。Podman など別ランタイムでは配置/収集方法が異なる
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
 

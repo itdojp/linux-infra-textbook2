@@ -200,7 +200,8 @@ Linuxスキル
 
 ### エコシステムとしての共存
 
-企業のITインフラは、Linuxだけで構成されているわけではない：
+企業のITインフラは、Linuxだけで構成されているわけではない。
+※ 以下は概念図であり、割合は例（概算）である。業界・規模・時期により大きく変わる。
 
 ```text
 [利用者層]
@@ -209,9 +210,9 @@ Linuxスキル
 └─ モバイル：iOS、Android
 
 [サーバー層]
-├─ Linux：Webサーバー、DB（80%）
-├─ Windows Server：Active Directory（15%）
-└─ その他UNIX：レガシーシステム（5%）
+├─ Linux：Webサーバー、DB（例: 80%）
+├─ Windows Server：Active Directory（例: 15%）
+└─ その他UNIX：レガシーシステム（例: 5%）
 ```
 
 ### それぞれの得意分野

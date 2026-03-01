@@ -309,7 +309,7 @@ ls -la
 cd ..
 
 # ディレクトリごと削除（中身がある場合）
-rm -rf my_project
+rm -r my_project
 
 # 削除されたか確認
 ls my_project
