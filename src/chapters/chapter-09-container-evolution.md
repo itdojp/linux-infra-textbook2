@@ -146,7 +146,8 @@ EOF
 - `cgroup.subtree_control` への書き込みは、書き込み対象のcgroupが内部プロセスを持たないこと（`cgroup.procs` が空）を要求する
   `cgroup.procs` が空でない場合は `Device or resource busy` になりやすい
 - systemd管理下では `cpu`/`memory` 等が既に有効化されていることが多い
-  すでに有効な場合は追加の `echo "+..."` を行わずに後続手順へ進める
+  本章の例は root cgroup（`/sys/fs/cgroup`）で対象コントローラーが有効化済みであることを前提とする
+  未有効の場合は環境側で有効化が必要（root cgroup が空なら `echo "+cpu" | sudo tee /sys/fs/cgroup/cgroup.subtree_control` のように有効化可能）
 
 ```bash
 # cgroup v2の確認
@@ -157,9 +158,9 @@ cgroup2 on /sys/fs/cgroup type cgroup2
 $ cat /sys/fs/cgroup/cgroup.controllers
 cpu io memory pids
 
-# CPU使用率を50%に制限
+# CPU使用率を50%に制限（前提: root cgroup で cpu コントローラーが有効）
 $ grep -qw cpu /sys/fs/cgroup/cgroup.subtree_control || \
-    echo "+cpu" | sudo tee /sys/fs/cgroup/cgroup.subtree_control > /dev/null
+    echo "NOTE: cpu コントローラーが root cgroup の subtree_control で有効化されていません（この節はスキップしてください）"
 $ sudo mkdir /sys/fs/cgroup/mylimit
 $ echo "50000 100000" | sudo tee /sys/fs/cgroup/mylimit/cpu.max
 # 100000マイクロ秒中50000マイクロ秒使用可能 = 50%
@@ -174,10 +175,19 @@ $ echo $$ | sudo tee /sys/fs/cgroup/mylimit/cgroup.procs
 cat > memory_limit_demo.sh << 'EOF'
 #!/bin/bash
 
+# 前提: root cgroup で memory コントローラーが有効になっている環境を対象とする
+if ! grep -qw memory /sys/fs/cgroup/cgroup.controllers; then
+    echo "memory コントローラーが利用できません（cgroup.controllers に memory がありません）。" >&2
+    exit 1
+fi
+if ! grep -qw memory /sys/fs/cgroup/cgroup.subtree_control; then
+    echo "memory コントローラーが root cgroup の subtree_control で有効化されていません。" >&2
+    echo "（root cgroup の cgroup.procs が空の環境なら、echo \"+memory\" | sudo tee /sys/fs/cgroup/cgroup.subtree_control で有効化できます）" >&2
+    exit 1
+fi
+
 # メモリ制限付きのcgroup作成
 sudo mkdir -p /sys/fs/cgroup/memlimit
-grep -qw memory /sys/fs/cgroup/cgroup.subtree_control || \
-    echo "+memory" | sudo tee /sys/fs/cgroup/cgroup.subtree_control > /dev/null
 echo "100M" | sudo tee /sys/fs/cgroup/memlimit/memory.max
 
 # メモリを大量に使用するプログラム
@@ -418,8 +428,17 @@ gcc cpu_stress.c -o cpu_stress
 
 # cgroup設定
 sudo mkdir -p /sys/fs/cgroup/cpu_demo
-grep -qw cpu /sys/fs/cgroup/cgroup.subtree_control || \
-    echo "+cpu" | sudo tee /sys/fs/cgroup/cgroup.subtree_control > /dev/null
+
+# この演習では、すでにroot cgroupでcpuコントローラーが有効になっている環境のみを対象とする
+if ! grep -qw cpu /sys/fs/cgroup/cgroup.controllers; then
+    echo "cpu コントローラーが利用できません（cgroup.controllers に cpu がありません）。" >&2
+    exit 1
+fi
+if ! grep -qw cpu /sys/fs/cgroup/cgroup.subtree_control; then
+    echo "cpu コントローラーが root cgroup の subtree_control で有効化されていないため、このデモを中断します。" >&2
+    echo "（root cgroup の cgroup.procs が空の環境なら、echo \"+cpu\" | sudo tee /sys/fs/cgroup/cgroup.subtree_control で有効化できます）" >&2
+    exit 1
+fi
 
 # 20% CPU制限
 echo "20000 100000" | sudo tee /sys/fs/cgroup/cpu_demo/cpu.max > /dev/null
