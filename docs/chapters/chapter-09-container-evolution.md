@@ -467,8 +467,8 @@ create_rootfs() {
     for bin in "$ROOTFS"/bin/*; do
         ldd "$bin" 2>/dev/null | grep -oE '/[^ ]+' | while read -r lib; do
             mkdir -p "$ROOTFS$(dirname "$lib")"
-            cp "$lib" "$ROOTFS$lib" 2>/dev/null
-        done
+            cp "$lib" "$ROOTFS$lib" 2>/dev/null || true
+        done || true
     done
     
     # 基本的な設定ファイル
