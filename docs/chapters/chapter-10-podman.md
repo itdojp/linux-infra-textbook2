@@ -221,7 +221,7 @@ podman images
 podman run -d --name web -p 8080:80 nginx
 podman ps
 podman logs web
-podman exec -it web /bin/bash
+podman exec -it web sh
 podman stop web
 podman rm web
 ```
