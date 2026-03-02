@@ -327,7 +327,7 @@ if tar -czf "$BACKUP_DIR/$DATE/www_backup.tar.gz" "$SOURCE_DIR" 2>>$LOG_FILE; th
     log_message "バックアップ成功"
     
     # 古いバックアップを削除（7日以上前）
-    find $BACKUP_DIR -type d -mtime +7 -exec rm -rf {} \; 2>/dev/null
+    find "$BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -mtime +7 -exec rm -rf -- {} \; 2>/dev/null
     log_message "古いバックアップを削除"
 else
     log_message "エラー: バックアップ失敗"

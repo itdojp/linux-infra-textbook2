@@ -225,19 +225,20 @@ EOF
 # manual_container.sh - 手動でコンテナ環境を作成
 cat > manual_container.sh << 'EOF'
 #!/bin/bash
+set -euo pipefail
 
 # 1. ルートファイルシステムの準備
 ROOTFS="/tmp/container_root"
-mkdir -p $ROOTFS
+mkdir -p "$ROOTFS"
 
 # 最小限のLinux環境をコピー（Alpine Linuxを使用）
 wget -O alpine.tar.gz https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.0-x86_64.tar.gz
-tar -xzf alpine.tar.gz -C $ROOTFS
+tar -xzf alpine.tar.gz -C "$ROOTFS"
 
 # 2. 名前空間を分離してchrootで起動
 sudo unshare --mount --uts --ipc --net --pid --fork \
-    --mount-proc=$ROOTFS/proc \
-    chroot $ROOTFS /bin/sh -c '
+    --mount-proc="$ROOTFS/proc" \
+    chroot "$ROOTFS" /bin/sh -c '
     # コンテナ内での作業
     hostname container
     echo "Welcome to manual container!"
@@ -249,7 +250,7 @@ sudo unshare --mount --uts --ipc --net --pid --fork \
 '
 
 # クリーンアップ
-sudo rm -rf $ROOTFS alpine.tar.gz
+sudo rm -rf -- "$ROOTFS" alpine.tar.gz
 EOF
 ```
 
@@ -530,7 +531,7 @@ create_rootfs
 run_container
 
 # 後片付け
-sudo rm -rf $ROOTFS
+sudo rm -rf -- "$ROOTFS"
 EOF
 ```
 
@@ -604,8 +605,8 @@ cat > layer_demo.sh << 'EOF'
 echo "=== Container Image Layers Demo ==="
 
 WORK_DIR="/tmp/layer_demo"
-mkdir -p $WORK_DIR
-cd $WORK_DIR
+mkdir -p "$WORK_DIR"
+cd "$WORK_DIR"
 
 # レイヤー1：ベースシステム
 echo "Creating Layer 1: Base System"
@@ -648,7 +649,7 @@ echo "Merged filesystem contents:"
 ls -la overlay/merged/
 
 sudo umount overlay/merged
-rm -rf $WORK_DIR
+rm -rf -- "$WORK_DIR"
 EOF
 ```
 
