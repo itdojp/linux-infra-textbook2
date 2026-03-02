@@ -88,9 +88,9 @@ permalink: /
 ## ライセンス
 
 本書は **Creative Commons BY-NC-SA 4.0** ライセンスで公開されています。  
-**🔓 教育・研究・個人学習での利用は自由** ですが、**💼 商用利用には事前許諾** が必要です。
+教育・研究・個人学習での利用は自由です。一方、商用利用には事前許諾が必要です。
 
-📋 [詳細なライセンス条件](https://github.com/itdojp/it-engineer-knowledge-architecture/blob/main/LICENSE.md)
+[ライセンス条件の詳細](https://github.com/itdojp/it-engineer-knowledge-architecture/blob/main/LICENSE.md)
 
 **お問い合わせ**  
 株式会社アイティードゥ（ITDO Inc.）  
@@ -98,8 +98,8 @@ Email: [knowledge@itdo.jp](mailto:knowledge@itdo.jp)
 
 ---
 
-**📧 著者:** ITDO Inc. <knowledge@itdo.jp>  
+**著者:** ITDO Inc. <knowledge@itdo.jp>  
 **バージョン:** 1.0.1  
-**📅 最終更新:** 2026年2月20日
+**最終更新:** 2026年2月20日
 
 {% include page-navigation.html %}
