@@ -361,10 +361,12 @@ find ~ -type f \( -name "*.jpg" -o -name "*.png" \) -mtime -7 > image_list.txt
 
 ※ `find -mtime` は「最終更新時刻（mtime）」で判定する。作成日時（birth time）はファイルシステム/ツールによって取得できない場合がある。
 
-Windows/macOS では：
-- ファイル検索機能を使う
-- 結果をコピー＆ペースト？
-- PowerShellなら可能だが、標準的ではない
+macOS では、Linux と同様に `find` などの標準コマンドで実現できる（例）。
+
+Windows では：
+- エクスプローラー等のファイル検索機能を使う
+- 結果をコピーして保存する
+- PowerShell 等で同等の処理をスクリプト化する（前提は環境により異なる）
 
 ## 2.7 まとめ：思想が作る未来
 
