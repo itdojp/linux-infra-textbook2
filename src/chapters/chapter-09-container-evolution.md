@@ -229,6 +229,10 @@ set -euo pipefail
 
 # 1. ルートファイルシステムの準備
 ROOTFS="/tmp/container_root"
+cleanup() {
+    sudo rm -rf -- "$ROOTFS" alpine.tar.gz
+}
+trap cleanup EXIT
 mkdir -p "$ROOTFS"
 
 # 最小限のLinux環境をコピー（Alpine Linuxを使用）
@@ -241,16 +245,21 @@ sudo unshare --mount --uts --ipc --net --pid --fork \
     chroot "$ROOTFS" /bin/sh -c '
     # コンテナ内での作業
     hostname container
-    echo "Welcome to manual container!"
-    echo "Hostname: $(hostname)"
-    echo "Process list:"
-    ps aux
-    echo "Network interfaces:"
-    ip addr show
-'
-
-# クリーンアップ
-sudo rm -rf -- "$ROOTFS" alpine.tar.gz
+	    echo "Welcome to manual container!"
+	    echo "Hostname: $(hostname)"
+	    echo "Process list:"
+	    if command -v ps >/dev/null 2>&1; then
+	        ps aux 2>/dev/null || ps
+	    else
+	        echo "(ps is not installed)"
+	    fi
+	    echo "Network interfaces:"
+	    if command -v ip >/dev/null 2>&1; then
+	        ip addr show
+	    else
+	        echo "(ip is not installed)"
+	    fi
+	'
 EOF
 ```
 
