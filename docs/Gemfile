@@ -3,6 +3,11 @@ source "https://rubygems.org"
 # Jekyll and related gems
 gem "jekyll", "~> 4.3.0"
 gem "jekyll-sass-converter", "~> 3.0"
+gem "jekyll-feed"
+gem "jekyll-sitemap"
+gem "jekyll-seo-tag"
+gem "jekyll-relative-links"
+gem "jekyll-optional-front-matter"
 
 # Performance and optimization
 gem "sassc", "~> 2.4"
