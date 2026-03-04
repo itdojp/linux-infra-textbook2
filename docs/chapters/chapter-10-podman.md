@@ -29,33 +29,33 @@
 
 1. **セキュリティリスク**
 
-   ```bash
-   # Dockerデーモンは常にroot権限で動作
-   $ ps aux | grep dockerd
-   root  1234  0.5  1.2  1234567  123456  ?  Ssl  09:00  0:30 /usr/bin/dockerd
+```bash
+# Dockerデーモンは常にroot権限で動作
+$ ps aux | grep dockerd
+root  1234  0.5  1.2  1234567  123456  ?  Ssl  09:00  0:30 /usr/bin/dockerd
 
-   # （安全なデモ）ホスト側ディレクトリをマウントすると、コンテナから変更できる
-   # docker グループは実質root相当の権限になり得るため、最小権限の観点で注意する
-   $ mkdir -p /tmp/host-demo && echo "before" > /tmp/host-demo/file.txt
-   $ docker run --rm -v /tmp/host-demo:/host ubuntu bash -c 'ls -l /host && echo after > /host/file.txt'
-   $ cat /tmp/host-demo/file.txt
-   ```
+# （安全なデモ）ホスト側ディレクトリをマウントすると、コンテナから変更できる
+# docker グループは実質root相当の権限になり得るため、最小権限の観点で注意する
+$ mkdir -p /tmp/host-demo && echo "before" > /tmp/host-demo/file.txt
+$ docker run --rm -v /tmp/host-demo:/host ubuntu bash -c 'ls -l /host && echo after > /host/file.txt'
+$ cat /tmp/host-demo/file.txt
+```
 
 1. **単一障害点**
 
-   ```bash
-   # Dockerデーモンが停止すると、すべてのコンテナに影響
-   $ sudo systemctl stop docker
-   # コンテナの管理操作（起動/停止/ログ取得 等）ができなくなる
-   # 既存コンテナのプロセスは直ちに停止しないことが多い（環境/設定による）
-   ```
+```bash
+# Dockerデーモンが停止すると、すべてのコンテナに影響
+$ sudo systemctl stop docker
+# コンテナの管理操作（起動/停止/ログ取得 等）ができなくなる
+# 既存コンテナのプロセスは直ちに停止しないことが多い（環境/設定による）
+```
 
 1. **システムサービスとの統合の難しさ**
 
-   ```bash
-   # systemdとの統合が複雑
-   # Dockerデーモンを介する必要がある
-   ```
+```bash
+# systemdとの統合が複雑
+# Dockerデーモンを介する必要がある
+```
 
 > この章の読み方  
 > 初学者は、まず「Docker とほぼ同じ操作感で使える」「一般ユーザー権限でコンテナを動かせる（Rootless）」の2点を優先して確認する。SELinux 連携などの詳細は、再読時に段階的に扱う。

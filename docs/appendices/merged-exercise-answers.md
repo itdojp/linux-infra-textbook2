@@ -3056,54 +3056,54 @@ groups:
 
 1. **接続プールの最適化**：
 
-   ```yaml
-   database:
-     pool:
-       min_size: 10
-       max_size: 50
-       connection_timeout: 3s
-       idle_timeout: 30s
-   ```
+```yaml
+database:
+  pool:
+    min_size: 10
+    max_size: 50
+    connection_timeout: 3s
+    idle_timeout: 30s
+```
 
 1. **Circuit Breakerパターンの実装**：
 
-   ```python
-   from pybreaker import CircuitBreaker
+```python
+from pybreaker import CircuitBreaker
 
-   db_breaker = CircuitBreaker(
-       fail_max=3,
-       reset_timeout=60,
-       exclude=[OperationalError]
-   )
+db_breaker = CircuitBreaker(
+    fail_max=3,
+    reset_timeout=60,
+    exclude=[OperationalError]
+)
 
-   @db_breaker
-   def connect_to_database():
-       return database.connect()
-   ```
+@db_breaker
+def connect_to_database():
+    return database.connect()
+```
 
 1. **ヘルスチェックの強化**：
 
-   ```python
-   async def health_check():
-       try:
-           await database.execute("SELECT 1")
-           return True
-       except Exception:
-           return False
+```python
+async def health_check():
+    try:
+        await database.execute("SELECT 1")
+        return True
+    except Exception:
+        return False
 
-   # 定期的にヘルスチェックを実行
-   ```
+# 定期的にヘルスチェックを実行
+```
 
 1. **タイムアウト設定の見直し**：
 
-   ```python
-   connection_config = {
-       'connect_timeout': 2,  # 2秒に短縮
-       'command_timeout': 5,
-       'retry_count': 3,
-       'retry_delay': 0.5
-   }
-   ```
+```python
+connection_config = {
+    'connect_timeout': 2,  # 2秒に短縮
+    'command_timeout': 5,
+    'retry_count': 3,
+    'retry_delay': 0.5
+}
+```
 
 ### 問題6：パフォーマンス分析
 
@@ -3122,56 +3122,56 @@ groups:
 
 1. **キャッシュの導入**：
 
-   ```python
-   # Redis キャッシュの実装
-   @cache.memoize(timeout=300)  # 5分間キャッシュ
-   def get_user_data(user_id):
-       return database.query(f"SELECT * FROM users WHERE id = {user_id}")
-   ```
+```python
+# Redis キャッシュの実装
+@cache.memoize(timeout=300)  # 5分間キャッシュ
+def get_user_data(user_id):
+    return database.query(f"SELECT * FROM users WHERE id = {user_id}")
+```
 
 1. **非同期処理の活用**：
 
-   ```python
-   async def process_order(order_data):
-       # 並列実行
-       user_task = asyncio.create_task(user_service.get_user(order_data.user_id))
-       inventory_task = asyncio.create_task(check_inventory(order_data.items))
+```python
+async def process_order(order_data):
+    # 並列実行
+    user_task = asyncio.create_task(user_service.get_user(order_data.user_id))
+    inventory_task = asyncio.create_task(check_inventory(order_data.items))
 
-       user_info, inventory_status = await asyncio.gather(user_task, inventory_task)
+    user_info, inventory_status = await asyncio.gather(user_task, inventory_task)
 
-       # External APIは結果に応じて非同期に
-       asyncio.create_task(notify_external_system(order_data))
+    # External APIは結果に応じて非同期に
+    asyncio.create_task(notify_external_system(order_data))
 
-       return process_result
-   ```
+    return process_result
+```
 
 1. **データベースクエリの最適化**：
 
-   ```sql
-   -- インデックスの追加
-   CREATE INDEX idx_users_active ON users(id) WHERE status = 'active';
+```sql
+-- インデックスの追加
+CREATE INDEX idx_users_active ON users(id) WHERE status = 'active';
 
-   -- クエリの最適化
-   SELECT id, name, email
-   FROM users
-   WHERE id = ? AND status = 'active'
-   -- 必要なカラムのみ選択
-   ```
+-- クエリの最適化
+SELECT id, name, email
+FROM users
+WHERE id = ? AND status = 'active'
+-- 必要なカラムのみ選択
+```
 
 1. **API呼び出しの最適化**：
 
-   ```python
-   # バッチ処理
-   def call_external_api_batch(requests):
-       return external_api.batch_process(requests)
+```python
+# バッチ処理
+def call_external_api_batch(requests):
+    return external_api.batch_process(requests)
 
-   # タイムアウトの設定
-   response = requests.post(
-       url,
-       json=data,
-       timeout=(3, 10)  # 接続3秒、読み取り10秒
-   )
-   ```
+# タイムアウトの設定
+response = requests.post(
+    url,
+    json=data,
+    timeout=(3, 10)  # 接続3秒、読み取り10秒
+)
+```
 
 ### 問題7：予測的監視
 
