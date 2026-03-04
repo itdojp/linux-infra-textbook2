@@ -2,7 +2,8 @@ source "https://rubygems.org"
 
 # Jekyll and related gems
 gem "jekyll", "~> 4.3.0"
-gem "jekyll-sass-converter", "~> 3.0"
+# 本リポジトリは SCSS/Sass を利用していないため、ビルド互換性を優先して sassc 系に固定する。
+gem "jekyll-sass-converter", "~> 2.2"
 gem "jekyll-feed", "~> 0.17"
 gem "jekyll-sitemap", "~> 1.4"
 gem "jekyll-seo-tag", "~> 2.8"

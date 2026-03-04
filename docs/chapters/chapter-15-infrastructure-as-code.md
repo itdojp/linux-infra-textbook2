@@ -34,6 +34,7 @@ terraform apply
 ### 手作業の問題点
 
 #### 実例：ある企業の悲劇
+
 ```text
 2019年某日、大手企業のインフラエンジニアAさんの作業記録：
 
@@ -52,6 +53,7 @@ terraform apply
 ### 人的ミスの分類と対策
 
 #### 1. 設定ミス
+
 ```yaml
 # 手作業での典型的なミス
 server1: memory=8GB, cpu=4
@@ -77,6 +79,7 @@ variable "server_config" {
 ```
 
 #### 2. 手順の抜け漏れ
+
 ```bash
 # 手作業の手順書（人間はミスをする）
 1. サーバーを作成
@@ -99,6 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
 ```
 
 #### 3. 環境間の差異
+
 ```hcl
 # 環境ごとの設定を変数で管理
 variable "environment" {
@@ -124,6 +128,7 @@ resource "aws_instance" "app" {
 ### 宣言的 vs 命令的
 
 #### 命令的アプローチ（従来のスクリプト）
+
 ```bash
 # 命令的：「どうやって」作るかを記述
 #!/bin/bash
@@ -137,6 +142,7 @@ iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 ```
 
 #### 宣言的アプローチ（IaC）
+
 ```hcl
 # 宣言的：「何が」欲しいかを記述
 resource "aws_instance" "web" {
@@ -158,6 +164,7 @@ resource "aws_instance" "web" {
 ### 冪等性の重要性
 
 #### 冪等性とは
+
 ```text
 f(x) = f(f(x)) = f(f(f(x))) = ...
 
@@ -165,6 +172,7 @@ f(x) = f(f(x)) = f(f(f(x))) = ...
 ```
 
 #### 実例で理解する冪等性
+
 ```python
 # 冪等でない操作
 counter += 1  # 実行するたびに値が変わる
@@ -188,6 +196,7 @@ if current_state != desired_state:
 ### 状態管理の仕組み
 
 #### Terraformの状態管理
+
 ```hcl
 # terraform.tfstate - 現在の状態を記録
 {
@@ -217,6 +226,7 @@ if current_state != desired_state:
 ```
 
 #### 状態の同期
+
 ```bash
 # 実際のインフラと状態ファイルの差分を確認
 terraform plan
@@ -235,6 +245,7 @@ terraform apply
 ### バージョン管理との統合
 
 #### Gitによるインフラコードの管理
+
 ```bash
 # ディレクトリ構造
 infrastructure/
@@ -264,6 +275,7 @@ git push origin main
 ```
 
 #### コードレビューによる品質保証
+
 ```yaml
 # .github/workflows/terraform-pr.yml
 name: Terraform Pull Request Check
@@ -313,6 +325,7 @@ jobs:
 ### 監査証跡（Audit Trail）
 
 #### 変更履歴の完全な記録
+
 ```bash
 # すべての変更がGitに記録される
 git log --oneline infrastructure/
@@ -330,6 +343,7 @@ git show a1b2c3d
 ```
 
 #### コンプライアンス対応
+
 ```hcl
 # ポリシーの強制
 resource "aws_s3_bucket" "data" {
@@ -376,6 +390,7 @@ resource "aws_s3_bucket" "data" {
 ### ドリフト検出と修正
 
 #### 手動変更の検出
+
 ```bash
 # 実際のインフラとコードの差異を検出
 terraform plan -refresh-only
@@ -1105,6 +1120,7 @@ resource "aws_budgets_budget" "monthly" {
 もはやインフラエンジニアは、サーバーラックの前で作業する人ではありません。
 
 現代のインフラエンジニアには、次のような役割が求められます。
+
 - **アーキテクト**：システム全体を設計する
 - **プログラマー**：インフラをコードで表現する
 - **SRE**：信頼性とパフォーマンスを追求する
@@ -1121,7 +1137,7 @@ Linuxの基礎から始まり、コンテナ、クラウド、そしてInfrastru
 
 本書で学んだ「なぜ」の視点を持ち続けることで、新しい技術にも対応できるはずです。
 
-**最後に**
+#### 最後に
 
 ```bash
 #!/bin/bash

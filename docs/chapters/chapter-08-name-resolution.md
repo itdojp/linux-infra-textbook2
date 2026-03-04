@@ -32,6 +32,7 @@
 ```
 
 問題点：
+
 - 中央管理のため、更新が遅い
 - ネットワークが大きくなると管理不可能
 - 名前の重複を防げない
@@ -113,6 +114,7 @@ graph TB
 ### LinuxでのDNS設定と動作
 
 #### /etc/resolv.conf - DNSクライアント設定
+
 ```bash
 # 基本的な設定
 $ cat /etc/resolv.conf
@@ -127,6 +129,7 @@ lrwxrwxrwx 1 root root 39 Mar 15 10:00 /etc/resolv.conf -> ../run/systemd/resolv
 ```
 
 #### /etc/hosts - ローカル名前解決
+
 ```bash
 $ cat /etc/hosts
 127.0.0.1       localhost
@@ -139,6 +142,7 @@ $ cat /etc/hosts
 ```
 
 #### /etc/nsswitch.conf - 名前解決の順序
+
 ```bash
 $ grep hosts /etc/nsswitch.conf
 hosts: files dns mDNS4_minimal [NOTFOUND=return]
@@ -180,6 +184,7 @@ SRV     - サービスロケーション
 ```
 
 #### 実際のDNSクエリ
+
 ```bash
 # Aレコード（IPv4アドレス）
 $ dig example.com A
@@ -221,6 +226,7 @@ $ avahi-browse -a
 ### サービスディスカバリ
 
 #### DNS-SD（DNS Service Discovery）
+
 ```bash
 # サービスの公開
 $ avahi-publish-service "My Web Server" _http._tcp 80 "path=/" "version=1.0"
@@ -235,6 +241,7 @@ $ avahi-browse -r _http._tcp
 ```
 
 #### SRVレコードによるサービス発見
+
 ```bash
 # SRVレコードの形式
 _service._proto.name. TTL class SRV priority weight port target.
@@ -251,6 +258,7 @@ _kerberos._tcp.example.com. 3600 IN SRV 0 100 88 kdc2.example.com.
 ### 負荷分散とDNS
 
 #### DNSラウンドロビン
+
 ```bash
 # 複数のAレコードによる簡易負荷分散
 $ dig www.example.com A
@@ -263,6 +271,7 @@ www.example.com.    300    IN    A    192.0.2.3
 ```
 
 #### GeoDNS - 地理的負荷分散
+
 ```bash
 # クライアントの地域に応じて異なるIPを返す
 # 東京からのクエリ
@@ -279,6 +288,7 @@ www.global-service.com.    300    IN    A    198.51.100.1  # NY DC
 ### 内部DNSの設計
 
 #### スプリットDNS（Split-horizon DNS）
+
 ```bash
 # 外部向けDNS設定（BIND）
 zone "example.com" {
@@ -304,6 +314,7 @@ www    IN    A    192.168.1.100  # プライベートIP
 ### キャッシュとパフォーマンス
 
 #### ローカルDNSキャッシュ
+
 ```bash
 # systemd-resolvedの統計情報
 $ resolvectl statistics
@@ -323,6 +334,7 @@ no-negcache
 ```
 
 #### TTL（Time To Live）の理解
+
 ```bash
 # TTLの確認
 $ dig example.com
@@ -546,6 +558,8 @@ EOF
 
 ### 演習5：DNS負荷分散の実装
 
+{% raw %}
+
 ```bash
 # dns_loadbalancer.sh - 簡易DNS負荷分散
 cat > dns_loadbalancer.sh << 'EOF'
@@ -593,6 +607,8 @@ chmod +x test_lb.sh
 echo "Run ./test_lb.sh to test load balancing"
 EOF
 ```
+
+{% endraw %}
 
 ## 8.6 基本的な診断の流れ
 
@@ -664,6 +680,7 @@ dig +norecurse @権威サーバー ドメイン名                      # 権威
 ### 一般的な問題パターンと解決法
 
 #### パターン1: DNS解決が全くできない
+
 ```bash
 # 症状: nslookup/dig が全て失敗
 # 原因調査:
@@ -678,6 +695,7 @@ echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
 ```
 
 #### パターン2: 一部のドメインだけ解決できない
+
 ```bash
 # 症状: google.comは解決できるが、internal.company.comができない
 # 原因調査:
@@ -689,6 +707,7 @@ echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
 ```
 
 #### パターン3: DNS解決が異常に遅い
+
 ```bash
 # 症状: 名前解決に数秒かかる
 # 原因調査:
@@ -704,6 +723,7 @@ echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
 ### よくある問題と解決方法
 
 #### 1. 名前解決ができない
+
 ```bash
 # 診断手順
 # 1. 基本的な接続確認
@@ -720,6 +740,7 @@ sudo systemd-resolve --statistics
 ```
 
 #### 2. 名前解決が遅い
+
 ```bash
 # パフォーマンス分析
 cat > dns_performance.sh << 'EOF'
@@ -749,6 +770,7 @@ EOF
 ```
 
 #### 3. 内部名と外部名の混在
+
 ```bash
 # /etc/resolv.confの適切な設定
 cat > /etc/resolv.conf << EOF
@@ -790,6 +812,7 @@ EOF
 ## 章末演習問題
 
 ### 問題1：基本理解の確認
+
 以下の文章の空欄を埋めてください。
 
 1. DNSは（　　　　　　　　　　　）の略で、（　　　）を（　　　　　　）に変換するシステムです。
@@ -797,6 +820,7 @@ EOF
 3. Linuxで名前解決の順序を決定するファイルは（　　　　　　　　　）です。
 
 ### 問題2：概念の理解
+
 次の質問に答えてください。
 
 1. DNSが中央集権型ではなく分散型データベースとして設計された理由を3つ挙げて説明してください。
@@ -804,6 +828,7 @@ EOF
 3. mDNS（Multicast DNS）が必要な場面と、通常のDNSとの違いを説明してください。
 
 ### 問題3：DNSレコードの理解
+
 以下のDNSレコードタイプについて、それぞれの用途と例を示してください。
 
 1. A レコード
@@ -813,6 +838,7 @@ EOF
 5. PTR レコード
 
 ### 問題4：実践的な課題
+
 以下のシナリオに対する解決策を示してください。
 
 1. 社内ネットワークでは内部IPアドレス、外部からは公開IPアドレスを返すDNS設定を実現する方法
@@ -820,6 +846,7 @@ EOF
 3. 開発環境で本番環境のドメイン名を使いたい場合の設定方法
 
 ### 問題5：DNS診断スクリプト
+
 以下の要件を満たすDNS診断スクリプトを作成してください。
 
 ```bash
@@ -837,6 +864,7 @@ EOF
 ```
 
 ### 問題6：負荷分散DNS
+
 次の要件を満たすDNS設定を作成してください。
 
 - `www.example.com` へのアクセスを3台のWebサーバーに分散
@@ -844,6 +872,7 @@ EOF
 - ヘルスチェックで応答しないサーバーは自動的に除外
 
 ### 問題7：セキュリティ
+
 以下のDNSセキュリティに関する質問に答えてください。
 
 1. DNSキャッシュポイズニング攻撃とは何か、どのように防御するか
@@ -851,6 +880,7 @@ EOF
 3. DNS over HTTPS（DoH）のメリットとデメリット
 
 ### 問題8：発展的課題
+
 1. マイクロサービスアーキテクチャにおけるサービスディスカバリの実装方法を、DNSベースとそれ以外の方法で比較してください。
 
 2. エッジコンピューティング環境でのDNSの課題と解決策について論じてください。

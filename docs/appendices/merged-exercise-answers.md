@@ -11,12 +11,14 @@ order: 19
 ### 問題1：基本理解の確認
 
 1. Linuxは（**1991**）年にリーナス・トーバルズによって開発が始まりました。
+
 2. 企業がLinuxを選ぶ技術的理由として、（**安定**）性、（**スケーラビリティ**）性、自動化との（**親和**）性があります。
+
 3. サーバーOSとしてのLinuxの役割は、ハードウェアの（**抽象**）化、リソースの（**管理**）と分配、（**セキュリティ**）の確保です。
 
 ### 問題2：概念の理解
 
-**1. なぜ多くの企業がWindows ServerやmacOSではなく、Linuxをサーバー用途に選ぶのか、3つの観点から説明**
+#### 1. なぜ多くの企業がWindows ServerやmacOSではなく、Linuxをサーバー用途に選ぶのか、3つの観点から説明
 
 1. **経済的観点**：
    - Linuxは無料で使用でき、ライセンス費用が不要
@@ -33,17 +35,21 @@ order: 19
    - 世界規模のコミュニティサポート
    - 一度習得すれば様々な環境で活用可能な汎用性
 
-**2. 「オペレーティングシステム」の役割を、レストラン以外の身近な例えで説明**
+#### 2. 「オペレーティングシステム」の役割を、レストラン以外の身近な例えで説明
 
 交通管制センターの例：
+
 - **ハードウェア**：道路、信号機、標識（インフラ）
+
 - **OS**：交通管制センター（交通整理、ルール適用）
+
 - **アプリケーション**：各車両（目的地に向かう）
+
 - **利用者**：運転手や乗客（目的達成）
 
 OSは道路上の車両の流れを管理し、事故を防ぎ、効率的な交通を実現します。
 
-**3. オンプレミスからクラウドへの移行が進んでいる理由**
+#### 3. オンプレミスからクラウドへの移行が進んでいる理由
 
 - **コストの観点**：
   - 初期投資が不要（CAPEX→OPEX）
@@ -57,7 +63,7 @@ OSは道路上の車両の流れを管理し、事故を防ぎ、効率的な交
 
 ### 問題3：実践的思考
 
-**ECサイトのインフラ構成**
+#### ECサイトのインフラ構成
 
 1. **必要な構成要素**：
    - Webサーバー（nginx/Apache）
@@ -83,32 +89,32 @@ OSは道路上の車両の流れを管理し、事故を防ぎ、効率的な交
 
 ### 問題4：トラブルシューティング
 
-**Webサイトが時々遅くなる問題の調査**
+#### Webサイトが時々遅くなる問題の調査
 
 1. **確認項目（優先順位順）**：
    1. **サーバーリソース使用状況**
       - CPU、メモリ、ディスクI/Oを確認
       - 閾値：CPU80%以上、メモリ90%以上で問題あり
-   
+
    2. **ネットワーク状況**
       - 帯域使用率、パケットロス率
       - レイテンシの測定
-   
+
    3. **アプリケーションログ**
       - エラーログの確認
       - 処理時間の長いリクエストの特定
-   
+
    4. **データベースの状態**
       - スロークエリの確認
       - 接続数、ロック状況
-   
+
    5. **外部サービスの応答**
       - API呼び出しのレスポンスタイム
       - CDNの状態確認
 
 ### 問題5：発展的課題
 
-**Infrastructure as CodeとLinuxの関係**
+#### Infrastructure as CodeとLinuxの関係
 
 Infrastructure as CodeはLinuxの以下の特性を活かしています：
 
@@ -124,7 +130,7 @@ Infrastructure as CodeはLinuxの以下の特性を活かしています：
    - 同じコードから同じ環境を確実に構築可能
    - Linuxの決定論的な動作が基盤
 
-**コンテナ技術とLinuxの関係**
+#### コンテナ技術とLinuxの関係
 
 コンテナ技術はLinuxの以下の機能を活用：
 
@@ -141,12 +147,14 @@ Infrastructure as CodeはLinuxの以下の特性を活かしています：
 ### 問題1：基本理解の確認
 
 1. UNIXは（**1969**）年に（**AT&Tベル研究所**）で開発されました。
+
 2. Linuxの設計思想「小さなツールの組み合わせ」は、（**KISS**）原則とも呼ばれます。
+
 3. Linuxのアーキテクチャは、（**カーネル**）と（**ユーザーランド**）に分かれており、ハードウェアへの直接アクセスは（**カーネル**）のみが行います。
 
 ### 問題2：概念の理解
 
-**1. 「すべてはファイル」という設計思想のメリット**
+#### 1. 「すべてはファイル」という設計思想のメリット
 
 1. **統一的なインターフェース**：
    - 例：デバイスもファイルも同じopen/read/write/closeで操作
@@ -160,7 +168,7 @@ Infrastructure as CodeはLinuxの以下の特性を活かしています：
    - 例：設定変更もデバイス操作もリダイレクトで実現
    - 複雑な操作を簡単に自動化できる
 
-**2. パイプを使った処理の優位性**
+#### 2. パイプを使った処理の優位性
 
 1. **段階的な問題解決**：
    - 各段階で結果を確認しながら処理を構築
@@ -170,7 +178,7 @@ Infrastructure as CodeはLinuxの以下の特性を活かしています：
    - 全データをメモリに読み込まず、ストリーム処理
    - 巨大なファイルも効率的に処理可能
 
-**3. カーネルとユーザーランドの分離の利点**
+#### 3. カーネルとユーザーランドの分離の利点
 
 - **セキュリティの観点**：
   - カーネルが全アクセスを仲介し、不正を防ぐ
@@ -184,7 +192,7 @@ Infrastructure as CodeはLinuxの以下の特性を活かしています：
 
 ### 問題3：実践的思考
 
-**1. 大量のログファイルから特定IPのアクセスを集計**
+#### 1. 大量のログファイルから特定IPのアクセスを集計
 
 ```bash
 # 方法1: 基本的なアプローチ
@@ -197,7 +205,7 @@ grep -h "192.168.1.100" access.log.{1..100} | \
 awk '{print substr($4,2,10)}' | sort | uniq -c | sort -k2
 ```
 
-**2. メモリ使用率上位5プロセスの監視**
+#### 2. メモリ使用率上位5プロセスの監視
 
 ```bash
 #!/bin/bash
@@ -207,32 +215,38 @@ while true; do
     echo "=== $(date) ==="
     # メモリ使用率上位5プロセスを表示
     ps aux --sort=-%mem | head -6 | tail -5
-    
+
     # 50%を超えるプロセスをチェック
     ps aux --sort=-%mem | awk 'NR>1 && $4>50 {
         print "ALERT: Process " $11 " is using " $4 "% memory (PID: " $2 ")"
     }'
-    
+
     sleep 60
 done
 ```
 
 ### 問題4：設計思想の応用
 
-**1. 「一つのプログラムは一つのことをうまくやる」の適用**
+#### 1. 「一つのプログラムは一つのことをうまくやる」の適用
 
 例：ログ分析システムの設計
+
 - **ログ収集器**：ログファイルの収集のみ
+
 - **パーサー**：ログの解析のみ
+
 - **フィルター**：条件に基づく抽出のみ
+
 - **集計器**：統計情報の計算のみ
+
 - **レポーター**：結果の表示のみ
 
 各コンポーネントは独立して開発・テスト・更新可能。
 
-**2. パイプのような仕組みの実装**
+#### 2. パイプのような仕組みの実装
 
 メッセージキューを使った実装：
+
 ```text
 [ログ収集] → Queue → [パーサー] → Queue → [フィルター] → Queue → [集計器]
 ```
@@ -241,7 +255,8 @@ done
 
 ### 問題5：トラブルシューティング
 
-**問題のあるコマンド：**
+#### 問題のあるコマンド
+
 ```bash
 cat /var/log/app.log | grep "2024-03-15" | grep "ERROR" | wc -l > count.txt | mail -s "Today's errors" admin@example.com
 ```
@@ -250,6 +265,7 @@ cat /var/log/app.log | grep "2024-03-15" | grep "ERROR" | wc -l > count.txt | ma
 パイプの最後で`count.txt`にリダイレクトしているため、その後のパイプが機能しない。
 
 **修正案**：
+
 ```bash
 # 方法1: teeを使用
 cat /var/log/app.log | grep "2024-03-15" | grep "ERROR" | wc -l | tee count.txt | mail -s "Today's errors" admin@example.com
@@ -262,7 +278,7 @@ echo $count | mail -s "Today's errors" admin@example.com
 
 ### 問題6：発展的課題
 
-**マイクロサービスとUNIX思想の関連**
+#### マイクロサービスとUNIX思想の関連
 
 マイクロサービスアーキテクチャは、UNIXの「小さなツールの組み合わせ」思想の現代的な実装です：
 
@@ -290,7 +306,7 @@ echo $count | mail -s "Today's errors" admin@example.com
 
 ### 問題2：概念の理解
 
-**1. ハードウェアデバイスをファイルとして扱う利点**
+#### 1. ハードウェアデバイスをファイルとして扱う利点
 
 1. **統一的な操作方法**：
    - すべてのデバイスを同じAPIで操作可能
@@ -304,7 +320,7 @@ echo $count | mail -s "Today's errors" admin@example.com
    - リダイレクトやパイプでデバイスを操作
    - 自動化が簡単に実現可能
 
-**2. /procと/sysの違い**
+#### 2. /procと/sysの違い
 
 - **/proc**：
   - プロセスとシステムの実行時情報を提供
@@ -316,7 +332,7 @@ echo $count | mail -s "Today's errors" admin@example.com
   - 設定可能なパラメータが多い
   - 例：デバイスの設定、電源管理、ネットワーク設定
 
-**3. ブロックデバイスとキャラクタデバイスの違い**
+#### 3. ブロックデバイスとキャラクタデバイスの違い
 
 - **ブロックデバイス**：
   - 一定サイズのブロック単位でアクセス
@@ -330,7 +346,7 @@ echo $count | mail -s "Today's errors" admin@example.com
 
 ### 問題3：実践的思考
 
-**1. 実行中の全プロセスが開いているファイルの総数**
+#### 1. 実行中の全プロセスが開いているファイルの総数
 
 ```bash
 # 方法1: lsofを使用
@@ -343,7 +359,7 @@ while read dir; do
 done | wc -l
 ```
 
-**2. システムの温度センサーの値を定期的に記録**
+#### 2. システムの温度センサーの値を定期的に記録
 
 ```bash
 #!/bin/bash
@@ -356,13 +372,13 @@ while true; do
     # センサーの場所は環境により異なる
     temp=$(cat /sys/class/thermal/thermal_zone0/temp)
     temp_c=$(echo "scale=2; $temp / 1000" | bc)
-    
+
     echo "$timestamp: ${temp_c}°C" >> "$LOG_FILE"
     sleep 300  # 5分ごと
 done
 ```
 
-**3. 特定のプロセスのメモリ使用量の変化を記録**
+#### 3. 特定のプロセスのメモリ使用量の変化を記録
 
 ```bash
 #!/bin/bash
@@ -391,7 +407,7 @@ done
 
 ### 問題4：トラブルシューティング
 
-**1. 大量ログ出力でディスク圧迫、内容は不要**
+#### 1. 大量ログ出力でディスク圧迫、内容は不要
 
 ```bash
 # /dev/nullにリダイレクト
@@ -404,7 +420,7 @@ StandardOutput=null
 StandardError=null
 ```
 
-**2. USBデバイスの認識確認**
+#### 2. USBデバイスの認識確認
 
 ```bash
 # 接続前後でデバイスを比較
@@ -420,7 +436,7 @@ dmesg | tail -20
 lsusb -v
 ```
 
-**3. プロセスが使用しているポート確認**
+#### 3. プロセスが使用しているポート確認
 
 ```bash
 # 方法1: /procから直接確認
@@ -481,7 +497,7 @@ echo "  PID: $max_pid, Name: $max_cmd, Open files: $max_files"
 
 ### 問題6：発展的課題
 
-**1. Dockerと「すべてはファイル」思想の活用**
+#### 1. Dockerと「すべてはファイル」思想の活用
 
 Dockerは以下の方法でこの思想を活用：
 
@@ -493,7 +509,7 @@ Dockerは以下の方法でこの思想を活用：
   - `/proc/PID/ns/`以下のファイルで名前空間を管理
   - ファイルディスクリプタとして名前空間を操作
 
-**2. 「すべてはファイル」の限界**
+#### 2. 「すべてはファイル」の限界
 
 - **非同期イベント**：
   - GUIイベント、リアルタイムストリーミング
@@ -512,26 +528,28 @@ Dockerは以下の方法でこの思想を活用：
 ### 問題1：基本理解の確認
 
 1. シェルは人間と（**カーネル**）の間に立つ（**通訳者**）の役割を果たします。
+
 2. パイプ（|）は、あるコマンドの（**標準出力**）を別のコマンドの（**標準入力**）につなぎます。
+
 3. リダイレクトで、標準出力は（**>**）、標準エラー出力は（**2>**）、両方を同じファイルに出力するには（**2>&1**）と記述します。
 
 ### 問題2：コマンドの理解
 
-**1. `find /var/log -name "*.log" -mtime +30 -exec rm {} \;`**
+#### 1. `find /var/log -name "*.log" -mtime +30 -exec rm {} \;`
 
 30日以上前に更新された/var/log以下の.logファイルをすべて削除する。
 
-**2. `ps aux | grep nginx | grep -v grep | awk '{print $2}' | xargs kill -HUP`**
+#### 2. `ps aux | grep nginx | grep -v grep | awk '{print $2}' | xargs kill -HUP`
 
 nginxプロセスのPIDを取得し、HUPシグナル（設定再読み込み）を送信する。
 
-**3. `tail -f /var/log/syslog | grep -E "error|warning" | tee alerts.log`**
+#### 3. `tail -f /var/log/syslog | grep -E "error|warning" | tee alerts.log`
 
 syslogをリアルタイム監視し、errorまたはwarningを含む行を画面表示しつつalerts.logにも保存する。
 
 ### 問題3：実践的な課題
 
-**1. TODOを含む行をファイル名と行番号付きで表示**
+#### 1. TODOを含む行をファイル名と行番号付きで表示
 
 ```bash
 grep -rn "TODO" . --include="*.txt"
@@ -539,7 +557,7 @@ grep -rn "TODO" . --include="*.txt"
 find . -name "*.txt" -exec grep -Hn "TODO" {} \;
 ```
 
-**2. 直近1時間のログレベル集計**
+#### 2. 直近1時間のログレベル集計
 
 ```bash
 #!/bin/bash
@@ -561,7 +579,7 @@ END {
 }'
 ```
 
-**3. サブディレクトリのディスク使用量TOP10**
+#### 3. サブディレクトリのディスク使用量TOP10
 
 ```bash
 du -sh */ 2>/dev/null | sort -rh | head -10
@@ -615,7 +633,7 @@ tail -f "$LOGFILE" | while read line; do
         echo "$line" >> "$ERROR_LOG"
         ERROR_COUNT=$((ERROR_COUNT + 1))
         TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
-        
+
         # 1分間のチェック
         CURRENT_TIME=$(date +%s)
         if [ $((CURRENT_TIME - LAST_CHECK)) -ge 60 ]; then
@@ -631,7 +649,8 @@ done
 
 ### 問題6：トラブルシューティング
 
-**問題のあるスクリプト：**
+#### 問題のあるスクリプト
+
 ```bash
 if [ $usage > $threshold ]; then
 ```
@@ -639,7 +658,8 @@ if [ $usage > $threshold ]; then
 **問題点**：
 `>`はリダイレクト演算子として解釈される。数値比較には`-gt`を使用すべき。
 
-**修正版：**
+#### 修正版
+
 ```bash
 #!/bin/bash
 # ディスク使用率が80%を超えたらアラートを出すスクリプト
@@ -649,7 +669,7 @@ df -h | grep -v "Filesystem" | while read line
 do
     usage=$(echo $line | awk '{print $5}' | sed 's/%//')
     mount=$(echo $line | awk '{print $6}')
-    
+
     # 数値比較には -gt を使用
     if [ "$usage" -gt "$threshold" ]; then
         echo "Warning: $mount is $usage% full"
@@ -659,22 +679,30 @@ done
 
 ### 問題7：発展的課題
 
-**1. GUIとCUIの選択基準**
+#### 1. GUIとCUIの選択基準
 
 **GUIの利点と適用場面**：
+
 - 直感的操作（初心者向け）
+
 - ビジュアルデータの扱い（画像編集、CAD）
+
 - 複雑な選択操作（ファイルマネージャー）
 
 **CUIの利点と適用場面**：
+
 - 自動化・スクリプト化（定期タスク）
+
 - リモート操作（SSH経由の管理）
+
 - 大量データ処理（ログ解析）
+
 - 再現性が必要な作業（構成管理）
 
-**2. DevOps/SREでのシェルスクリプト活用例**
+#### 2. DevOps/SREでのシェルスクリプト活用例
 
 - **CI/CDパイプライン**：
+
   ```bash
   # デプロイスクリプトの例
   #!/bin/bash
@@ -687,6 +715,7 @@ done
   ```
 
 - **監視・アラート**：
+
   ```bash
   # ヘルスチェックスクリプト
   if ! curl -f http://app/health; then
@@ -695,6 +724,7 @@ done
   ```
 
 - **インフラ自動化**：
+
   ```bash
   # サーバープロビジョニング
   terraform apply -auto-approve
@@ -713,7 +743,7 @@ done
 
 ### 問題2：概念の理解
 
-**1. fork()とexec()を分ける設計の利点**
+#### 1. fork()とexec()を分ける設計の利点
 
 - **柔軟な環境設定**：
   - fork()後、exec()前に環境変数やファイルディスクリプタを設定可能
@@ -726,7 +756,7 @@ done
 - **プロセス属性の制御**：
   - 実行前にnice値、リソース制限などを設定可能
 
-**2. ゾンビプロセスについて**
+#### 2. ゾンビプロセスについて
 
 - **定義**：
   終了したが、親プロセスがwait()していないプロセス
@@ -740,7 +770,7 @@ done
   - 親プロセスを終了させる（initが回収）
   - ダブルフォークテクニックの使用
 
-**3. シグナルと他のIPC方法の違い**
+#### 3. シグナルと他のIPC方法の違い
 
 - **シグナル**：
   - 非同期、単方向、少量の情報
@@ -752,7 +782,7 @@ done
 
 ### 問題3：実践的な課題
 
-**1. CPU使用率50%超のプロセス特定**
+#### 1. CPU使用率50%超のプロセス特定
 
 ```bash
 ps aux --sort=-%cpu | awk 'NR>1 && $3>50 {
@@ -760,7 +790,7 @@ ps aux --sort=-%cpu | awk 'NR>1 && $3>50 {
 }'
 ```
 
-**2. メモリ使用量の変化を記録**
+#### 2. メモリ使用量の変化を記録
 
 ```bash
 #!/bin/bash
@@ -774,13 +804,13 @@ while kill -0 $PID 2>/dev/null; do
     vmsize=$(grep VmSize /proc/$PID/status | awk '{print $2}')
     vmrss=$(grep VmRSS /proc/$PID/status | awk '{print $2}')
     vmswap=$(grep VmSwap /proc/$PID/status | awk '{print $2}')
-    
+
     echo "$timestamp,$vmsize,$vmrss,$vmswap" >> "$OUTPUT"
     sleep 10
 done
 ```
 
-**3. プロセス数監視スクリプト**
+#### 3. プロセス数監視スクリプト
 
 ```bash
 #!/bin/bash
@@ -791,26 +821,26 @@ ALERT_FILE="/var/log/process_alert.log"
 
 while true; do
     count=$(ps aux | wc -l)
-    
+
     if [ $count -gt $THRESHOLD ]; then
         msg="警告: プロセス数が${count}個に達しました (閾値: $THRESHOLD)"
         echo "$(date): $msg" >> "$ALERT_FILE"
-        
+
         # メール送信やSlack通知など
         # echo "$msg" | mail -s "Process Alert" admin@example.com
-        
+
         # 詳細情報を記録
         echo "=== Top 10 processes by count ===" >> "$ALERT_FILE"
         ps aux --sort=-pid | head -10 >> "$ALERT_FILE"
     fi
-    
+
     sleep 60
 done
 ```
 
 ### 問題4：トラブルシューティング
 
-**1. 大量のゾンビプロセス**
+#### 1. 大量のゾンビプロセス
 
 ```bash
 # 親プロセスの特定
@@ -822,7 +852,7 @@ ps aux | grep defunct | awk '{print $3}' | sort | uniq -c | sort -rn
 # 3. systemdサービスならKillMode=mixedを設定
 ```
 
-**2. kill -TERMで終了しないプロセス**
+#### 2. kill -TERMで終了しないプロセス
 
 ```bash
 # 1. プロセスの状態確認
@@ -839,7 +869,7 @@ kill -KILL 1234
 lsof -p 1234
 ```
 
-**3. fork()が失敗**
+#### 3. fork()が失敗
 
 ```bash
 # プロセス数の確認
@@ -923,12 +953,12 @@ while true; do
     # プロセスの確認
     pids=($(pgrep -x "$PROCESS_NAME"))
     count=${#pids[@]}
-    
+
     if [ $count -eq 0 ]; then
         log "Process not found, starting $PROCESS_NAME"
         # プロセスを起動（実際のコマンドに置き換える）
         $PROCESS_NAME &
-        
+
     elif [ $count -gt 1 ]; then
         log "Multiple instances found ($count), keeping oldest"
         # 最も古いPID以外を終了
@@ -940,14 +970,14 @@ while true; do
     else
         log "Process running normally (PID: ${pids[0]})"
     fi
-    
+
     sleep $CHECK_INTERVAL
 done
 ```
 
 ### 問題7：発展的課題
 
-**1. コンテナでのプロセス隔離**
+#### 1. コンテナでのプロセス隔離
 
 - **Namespace**：
   - PID namespace: コンテナ内でPID 1から開始
@@ -969,17 +999,24 @@ echo $$ > /sys/fs/cgroup/memory/mygroup/cgroup.procs
 echo 100M > /sys/fs/cgroup/memory/mygroup/memory.limit_in_bytes
 ```
 
-**2. systemd vs SysV init**
+#### 2. systemd vs SysV init
 
 **SysV init**：
+
 - 順次起動（シリアル処理）
+
 - 依存関係はスクリプトの番号で管理
+
 - 起動が遅い
 
 **systemd**：
+
 - 並列起動
+
 - 明示的な依存関係（Requires, After）
+
 - ソケットアクティベーション
+
 - cgroupsによるプロセス管理
 
 ```ini
@@ -1033,31 +1070,34 @@ WantedBy=multi-user.target
 ### 問題3：実践的な課題
 
 1. **Webサーバーのドキュメントルート設定**
-```bash
-sudo chown -R www-data:webadmin /var/www/html
-sudo chmod 750 /var/www/html
-sudo find /var/www/html -type f -exec chmod 640 {} \;
-sudo find /var/www/html -type d -exec chmod 750 {} \;
-```
+
+   ```bash
+   sudo chown -R www-data:webadmin /var/www/html
+   sudo chmod 750 /var/www/html
+   sudo find /var/www/html -type f -exec chmod 640 {} \;
+   sudo find /var/www/html -type d -exec chmod 750 {} \;
+   ```
 
 2. **共有ディレクトリの設定**
-```bash
-sudo mkdir -p /shared/project
-sudo chgrp developers /shared/project
-sudo chmod 2775 /shared/project  # SetGIDビット設定
-```
+
+   ```bash
+   sudo mkdir -p /shared/project
+   sudo chgrp developers /shared/project
+   sudo chmod 2775 /shared/project  # SetGIDビット設定
+   ```
 
 3. **バックアップスクリプトの設定**
-```bash
-sudo chown root:backup /usr/local/bin/backup.sh
-sudo chmod 4750 /usr/local/bin/backup.sh  # SetUIDビット設定
-# より安全な方法：sudoersで制限
-# backup ALL=(root) NOPASSWD: /usr/local/bin/backup.sh
-```
+
+   ```bash
+   sudo chown root:backup /usr/local/bin/backup.sh
+   sudo chmod 4750 /usr/local/bin/backup.sh  # SetUIDビット設定
+   # より安全な方法：sudoersで制限
+   # backup ALL=(root) NOPASSWD: /usr/local/bin/backup.sh
+   ```
 
 ### 問題4：セキュリティ診断
 
-**問題点と修正方法：**
+#### 問題点と修正方法
 
 1. `/etc/app-config/` (777権限)
    - 問題：誰でも設定を変更可能
@@ -1139,9 +1179,12 @@ setfacl -d -m g:developers:rw- .
 
 **原因：** aliceはmanagersグループのメンバーではなく、othersの権限（---）も読み取り不可
 
-**解決策：**
+#### 解決策
+
 1. aliceをmanagersグループに追加：`sudo usermod -aG managers alice`
+
 2. ACLで個別に権限付与：`setfacl -m u:alice:rw /shared/important.txt`
+
 3. ファイルの権限を変更：`chmod 664 /shared/important.txt`
 
 ### 問題8：発展的課題
@@ -1325,19 +1368,28 @@ echo "Test completed at: $(date)"
 
 ### 問題7：パフォーマンス分析
 
-**分析結果：**
+#### 分析結果
+
 - 高い再送信数（1523セグメント）：パケットロスが発生
+
 - RTT 250.5ms：遅延が大きい（通常は数十ms以下が望ましい）
 
-**可能性のある問題：**
+#### 可能性のある問題
+
 - ネットワークの輻輳
+
 - 回線品質の問題
+
 - 距離による遅延
 
-**対策：**
+#### 対策
+
 - 帯域幅の増強
+
 - QoSの実装
+
 - CDNの利用
+
 - TCP輻輳制御アルゴリズムの調整
 
 ### 問題8：発展的課題
@@ -1402,24 +1454,25 @@ echo "Test completed at: $(date)"
 ### 問題4：実践的な課題
 
 1. **スプリットDNSの実現**
-```bash
-# BINDでのview設定
-view "internal" {
-    match-clients { 192.168.0.0/16; 10.0.0.0/8; };
-    zone "example.com" {
-        type master;
-        file "internal/example.com.zone";
-    };
-};
 
-view "external" {
-    match-clients { any; };
-    zone "example.com" {
-        type master;
-        file "external/example.com.zone";
-    };
-};
-```
+   ```text
+   # BINDでのview設定
+   view "internal" {
+       match-clients { 192.168.0.0/16; 10.0.0.0/8; };
+       zone "example.com" {
+           type master;
+           file "internal/example.com.zone";
+       };
+   };
+
+   view "external" {
+       match-clients { any; };
+       zone "example.com" {
+           type master;
+           file "external/example.com.zone";
+       };
+   };
+   ```
 
 2. **DNS障害時のトラブルシューティング**
    - DNSサーバーへの到達性確認
@@ -1429,13 +1482,14 @@ view "external" {
    - ネットワーク経路の確認
 
 3. **開発環境での設定**
-```bash
-# /etc/hostsに追加
-192.168.1.100 production.example.com
-192.168.1.101 api.production.example.com
 
-# またはローカルDNSサーバー（dnsmasq）の使用
-```
+   ```text
+   # /etc/hostsに追加
+   192.168.1.100 production.example.com
+   192.168.1.101 api.production.example.com
+
+   # またはローカルDNSサーバー（dnsmasq）の使用
+   ```
 
 ### 問題5：DNS診断スクリプト
 
@@ -1456,19 +1510,19 @@ echo "  \"tests\": ["
 # 各DNSサーバーでテスト
 for i in "${!DNS_SERVERS[@]}"; do
     dns="${DNS_SERVERS[$i]}"
-    
+
     # 応答時間測定
     start_time=$(date +%s.%N)
     result=$(dig @"$dns" "$DOMAIN" +short 2>/dev/null)
     end_time=$(date +%s.%N)
     response_time=$(echo "$end_time - $start_time" | bc)
-    
+
     # IPアドレス取得
     ips=$(echo "$result" | grep -E '^[0-9.]+$' | tr '\n' ' ')
-    
+
     # DNSSEC検証
     dnssec=$(dig @"$dns" "$DOMAIN" +dnssec +short | grep -c "RRSIG")
-    
+
     # JSON形式で出力
     echo "    {"
     echo "      \"server\": \"$dns\","
@@ -1476,7 +1530,7 @@ for i in "${!DNS_SERVERS[@]}"; do
     echo "      \"ips\": \"$ips\","
     echo "      \"dnssec\": $([ $dnssec -gt 0 ] && echo "true" || echo "false")"
     echo -n "    }"
-    
+
     [ $i -lt $((${#DNS_SERVERS[@]} - 1)) ] && echo ","
 done
 
@@ -1486,6 +1540,8 @@ echo "}"
 ```
 
 ### 問題6：負荷分散DNS
+
+{% raw %}
 
 ```bash
 # PowerDNSでの重み付き負荷分散設定
@@ -1497,13 +1553,13 @@ function preresolve(qname, qtype)
             {ip = "192.0.2.2", weight = 30, healthy = true},
             {ip = "192.0.2.3", weight = 20, healthy = true}
         }
-        
+
         -- ヘルスチェック（簡易版）
         for _, server in ipairs(servers) do
             -- 実際にはTCPチェックなどを実装
             server.healthy = checkHealth(server.ip)
         end
-        
+
         -- 重み付き選択
         local total_weight = 0
         for _, server in ipairs(servers) do
@@ -1511,10 +1567,10 @@ function preresolve(qname, qtype)
                 total_weight = total_weight + server.weight
             end
         end
-        
+
         local random = math.random(total_weight)
         local current = 0
-        
+
         for _, server in ipairs(servers) do
             if server.healthy then
                 current = current + server.weight
@@ -1528,6 +1584,8 @@ function preresolve(qname, qtype)
 end
 EOF
 ```
+
+{% endraw %}
 
 ### 問題7：セキュリティ
 
@@ -1590,27 +1648,29 @@ EOF
 ### 問題3：実践的な課題
 
 1. **メモリ100MB制限**
-```bash
-# cgroup v2の場合
-sudo mkdir -p /sys/fs/cgroup/mycontainer
-echo "+memory" | sudo tee /sys/fs/cgroup/cgroup.subtree_control
-echo "100M" | sudo tee /sys/fs/cgroup/mycontainer/memory.max
-echo $$ | sudo tee /sys/fs/cgroup/mycontainer/cgroup.procs
-```
+
+   ```bash
+   # cgroup v2の場合
+   sudo mkdir -p /sys/fs/cgroup/mycontainer
+   echo "+memory" | sudo tee /sys/fs/cgroup/cgroup.subtree_control
+   echo "100M" | sudo tee /sys/fs/cgroup/mycontainer/memory.max
+   echo $$ | sudo tee /sys/fs/cgroup/mycontainer/cgroup.procs
+   ```
 
 2. **コンテナ間通信ネットワーク**
-```bash
-# ブリッジネットワーク作成
-sudo ip link add br0 type bridge
-sudo ip addr add 172.20.0.1/24 dev br0
-sudo ip link set br0 up
 
-# 各コンテナ用のvethペア作成
-sudo ip link add veth0 type veth peer name veth0-br
-sudo ip link add veth1 type veth peer name veth1-br
-sudo ip link set veth0-br master br0
-sudo ip link set veth1-br master br0
-```
+   ```bash
+   # ブリッジネットワーク作成
+   sudo ip link add br0 type bridge
+   sudo ip addr add 172.20.0.1/24 dev br0
+   sudo ip link set br0 up
+
+   # 各コンテナ用のvethペア作成
+   sudo ip link add veth0 type veth peer name veth0-br
+   sudo ip link add veth1 type veth peer name veth1-br
+   sudo ip link set veth0-br master br0
+   sudo ip link set veth1-br master br0
+   ```
 
 3. **ホストディレクトリマウントの考慮事項**
    - 権限の分離（ユーザー名前空間）
@@ -1727,27 +1787,31 @@ echo "  VM memory overhead: ~512MB"
 
 ### 問題7：トラブルシューティング
 
-**段階的トラブルシューティング手順：**
+#### 段階的トラブルシューティング手順
 
 1. **イメージの確認**
+
    ```bash
    docker images
    docker pull <image> # 必要に応じて
    ```
 
 2. **リソース制限の確認**
+
    ```bash
    docker system df
    docker system prune # 不要なリソースを削除
    ```
 
 3. **ネットワーク設定**
+
    ```bash
    docker network ls
    docker network inspect bridge
    ```
 
 4. **権限設定**
+
    ```bash
    # ユーザーがdockerグループに属しているか
    groups
@@ -1756,6 +1820,7 @@ echo "  VM memory overhead: ~512MB"
    ```
 
 5. **ログの確認**
+
    ```bash
    docker logs <container>
    journalctl -u docker
@@ -1767,11 +1832,12 @@ echo "  VM memory overhead: ~512MB"
    - **seccomp**：システムコールのフィルタリング
    - **AppArmor**：アプリケーションレベルのアクセス制御
    - **SELinux**：強制アクセス制御
-   
-   実装例：
-   ```bash
-   docker run --security-opt seccomp=profile.json \
-              --security-opt apparmor=docker-default \
+
+    実装例：
+
+    ```bash
+    docker run --security-opt seccomp=profile.json \
+               --security-opt apparmor=docker-default \
               --security-opt label=level:s0:c100,c200 \
               myapp
    ```
@@ -1819,10 +1885,11 @@ echo "  VM memory overhead: ~512MB"
 ### 問題3：実践的な課題
 
 1. **Docker→Podman移行手順**
+
    ```bash
    # エイリアス設定
    alias docker=podman
-   
+
    # イメージの移行
    docker save myapp:latest | podman load
 
@@ -1832,10 +1899,11 @@ echo "  VM memory overhead: ~512MB"
    ```
 
 2. **マルチコンテナアプリケーション構築**
+
    ```bash
    # Podの作成
    podman pod create --name webapp -p 8080:80
-   
+
    # 各コンテナの起動
    podman run -d --pod webapp --name frontend nginx
    podman run -d --pod webapp --name backend node:20
@@ -1843,11 +1911,12 @@ echo "  VM memory overhead: ~512MB"
    ```
 
 3. **Rootlessで特権ポート使用**
+
    ```bash
    # 方法1：ポートフォワーディング
    podman run -d -p 8080:80 nginx
    # iptablesで80→8080転送
-   
+
    # 方法2：CAP_NET_BIND_SERVICE付与
    sudo setcap cap_net_bind_service=+ep $(which podman)
    ```
@@ -1935,12 +2004,14 @@ podman run -d \
 ### 問題7：トラブルシューティング
 
 1. **コンテナ名重複エラー**
+
    ```bash
    podman rm webapp  # または
    podman rm -f webapp
    ```
 
 2. **権限エラー**
+
    ```bash
    # Rootlessモードの確認
    podman info | grep rootless
@@ -1949,6 +2020,7 @@ podman run -d \
    ```
 
 3. **newuidmapエラー**
+
    ```bash
    # uidmapパッケージのインストール
    sudo apt install uidmap  # または
@@ -1956,6 +2028,7 @@ podman run -d \
    ```
 
 4. **ネットワーク名前空間エラー**
+
    ```bash
    # slirp4netnsのインストール
    sudo apt install slirp4netns
@@ -1964,16 +2037,17 @@ podman run -d \
 ### 問題8：発展的課題
 
 1. **PodmanとKubernetesの連携**
+
    ```bash
    # Pod→Kubernetesマニフェスト生成
    podman generate kube mypod > mypod.yaml
-   
+
    # 内容の確認と編集
    vi mypod.yaml
-   
+
    # Kubernetesマニフェスト→Pod実行
    podman play kube mypod.yaml
-   
+
    # 実用例：開発環境でPodman、本番でKubernetes
    ```
 
@@ -1982,7 +2056,7 @@ podman run -d \
      - 段階的移行（新規プロジェクトから）
      - 互換性レイヤーの活用
      - トレーニングプログラムの実施
-   
+
    - **ベストプラクティス**：
      - Rootlessコンテナの標準化
      - systemd統合によるライフサイクル管理
@@ -2058,8 +2132,11 @@ CMD ["python", "app.py"]
 ```
 
 最適化のポイント：
+
 - **イメージサイズ削減**：slim版のベースイメージ使用、キャッシュ削除
+
 - **ビルド時間短縮**：依存関係を先にコピーしてキャッシュ活用
+
 - **セキュリティ向上**：非rootユーザーでの実行
 
 ### 問題4：レイヤー分析
@@ -2105,7 +2182,7 @@ test:
 security_scan:
   stage: scan
   script:
-    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock 
+    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock
         aquasec/trivy image --severity HIGH,CRITICAL $IMAGE_NAME
 
 deploy:
@@ -2118,9 +2195,10 @@ deploy:
 
 ### 問題6：トラブルシューティング
 
-**改善方法：**
+#### 改善方法
 
 1. **Dockerfileの最適化**
+
    ```dockerfile
    FROM node:20-alpine
    WORKDIR /app
@@ -2142,7 +2220,7 @@ deploy:
 
 ### 問題7：セキュリティ
 
-**問題点と改善案：**
+#### 問題点と改善案
 
 1. **latestタグの使用**
    - 問題：予期しない変更の可能性
@@ -2161,6 +2239,7 @@ deploy:
    - 改善：.dockerignoreの使用
 
 改善後：
+
 ```dockerfile
 FROM node:20-alpine
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
@@ -2247,7 +2326,7 @@ CMD ["node", "server.js"]
 
 ### 問題3：実践的な課題
 
-**AWSインフラストラクチャ設計：**
+#### AWSインフラストラクチャ設計
 
 ```yaml
 # 必要なAWSサービスと設定
@@ -2267,14 +2346,14 @@ Resources:
       Target: CPU 70%
   - Launch Template:
       Instance Type: t3.medium (リザーブド推奨)
-      
+
   # 3. セキュリティ
   - Security Groups:
       - ALB: 80/443 from 0.0.0.0/0
       - Web: 80 from ALB SG only
       - SSH: 22 from Bastion only
   - Web Application Firewall (WAF)
-  
+
   # 4. モニタリング
   - CloudWatch Alarms
   - VPC Flow Logs
@@ -2283,10 +2362,15 @@ Resources:
 ### 問題4：責任分界点
 
 1. EC2インスタンスのOSパッチ適用：**ユーザー**
+
 2. データセンターの物理的セキュリティ：**AWS**
+
 3. セキュリティグループの設定：**ユーザー**
+
 4. ハイパーバイザーの保守：**AWS**
+
 5. アプリケーションのバックアップ：**ユーザー**
+
 6. ネットワークインフラストラクチャ：**AWS**
 
 ### 問題5：コスト最適化
@@ -2310,7 +2394,7 @@ Resources:
 
 ### 問題6：トラブルシューティング
 
-**SSH接続できない原因と確認項目：**
+#### SSH接続できない原因と確認項目
 
 1. **セキュリティグループ**
    - ポート22が開いているか
@@ -2367,10 +2451,10 @@ for ami in $OLD_AMIS; do
         --image-ids $ami \
         --query 'Images[0].BlockDeviceMappings[*].Ebs.SnapshotId' \
         --output text)
-    
+
     # AMI削除
     aws ec2 deregister-image --image-id $ami
-    
+
     # スナップショット削除
     for snap in $SNAPSHOT_IDS; do
         aws ec2 delete-snapshot --snapshot-id $snap
@@ -2384,26 +2468,27 @@ done
 ### 問題8：発展的課題
 
 1. **マルチリージョンDR戦略**
+
    ```yaml
    Primary Region (Tokyo):
      - Production Environment
      - RDS with automated backups
      - S3 with Cross-Region Replication
      - Route 53 health checks
-   
+
    DR Region (Osaka):
      - Pilot Light approach
      - Minimal resources always running
      - Database replica (async)
      - Pre-configured AMIs
-   
+
    Failover Process:
      1. Route 53 detects failure (1-2 min)
      2. Scale up DR environment (5 min)
      3. Promote RDS read replica (5 min)
      4. Update DNS records (5 min)
      Total RTO: ~15 minutes
-   
+
    Data Sync:
      - RDS: Async replication (RPO: <5 min)
      - S3: Cross-region replication (RPO: <15 min)
@@ -2421,7 +2506,7 @@ done
      - 学習曲線
      - 初期設定の複雑さ
      - 状態管理の必要性
-   
+
    - **CloudFormation vs Terraform**：
      - CloudFormation：
        - AWS公式、完全統合
@@ -2477,7 +2562,7 @@ done
 
 ### 問題3：実践的な課題
 
-**VPCネットワーク設計：**
+#### VPCネットワーク設計
 
 ```yaml
 # サブネット構成
@@ -2494,10 +2579,10 @@ VPC: 10.0.0.0/16
 # ルートテーブル
 Public Route Table:
   0.0.0.0/0 -> Internet Gateway
-  
+
 Private Route Table (AZ-1):
   0.0.0.0/0 -> NAT Gateway-1
-  
+
 Private Route Table (AZ-2):
   0.0.0.0/0 -> NAT Gateway-2
 
@@ -2507,12 +2592,12 @@ Web-SG:
     - 80/tcp from 0.0.0.0/0
     - 443/tcp from 0.0.0.0/0
     - 22/tcp from Bastion-SG
-    
+
 App-SG:
   Inbound:
     - 8080/tcp from Web-SG
     - 22/tcp from Bastion-SG
-    
+
 DB-SG:
   Inbound:
     - 3306/tcp from App-SG
@@ -2520,12 +2605,13 @@ DB-SG:
 
 ### 問題4：セキュリティ設計
 
-**問題点と改善案：**
+#### 問題点と改善案
 
 1. **Webサーバー用セキュリティグループ**
    - 問題：All Trafficを全開放は過度に緩い
    - 改善：
-     ```
+
+     ```text
      Inbound:
      - Type: HTTP, Source: 0.0.0.0/0
      - Type: HTTPS, Source: 0.0.0.0/0
@@ -2535,14 +2621,15 @@ DB-SG:
 2. **データベース用セキュリティグループ**
    - 問題：インターネット全体からDB接続可能
    - 改善：
-     ```
+
+     ```text
      Inbound:
      - Type: MySQL/Aurora, Source: App-Server-SG
      ```
 
 ### 問題5：ネットワークトラブルシューティング
 
-**優先順位付き確認項目：**
+#### 優先順位付き確認項目
 
 1. **NATゲートウェイの状態**
    - StatusがAvailableか確認
@@ -2566,7 +2653,7 @@ DB-SG:
 
 ### 問題6：コスト最適化
 
-**コスト削減方法：**
+#### コスト削減方法
 
 1. **NATゲートウェイの統合**
    - 開発環境では1つのNATゲートウェイに統合
@@ -2584,7 +2671,7 @@ DB-SG:
 
 ### 問題7：高可用性設計
 
-**マルチリージョンDRネットワーク設計：**
+#### マルチリージョンDRネットワーク設計
 
 ```yaml
 Primary Region (Tokyo):
@@ -2594,13 +2681,13 @@ Primary Region (Tokyo):
   - RDS Multi-AZ
   - Route 53 weighted routing (100%)
 
-DR Region (Osaka):  
+DR Region (Osaka):
   VPC: 172.16.0.0/16
   - Pilot light configuration
   - Minimal resources (1-2 instances)
   - RDS read replica
   - Route 53 weighted routing (0%)
-  
+
 Network Connectivity:
   - VPC Peering between regions
   - S3 Cross-Region Replication
@@ -2630,25 +2717,26 @@ Failover Process:
      - 解決策：適切なCIDR設計、NATの活用
 
 2. **VPCフローログを使用した異常検知システム**
+
    ```python
    # 検知すべき異常パターン
    異常パターン:
      1. ポートスキャン
         - 検知方法：同一送信元から複数ポートへの接続試行
         - 閾値：100ポート/分以上
-     
+
      2. DDoS攻撃
         - 検知方法：特定IPへの大量トラフィック
         - 閾値：1000リクエスト/秒以上
-     
+
      3. データ流出
         - 検知方法：内部から外部への異常な大量データ転送
         - 閾値：1GB/時間以上
-     
+
      4. 不正アクセス
         - 検知方法：拒否されたトラフィックの急増
         - 閾値：REJECTアクション50回/分以上
-   
+
    実装:
      - Lambda関数でリアルタイム処理
      - Amazon Athenaでバッチ分析
@@ -2660,7 +2748,7 @@ Failover Process:
 
 ### 問題1：基本理解の確認
 
-### 解答
+#### 解答
 
 1. システムの可観測性（Observability）は、（**メトリクス**）、（**ログ**）、（**トレース**）の三本柱で構成されています。
 
@@ -2670,33 +2758,39 @@ Failover Process:
 
 ### 問題2：概念の理解
 
-### 解答
+#### 解答
 
-**1. 従来の閾値ベースの監視と機械学習を使った異常検知の違い**
+#### 1. 従来の閾値ベースの監視と機械学習を使った異常検知の違い
 
-**閾値ベースの監視：**
+#### 閾値ベースの監視
+
 - **仕組み**：事前に定めた固定値を超えたらアラート
+
 - **利点**：
   - シンプルで理解しやすい
   - 設定が簡単
   - 誤検知の原因が明確
+
 - **欠点**：
   - 動的な環境に対応困難
   - 季節性や時間帯の考慮が難しい
   - 複数メトリクスの相関を見られない
 
-**機械学習による異常検知：**
+#### 機械学習による異常検知
+
 - **仕組み**：過去のパターンを学習し、統計的に異常を検出
+
 - **利点**：
   - 動的な閾値の自動調整
   - 複雑なパターンの検出
   - 未知の異常も検出可能
+
 - **欠点**：
   - ブラックボックス化しやすい
   - 学習データの質に依存
   - 計算リソースが必要
 
-**2. 構造化ログの利点**
+#### 2. 構造化ログの利点
 
 1. **検索・分析の効率化**：
    - JSONやKey-Value形式により、特定フィールドで高速検索可能
@@ -2710,9 +2804,9 @@ Failover Process:
    - user_id、request_id等の関連情報を構造的に保存
    - トラブルシューティング時の追跡が容易
 
-**3. メトリクス、ログ、トレースの使い分け**
+#### 3. メトリクス、ログ、トレースの使い分け
 
-**シナリオ：ECサイトで「注文完了が遅い」という報告**
+#### シナリオ：ECサイトで「注文完了が遅い」という報告
 
 1. **メトリクス**で全体像を把握：
    - レスポンスタイムの推移を確認
@@ -2731,7 +2825,7 @@ Failover Process:
 
 ### 解答：マイクロサービス監視システムの設計
 
-**アーキテクチャ構成：**
+#### アーキテクチャ構成
 
 ```yaml
 # docker-compose-monitoring.yml
@@ -2796,7 +2890,7 @@ services:
       - "3000:3000"
 ```
 
-**Prometheus設定：**
+#### Prometheus設定
 
 ```yaml
 # prometheus.yml
@@ -2830,7 +2924,9 @@ scrape_configs:
       - targets: ['product-service:8083']
 ```
 
-**アラートルール：**
+#### アラートルール
+
+{% raw %}
 
 ```yaml
 # alert_rules.yml
@@ -2847,11 +2943,16 @@ groups:
           description: "Service {{ $labels.job }} has error rate of {{ $value | humanizePercentage }}"
 ```
 
+{% endraw %}
+
 ### 問題4：アラート設計
 
-### 解答
+#### 解答
 
-**1. CPU使用率**
+#### 1. CPU使用率
+
+{% raw %}
+
 ```yaml
 - alert: HighCPUUsage
   expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
@@ -2869,7 +2970,10 @@ groups:
     severity: critical
 ```
 
-**2. メモリ使用率**
+{% endraw %}
+
+#### 2. メモリ使用率
+
 ```yaml
 - alert: HighMemoryUsage
   expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
@@ -2884,7 +2988,8 @@ groups:
     severity: critical
 ```
 
-**3. ディスク使用率**
+#### 3. ディスク使用率
+
 ```yaml
 - alert: DiskSpaceLow
   expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 20
@@ -2899,7 +3004,8 @@ groups:
     severity: critical
 ```
 
-**4. HTTPエラー率**
+#### 4. HTTPエラー率
+
 ```yaml
 - alert: HighHTTPErrorRate
   expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.05
@@ -2914,7 +3020,8 @@ groups:
     severity: critical
 ```
 
-**5. レスポンスタイム**
+#### 5. レスポンスタイム
+
 ```yaml
 - alert: SlowResponseTime
   expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
@@ -2933,9 +3040,9 @@ groups:
 
 ### 問題5：ログ分析
 
-### 解答
+#### 解答
 
-**読み取れる問題：**
+#### 読み取れる問題
 
 1. **データベース接続の不安定性**：
    - 2回の接続タイムアウトが発生
@@ -2945,9 +3052,10 @@ groups:
    - 全体で5秒以上かかっている
    - ユーザー体験に悪影響
 
-**改善提案：**
+#### 改善提案
 
 1. **接続プールの最適化**：
+
 ```yaml
 database:
   pool:
@@ -2957,7 +3065,8 @@ database:
     idle_timeout: 30s
 ```
 
-2. **Circuit Breakerパターンの実装**：
+1. **Circuit Breakerパターンの実装**：
+
 ```python
 from pybreaker import CircuitBreaker
 
@@ -2972,7 +3081,8 @@ def connect_to_database():
     return database.connect()
 ```
 
-3. **ヘルスチェックの強化**：
+1. **ヘルスチェックの強化**：
+
 ```python
 async def health_check():
     try:
@@ -2984,7 +3094,8 @@ async def health_check():
 # 定期的にヘルスチェックを実行
 ```
 
-4. **タイムアウト設定の見直し**：
+1. **タイムアウト設定の見直し**：
+
 ```python
 connection_config = {
     'connect_timeout': 2,  # 2秒に短縮
@@ -2996,9 +3107,9 @@ connection_config = {
 
 ### 問題6：パフォーマンス分析
 
-### 解答
+#### 解答
 
-**ボトルネックの特定：**
+#### ボトルネックの特定
 
 1. **主要ボトルネック**：
    - Order Service の External API Call（250ms）
@@ -3007,9 +3118,10 @@ connection_config = {
 2. **全体の処理時間**：
    - 合計：560ms（並列処理を考慮しない場合）
 
-**改善策：**
+#### 改善策
 
 1. **キャッシュの導入**：
+
 ```python
 # Redis キャッシュの実装
 @cache.memoize(timeout=300)  # 5分間キャッシュ
@@ -3017,34 +3129,37 @@ def get_user_data(user_id):
     return database.query(f"SELECT * FROM users WHERE id = {user_id}")
 ```
 
-2. **非同期処理の活用**：
+1. **非同期処理の活用**：
+
 ```python
 async def process_order(order_data):
     # 並列実行
     user_task = asyncio.create_task(user_service.get_user(order_data.user_id))
     inventory_task = asyncio.create_task(check_inventory(order_data.items))
-    
+
     user_info, inventory_status = await asyncio.gather(user_task, inventory_task)
-    
+
     # External APIは結果に応じて非同期に
     asyncio.create_task(notify_external_system(order_data))
-    
+
     return process_result
 ```
 
-3. **データベースクエリの最適化**：
+1. **データベースクエリの最適化**：
+
 ```sql
 -- インデックスの追加
 CREATE INDEX idx_users_active ON users(id) WHERE status = 'active';
 
 -- クエリの最適化
-SELECT id, name, email 
-FROM users 
+SELECT id, name, email
+FROM users
 WHERE id = ? AND status = 'active'
 -- 必要なカラムのみ選択
 ```
 
-4. **API呼び出しの最適化**：
+1. **API呼び出しの最適化**：
+
 ```python
 # バッチ処理
 def call_external_api_batch(requests):
@@ -3062,13 +3177,14 @@ response = requests.post(
 
 ### 解答：予測的スケーリング戦略
 
-**1. パターン分析：**
+#### 1. パターン分析
+
 ```python
 # CPU使用率のパターン
 # 毎日14:00にピーク（おそらくランチタイム後のアクセス集中）
 ```
 
-**2. スケーリング戦略：**
+#### 2. スケーリング戦略
 
 ```yaml
 # Kubernetes HPA with custom metrics
@@ -3104,7 +3220,7 @@ spec:
       stabilizationWindowSeconds: 300  # 5分間安定してから縮小
 ```
 
-**3. 事前スケーリングのスケジュール：**
+#### 3. 事前スケーリングのスケジュール
 
 ```yaml
 # CronJob for scheduled scaling
@@ -3149,7 +3265,7 @@ spec:
               echo "Scaled down to 3 replicas after peak time"
 ```
 
-**4. 予測モデルの実装：**
+#### 4. 予測モデルの実装
 
 ```python
 # predictive_scaling.py
@@ -3160,28 +3276,28 @@ from datetime import datetime, timedelta
 class PredictiveScaler:
     def __init__(self):
         self.model = Prophet(changepoint_prior_scale=0.05)
-        
+
     def train(self, historical_data):
         # データの準備
         df = pd.DataFrame(historical_data)
         df.columns = ['ds', 'y']  # Prophet expects these column names
-        
+
         # 週次の季節性を追加
         self.model.add_seasonality(
             name='daily_peak',
             period=1,
             fourier_order=5
         )
-        
+
         self.model.fit(df)
-    
+
     def predict_next_hours(self, hours=6):
         future = self.model.make_future_dataframe(
             periods=hours,
             freq='H'
         )
         forecast = self.model.predict(future)
-        
+
         # スケーリング推奨の生成
         recommendations = []
         for _, row in forecast.tail(hours).iterrows():
@@ -3192,24 +3308,28 @@ class PredictiveScaler:
                     'predicted_cpu': row['yhat'],
                     'recommended_replicas': replicas
                 })
-        
+
         return recommendations
 ```
 
 ### 問題8：発展的課題
 
-### 解答
+#### 解答
 
-**1. SLI、SLO、SLAの関係**
+#### 1. SLI、SLO、SLAの関係
 
-**定義と関係：**
+#### 定義と関係
+
 - **SLI（Service Level Indicator）**：サービスレベルを測定する指標
+
 - **SLO（Service Level Objective）**：SLIの目標値
+
 - **SLA（Service Level Agreement）**：顧客との契約上の約束
 
-**具体例：オンラインショッピングサイト**
+#### 具体例：オンラインショッピングサイト
 
-**SLI定義：**
+#### SLI定義
+
 ```yaml
 slis:
   - name: availability
@@ -3234,7 +3354,8 @@ slis:
       sum(rate(http_requests_total[5m]))
 ```
 
-**SLO定義：**
+#### SLO定義
+
 ```yaml
 slos:
   - sli: availability
@@ -3250,7 +3371,8 @@ slos:
     window: 30d
 ```
 
-**SLA定義：**
+#### SLA定義
+
 ```text
 契約条項：
 - 可用性：月間99.9%を保証
@@ -3260,14 +3382,17 @@ slos:
   - 95.0%未満：月額料金の50%返金
 ```
 
-**2. カオスエンジニアリングと可観測性**
+#### 2. カオスエンジニアリングと可観測性
 
-**関係性：**
+#### 関係性
+
 - カオスエンジニアリングは「計画的な障害注入」
+
 - 可観測性は「システムの内部状態の理解」
+
 - 両者は相補的：障害を注入し、システムの反応を観測
 
-**実験設計例：データベース障害のシミュレーション**
+#### 実験設計例：データベース障害のシミュレーション
 
 ```yaml
 # chaos-experiment.yaml
@@ -3290,14 +3415,15 @@ spec:
   duration: "5m"
 ```
 
-**監視設定：**
+#### 監視設定
+
 ```python
 # chaos_monitoring.py
 class ChaosExperimentMonitor:
     def __init__(self, prometheus_url):
         self.prom = PrometheusConnect(url=prometheus_url)
         self.baseline_metrics = {}
-        
+
     def capture_baseline(self, duration_minutes=30):
         """実験前のベースラインを記録"""
         queries = {
@@ -3305,7 +3431,7 @@ class ChaosExperimentMonitor:
             'latency_p95': 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))',
             'throughput': 'rate(http_requests_total[5m])'
         }
-        
+
         for name, query in queries.items():
             result = self.prom.custom_query_range(
                 query=query,
@@ -3314,20 +3440,20 @@ class ChaosExperimentMonitor:
                 step='1m'
             )
             self.baseline_metrics[name] = self.calculate_stats(result)
-    
+
     def monitor_experiment(self, experiment_duration_minutes=5):
         """実験中のメトリクスを監視"""
         alerts = []
-        
+
         # リアルタイム監視
         for minute in range(experiment_duration_minutes):
             current_metrics = self.get_current_metrics()
-            
+
             # ベースラインとの比較
             for metric_name, current_value in current_metrics.items():
                 baseline = self.baseline_metrics[metric_name]
                 deviation = abs(current_value - baseline['mean']) / baseline['std']
-                
+
                 if deviation > 3:  # 3σを超えたら異常
                     alerts.append({
                         'metric': metric_name,
@@ -3336,11 +3462,11 @@ class ChaosExperimentMonitor:
                         'deviation': deviation,
                         'timestamp': datetime.now()
                     })
-            
+
             time.sleep(60)
-        
+
         return alerts
-    
+
     def generate_report(self, alerts):
         """実験レポートの生成"""
         report = {
@@ -3354,31 +3480,31 @@ class ChaosExperimentMonitor:
             },
             'recommendations': self.generate_recommendations(alerts)
         }
-        
+
         return report
-    
+
     def generate_recommendations(self, alerts):
         """改善提案の生成"""
         recommendations = []
-        
+
         if any(a['metric'] == 'error_rate' for a in alerts):
             recommendations.append({
                 'issue': 'Error rate increased during database latency',
                 'recommendation': 'Implement circuit breaker pattern',
                 'priority': 'high'
             })
-        
+
         if any(a['metric'] == 'latency_p95' for a in alerts):
             recommendations.append({
                 'issue': 'Latency propagation observed',
                 'recommendation': 'Add database connection pooling and caching',
                 'priority': 'medium'
             })
-        
+
         return recommendations
 ```
 
-**実験手順：**
+#### 実験手順
 
 1. **事前準備**：
    - ベースラインメトリクスの記録（30分）
@@ -3399,11 +3525,12 @@ class ChaosExperimentMonitor:
    - Circuit Breakerの実装
    - タイムアウト設定の最適化
    - リトライロジックの改善
+
 ## 第15章 演習問題 解答集
 
 ### 問題1：基本理解の確認
 
-### 解答
+#### 解答
 
 1. Infrastructure as Codeの主な利点は、**再現**性、**バージョン**管理、**協働**作業、**自動**化、**スケール**の5つです。
 
@@ -3413,9 +3540,9 @@ class ChaosExperimentMonitor:
 
 ### 問題2：概念の理解
 
-### 解答
+#### 解答
 
-**1. 手作業によるインフラ管理の問題点とIaCでの解決策**
+#### 1. 手作業によるインフラ管理の問題点とIaCでの解決策
 
 1. **人的ミス**
    - 問題：設定の入力ミス、手順の抜け漏れ
@@ -3429,23 +3556,30 @@ class ChaosExperimentMonitor:
    - 問題：誰が、いつ、何を変更したか追跡困難
    - IaCでの解決：Gitによるバージョン管理、変更履歴の完全な記録
 
-**2. Terraformの状態管理の重要性**
+#### 2. Terraformの状態管理の重要性
 
 状態ファイル（terraform.tfstate）は、Terraformが管理するリソースの現在の状態を記録しています。
 
 重要性：
+
 - 実際のリソースとコードのマッピング
+
 - リソースの依存関係の管理
+
 - 変更の差分計算の基盤
 
 状態ファイルを失った場合の影響：
+
 - リソースのIDが不明になり、Terraformで管理できなくなる
+
 - 既存リソースを新規作成しようとして重複エラーが発生
+
 - 手動でのインポート作業が必要になる
 
-**3. 宣言的設定と命令的設定の違い**
+#### 3. 宣言的設定と命令的設定の違い
 
 命令的設定の例：
+
 ```bash
 # 手順を記述
 create_server()
@@ -3455,6 +3589,7 @@ start_service()
 ```
 
 宣言的設定の例：
+
 ```hcl
 # 望む状態を記述
 resource "aws_instance" "web" {
@@ -3465,7 +3600,7 @@ resource "aws_instance" "web" {
 
 ### 問題3：実践的な課題
 
-### 解答
+#### 解答
 
 ```hcl
 # variables.tf
@@ -3479,7 +3614,7 @@ locals {
     dev  = 1
     prod = 3
   }
-  
+
   instance_type = {
     dev  = "t3.micro"
     prod = "t3.small"
@@ -3491,9 +3626,9 @@ resource "aws_instance" "web" {
   count         = local.instance_count[var.environment]
   instance_type = local.instance_type[var.environment]
   ami           = data.aws_ami.amazon_linux_2.id
-  
+
   vpc_security_group_ids = [aws_security_group.web.id]
-  
+
   tags = {
     Name        = "${var.environment}-web-${count.index + 1}"
     Environment = var.environment
@@ -3502,14 +3637,14 @@ resource "aws_instance" "web" {
 
 resource "aws_security_group" "web" {
   name_prefix = "${var.environment}-web-sg-"
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -3521,7 +3656,7 @@ resource "aws_security_group" "web" {
 # ロードバランサー（本番環境のみ）
 resource "aws_lb" "web" {
   count = var.environment == "prod" ? 1 : 0
-  
+
   name               = "${var.environment}-web-alb"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb[0].id]
@@ -3530,16 +3665,16 @@ resource "aws_lb" "web" {
 
 resource "aws_security_group" "alb" {
   count = var.environment == "prod" ? 1 : 0
-  
+
   name_prefix = "${var.environment}-alb-sg-"
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   egress {
     from_port       = 0
     to_port         = 0
@@ -3554,12 +3689,17 @@ resource "aws_security_group" "alb" {
 ### 問題点と修正
 
 問題点：
+
 1. AMI IDがハードコード
+
 2. セキュリティグループルールが独立している
+
 3. user_dataで$RANDOMを使用（冪等性の欠如）
+
 4. タグが不足
 
 修正後：
+
 ```hcl
 # SSM Public Parameter から最新のAmazon Linux 2023 AMIを取得
 data "aws_ssm_parameter" "amazon_linux_2023_ami" {
@@ -3569,9 +3709,9 @@ data "aws_ssm_parameter" "amazon_linux_2023_ami" {
 resource "aws_instance" "web" {
   instance_type = "t3.micro"
   ami           = data.aws_ssm_parameter.amazon_linux_2023_ami.value
-  
+
   vpc_security_group_ids = [aws_security_group.web.id]
-  
+
   user_data = <<-EOF
     #!/bin/bash
     dnf update -y
@@ -3581,7 +3721,7 @@ resource "aws_instance" "web" {
     systemctl start nginx
     systemctl enable nginx
   EOF
-  
+
   tags = {
     Name        = "web-server"
     Environment = "production"
@@ -3591,14 +3731,14 @@ resource "aws_instance" "web" {
 
 resource "aws_security_group" "web" {
   name_prefix = "web-sg-"
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -3610,7 +3750,7 @@ resource "aws_security_group" "web" {
 
 ### 問題5：モジュール設計
 
-### 解答
+#### 解答
 
 ```hcl
 # modules/vpc/variables.tf
@@ -3635,7 +3775,7 @@ resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
-  
+
   tags = {
     Name        = "${var.environment}-vpc"
     Environment = var.environment
@@ -3647,9 +3787,9 @@ resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index)
   availability_zone = var.availability_zones[count.index]
-  
+
   map_public_ip_on_launch = true
-  
+
   tags = {
     Name        = "${var.environment}-public-${var.availability_zones[count.index]}"
     Environment = var.environment
@@ -3662,7 +3802,7 @@ resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 100)
   availability_zone = var.availability_zones[count.index]
-  
+
   tags = {
     Name        = "${var.environment}-private-${var.availability_zones[count.index]}"
     Environment = var.environment
@@ -3672,7 +3812,7 @@ resource "aws_subnet" "private" {
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
-  
+
   tags = {
     Name        = "${var.environment}-igw"
     Environment = var.environment
@@ -3682,12 +3822,12 @@ resource "aws_internet_gateway" "main" {
 resource "aws_eip" "nat" {
   count  = length(var.availability_zones)
   domain = "vpc"
-  
+
   tags = {
     Name        = "${var.environment}-nat-eip-${count.index}"
     Environment = var.environment
   }
-  
+
   depends_on = [aws_internet_gateway.main]
 }
 
@@ -3695,7 +3835,7 @@ resource "aws_nat_gateway" "main" {
   count         = length(var.availability_zones)
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
-  
+
   tags = {
     Name        = "${var.environment}-nat-${count.index}"
     Environment = var.environment
@@ -3704,12 +3844,12 @@ resource "aws_nat_gateway" "main" {
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
-  
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.main.id
   }
-  
+
   tags = {
     Name        = "${var.environment}-public-rt"
     Environment = var.environment
@@ -3719,12 +3859,12 @@ resource "aws_route_table" "public" {
 resource "aws_route_table" "private" {
   count  = length(var.availability_zones)
   vpc_id = aws_vpc.main.id
-  
+
   route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.main[count.index].id
   }
-  
+
   tags = {
     Name        = "${var.environment}-private-rt-${count.index}"
     Environment = var.environment
@@ -3784,11 +3924,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
         working-directory: ./terraform
@@ -3798,15 +3938,15 @@ jobs:
     needs: format-check
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Terraform Init
         run: terraform init -backend=false
         working-directory: ./terraform
-      
+
       - name: Terraform Validate
         run: terraform validate
         working-directory: ./terraform
@@ -3816,13 +3956,13 @@ jobs:
     needs: validate
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@v12.3080.0
         with:
           directory: terraform/
           framework: terraform
-      
+
       - name: Run tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
         with:
@@ -3834,28 +3974,28 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-      
+
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform
-      
+
       - name: Terraform Plan
         id: plan
         run: terraform plan -out=tfplan -no-color
         working-directory: ./terraform
         continue-on-error: true
-      
+
       - name: Comment PR
         uses: actions/github-script@v6
         env:
@@ -3864,17 +4004,17 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `#### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            
+
             <details><summary>Show Plan</summary>
-            
+
             \`\`\`
             ${process.env.PLAN}
             \`\`\`
-            
+
             </details>
-            
+
             *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -3890,22 +4030,22 @@ jobs:
       name: production
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-      
+
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform
-      
+
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: ./terraform
@@ -3968,9 +4108,10 @@ main = rule {
 
 ### 問題8：災害復旧
 
-### 解答
+#### 解答
 
 設計概要：
+
 ```hcl
 # dr_design.tf
 # プライマリリージョン（東京）
@@ -3988,21 +4129,21 @@ provider "aws" {
 # RDS Multi-AZ with Read Replica
 resource "aws_db_instance" "primary" {
   provider = aws.primary
-  
+
   identifier     = "primary-database"
   engine         = "mysql"
   engine_version = "8.0"
-  
+
   multi_az                = true
   backup_retention_period = 7
   backup_window          = "03:00-04:00"
-  
+
   enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
 }
 
 resource "aws_db_instance" "dr_replica" {
   provider = aws.dr
-  
+
   replicate_source_db = aws_db_instance.primary.id
   identifier          = "dr-replica"
 }
@@ -4011,7 +4152,7 @@ resource "aws_db_instance" "dr_replica" {
 resource "aws_s3_bucket" "primary" {
   provider = aws.primary
   bucket   = "myapp-primary-data"
-  
+
   versioning {
     enabled = true
   }
@@ -4019,18 +4160,18 @@ resource "aws_s3_bucket" "primary" {
 
 resource "aws_s3_bucket_replication_configuration" "primary_to_dr" {
   provider = aws.primary
-  
+
   role   = aws_iam_role.replication.arn
   bucket = aws_s3_bucket.primary.id
-  
+
   rule {
     id     = "replicate-to-dr"
     status = "Enabled"
-    
+
     destination {
       bucket        = aws_s3_bucket.dr.arn
       storage_class = "STANDARD_IA"
-      
+
       replication_time {
         status = "Enabled"
         time {
@@ -4055,12 +4196,12 @@ resource "aws_route53_record" "www" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "www.example.com"
   type    = "A"
-  
+
   set_identifier = "Primary"
   failover_routing_policy {
     type = "PRIMARY"
   }
-  
+
   alias {
     name                   = aws_lb.primary.dns_name
     zone_id                = aws_lb.primary.zone_id
@@ -4072,12 +4213,12 @@ resource "aws_route53_record" "www_dr" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "www.example.com"
   type    = "A"
-  
+
   set_identifier = "DR"
   failover_routing_policy {
     type = "SECONDARY"
   }
-  
+
   alias {
     name                   = aws_lb.dr.dns_name
     zone_id                = aws_lb.dr.zone_id
@@ -4092,7 +4233,7 @@ resource "aws_lambda_function" "dr_failover" {
   role          = aws_iam_role.lambda.arn
   handler       = "index.handler"
   runtime       = "python3.12"
-  
+
   environment {
     variables = {
       DR_RDS_INSTANCE = aws_db_instance.dr_replica.id
@@ -4104,7 +4245,7 @@ resource "aws_lambda_function" "dr_failover" {
 
 ### 問題9：コスト最適化
 
-### 解答
+#### 解答
 
 ```hcl
 # cost_optimization.tf
@@ -4113,11 +4254,11 @@ resource "aws_lambda_function" "dr_failover" {
 resource "aws_autoscaling_schedule" "dev_start" {
   scheduled_action_name  = "dev-start"
   autoscaling_group_name = aws_autoscaling_group.dev.name
-  
+
   min_size         = 1
   max_size         = 2
   desired_capacity = 1
-  
+
   # 平日9時に起動（UTC 0時 = JST 9時）
   recurrence = "0 0 * * MON-FRI"
 }
@@ -4125,11 +4266,11 @@ resource "aws_autoscaling_schedule" "dev_start" {
 resource "aws_autoscaling_schedule" "dev_stop" {
   scheduled_action_name  = "dev-stop"
   autoscaling_group_name = aws_autoscaling_group.dev.name
-  
+
   min_size         = 0
   max_size         = 0
   desired_capacity = 0
-  
+
   # 平日18時に停止（UTC 9時 = JST 18時）
   recurrence = "0 9 * * MON-FRI"
 }
@@ -4138,11 +4279,11 @@ resource "aws_autoscaling_schedule" "dev_stop" {
 resource "aws_autoscaling_schedule" "staging_night" {
   scheduled_action_name  = "staging-scale-down"
   autoscaling_group_name = aws_autoscaling_group.staging.name
-  
+
   min_size         = 1
   max_size         = 2
   desired_capacity = 1
-  
+
   # 毎日20時に縮小（UTC 11時 = JST 20時）
   recurrence = "0 11 * * *"
 }
@@ -4150,11 +4291,11 @@ resource "aws_autoscaling_schedule" "staging_night" {
 resource "aws_autoscaling_schedule" "staging_day" {
   scheduled_action_name  = "staging-scale-up"
   autoscaling_group_name = aws_autoscaling_group.staging.name
-  
+
   min_size         = 2
   max_size         = 4
   desired_capacity = 2
-  
+
   # 毎日8時に拡大（UTC 23時前日 = JST 8時）
   recurrence = "0 23 * * *"
 }
@@ -4162,30 +4303,30 @@ resource "aws_autoscaling_schedule" "staging_day" {
 # 本番環境：トラフィックに応じた自動スケーリング
 resource "aws_autoscaling_group" "production" {
   name = "production-asg"
-  
+
   min_size         = 3
   max_size         = 20
   desired_capacity = 5
-  
+
   # ターゲット追跡スケーリング
   target_group_arns = [aws_lb_target_group.production.arn]
-  
+
   mixed_instances_policy {
     instances_distribution {
       on_demand_base_capacity                  = 3
       on_demand_percentage_above_base_capacity = 30
       spot_allocation_strategy                 = "capacity-optimized"
     }
-    
+
     launch_template {
       launch_template_specification {
         launch_template_id = aws_launch_template.production.id
       }
-      
+
       override {
         instance_type = "t3.large"
       }
-      
+
       override {
         instance_type = "t3a.large"
       }
@@ -4197,12 +4338,12 @@ resource "aws_autoscaling_policy" "cpu_target" {
   name                   = "cpu-target-tracking"
   autoscaling_group_name = aws_autoscaling_group.production.name
   policy_type            = "TargetTrackingScaling"
-  
+
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
-    
+
     target_value = 65.0
   }
 }
@@ -4211,13 +4352,13 @@ resource "aws_autoscaling_policy" "request_count_target" {
   name                   = "request-count-tracking"
   autoscaling_group_name = aws_autoscaling_group.production.name
   policy_type            = "TargetTrackingScaling"
-  
+
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
       resource_label         = "${aws_lb.production.arn_suffix}/${aws_lb_target_group.production.arn_suffix}"
     }
-    
+
     target_value = 1000.0
   }
 }
@@ -4225,9 +4366,9 @@ resource "aws_autoscaling_policy" "request_count_target" {
 
 ### 問題10：発展的課題
 
-### 解答
+#### 解答
 
-**1. GitOpsワークフロー**
+#### 1. GitOpsワークフロー
 
 ArgoCD を使用した GitOps ワークフロー：
 
@@ -4257,13 +4398,18 @@ spec:
 ```
 
 プロセス：
+
 1. 開発者がインフラコードを変更しPR作成
+
 2. CI/CDでテストとplan実行
+
 3. PRがマージされるとArgoCDが変更を検知
+
 4. ArgoCDがTerraform applyを自動実行
+
 5. 実際の状態とGitの状態を常に同期
 
-**2. IaCツールの比較**
+#### 2. IaCツールの比較
 
 | ツール | 適用場面 | 特徴 |
 |--------|----------|------|
@@ -4272,9 +4418,10 @@ spec:
 | Pulumi | プログラミング言語でインフラ定義 | TypeScript/Python/Go対応、型安全 |
 | Ansible | 設定管理とプロビジョニング | エージェントレス、手続き的、冪等性 |
 
-**3. IaCにおけるテスト戦略**
+#### 3. IaCにおけるテスト戦略
 
 単体テスト：
+
 ```go
 func TestValidateVariables(t *testing.T) {
     // 変数の妥当性検証
@@ -4286,15 +4433,16 @@ func TestValidateVariables(t *testing.T) {
 ```
 
 統合テスト：
+
 ```go
 func TestVPCModule(t *testing.T) {
     terraformOptions := &terraform.Options{
         TerraformDir: "../modules/vpc",
     }
     defer terraform.Destroy(t, terraformOptions)
-    
+
     terraform.InitAndApply(t, terraformOptions)
-    
+
     // VPCが作成されたか確認
     vpcId := terraform.Output(t, terraformOptions, "vpc_id")
     assert.NotEmpty(t, vpcId)
@@ -4302,6 +4450,7 @@ func TestVPCModule(t *testing.T) {
 ```
 
 E2Eテスト：
+
 ```go
 func TestCompleteInfrastructure(t *testing.T) {
     // 本番相当の環境を構築

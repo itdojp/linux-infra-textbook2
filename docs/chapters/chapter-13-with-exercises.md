@@ -22,6 +22,7 @@
 ### 従来のネットワーク構築の課題
 
 #### 物理ネットワークの制約
+
 ```text
 【従来のネットワーク拡張プロセス】
 1. 要件定義（2週間）
@@ -54,6 +55,7 @@
 ### AWSにおける実装：VPC
 
 #### 5分で構築できる企業ネットワーク
+
 ```bash
 # 1. VPCの作成（仮想データセンター）
 aws ec2 create-vpc --cidr-block 10.0.0.0/16
@@ -90,6 +92,7 @@ aws ec2 create-route --route-table-id rtb-12345 --destination-cidr-block 0.0.0.0
 ### 実践的なVPC設計
 
 #### マルチティアアーキテクチャ
+
 ```yaml
 # vpc-architecture.yaml - CloudFormationテンプレート
 AWSTemplateFormatVersion: '2010-09-09'
@@ -280,6 +283,7 @@ Resources:
 ### ゼロトラストネットワークの実装
 
 #### セキュリティグループによるマイクロセグメンテーション
+
 ```bash
 # Web層のセキュリティグループ
 aws ec2 create-security-group \
@@ -398,6 +402,7 @@ EOF
 ### VPCピアリングとTransit Gateway
 
 #### 複数VPC間の接続
+
 ```bash
 # VPCピアリング接続の作成
 aws ec2 create-vpc-peering-connection \
@@ -417,6 +422,7 @@ aws ec2 create-route \
 ```
 
 #### Transit Gatewayによるハブ&スポーク構成
+
 ```python
 # transit_gateway_setup.py
 import boto3
@@ -1228,6 +1234,7 @@ setup_cloudwatch_metrics() {
 ### 設計の重要性
 
 仮想だからこそ：
+
 - **セキュリティ設計**：多層防御の実装
 - **可用性設計**：マルチAZ、冗長性の確保
 - **拡張性設計**：将来の成長を見据えた設計
@@ -1268,6 +1275,7 @@ setup_cloudwatch_metrics() {
 以下の要件を満たすVPCネットワークを設計してください：
 
 **要件：**
+
 - 3層アーキテクチャ（Web、App、DB）
 - 2つのアベイラビリティゾーンで高可用性
 - インターネットからはWeb層のみアクセス可能
@@ -1298,6 +1306,7 @@ Inbound:
 ### 問題6：コスト最適化
 
 以下のネットワーク構成のコストを削減する方法を3つ提案してください：
+
 - 各AZに1つずつ、計2つのNATゲートウェイ
 - 10個のElastic IP（うち3個は未使用）
 - VPCピアリング5本（異なるVPC間）
@@ -1306,6 +1315,7 @@ Inbound:
 ### 問題7：高可用性設計
 
 マルチリージョンでの災害復旧を考慮したネットワーク設計を作成してください。以下の要件を満たすこと：
+
 - プライマリリージョン：東京
 - DRリージョン：大阪
 - RPO：1時間

@@ -23,6 +23,7 @@
 ### 従来の配布方法の限界
 
 #### ソースコード配布の問題
+
 ```bash
 # 開発者A：「私のアプリケーションです」
 $ tar czf myapp.tar.gz src/
@@ -37,6 +38,7 @@ $ python app.py
 ```
 
 #### 仮想マシンイメージの問題
+
 ```bash
 # VMイメージのサイズ
 $ ls -lh
@@ -51,6 +53,7 @@ $ ls -lh
 ### コンテナイメージの革新
 
 #### 完全な実行環境の定義
+
 ```dockerfile
 # Dockerfile - 環境の完全な定義
 FROM python:3.11-slim
@@ -78,6 +81,7 @@ CMD ["python", "app.py"]
 ```
 
 #### イメージという単位での配布
+
 ```bash
 # 開発者A：環境ごとパッケージング
 $ podman build -t myapp:v1.0 .
@@ -99,6 +103,7 @@ $ podman run registry.example.com/myapp:v1.0
 ### レイヤーの詳細な仕組み
 
 #### 実際のレイヤー構造を確認
+
 ```bash
 # イメージのレイヤーを表示
 $ podman image inspect nginx:latest | jq '.[0].RootFS.Layers'
@@ -135,6 +140,7 @@ deb46925e5ca   2 weeks ago   /bin/sh -c #(nop)  CMD ["nginx" "-g" "daem...  0B
 ![実行時のコンテナ層構造]({{ '/assets/images/diagrams/chapter-11/container-runtime-layers.svg' | relative_url }})
 
 #### OverlayFSの動作
+
 ```bash
 # OverlayFSの実験
 # overlay_demo.sh
@@ -173,6 +179,7 @@ EOF
 ### キャッシュによる効率化
 
 #### レイヤーキャッシュの仕組み
+
 ```dockerfile
 # 効率的なDockerfile
 FROM node:20-alpine
@@ -188,6 +195,7 @@ CMD ["node", "server.js"]
 ```
 
 #### キャッシュの活用例
+
 ```bash
 # 初回ビルド
 $ podman build -t myapp:v1 .
@@ -209,6 +217,7 @@ $ podman build -t myapp:v2 .
 ### 自動ビルドパイプライン
 
 #### GitLab CI/CDの例
+
 ```yaml
 # .gitlab-ci.yml
 stages:
@@ -265,6 +274,7 @@ deploy:
 ### イメージの自動最適化
 
 #### マルチステージビルド
+
 ```dockerfile
 # Dockerfile - マルチステージビルドの例
 # ステージ1: ビルド環境
@@ -284,6 +294,7 @@ CMD ["./app"]
 ```
 
 #### サイズ最適化のテクニック
+
 ```dockerfile
 # 最適化前：1.2GB
 FROM ubuntu:22.04
@@ -306,6 +317,7 @@ CMD ["python", "app.py"]
 ### ベストプラクティス
 
 #### 1. 最小限の基底イメージを使用
+
 ```dockerfile
 # 悪い例：フルOSイメージ
 FROM ubuntu:22.04              # 77MB
@@ -318,6 +330,7 @@ FROM scratch                   # 0MB（静的バイナリ用）
 ```
 
 #### 2. レイヤー数の最適化
+
 ```dockerfile
 # 悪い例：各コマンドが新しいレイヤー
 RUN apt-get update
@@ -335,6 +348,7 @@ RUN apt-get update && \
 ```
 
 #### 3. ビルドキャッシュの活用
+
 ```dockerfile
 # 変更頻度の低いものを先に
 FROM node:20-alpine
@@ -352,6 +366,7 @@ CMD ["node", "server.js"]
 ### セキュリティを考慮した設計
 
 #### 非rootユーザーでの実行
+
 ```dockerfile
 FROM node:20-alpine
 
@@ -372,6 +387,7 @@ CMD ["node", "server.js"]
 ```
 
 #### シークレットの適切な扱い
+
 ```dockerfile
 # 悪い例：シークレットがレイヤーに残る
 FROM alpine
@@ -694,6 +710,7 @@ chmod +x security_scan.sh
 ### プライベートレジストリの構築
 
 #### 基本的なレジストリのセットアップ
+
 ```bash
 # TLS付きレジストリの構築
 # 証明書の生成
@@ -715,6 +732,7 @@ podman run -d \
 ```
 
 #### 認証付きレジストリ
+
 ```bash
 # htpasswdファイルの作成
 podman run --entrypoint htpasswd \
@@ -735,6 +753,7 @@ podman run -d \
 ### レジストリの高度な機能
 
 #### ガベージコレクション
+
 ```bash
 # 未使用のレイヤーを削除
 podman exec registry bin/registry garbage-collect /etc/docker/registry/config.yml
@@ -744,6 +763,7 @@ podman exec registry bin/registry garbage-collect --dry-run /etc/docker/registry
 ```
 
 #### レプリケーション
+
 ```yaml
 # プルスルーキャッシュの設定
 version: 0.1
@@ -777,6 +797,7 @@ proxy:
 ### イメージ設計の重要性
 
 良いイメージ設計は：
+
 - **小さい**：必要最小限のコンポーネント
 - **速い**：キャッシュを活用した高速ビルド
 - **安全**：脆弱性の最小化、非root実行
@@ -832,6 +853,7 @@ CMD ["python3", "app.py"]
 ```
 
 最適化のポイント：
+
 - イメージサイズの削減
 - ビルド時間の短縮
 - セキュリティの向上
