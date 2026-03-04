@@ -32,6 +32,7 @@ Linuxシステムも同様です。複数のユーザーとプロセスが同じ
 ```
 
 この環境では、以下が必須でした：
+
 - 各ユーザーのファイルを保護
 - システムリソースの公平な配分
 - 悪意あるユーザーからの防御
@@ -50,6 +51,7 @@ nginx       # Webサーバー用
 ```
 
 各サービスが独立したユーザーで動作することで：
+
 - サービス間の干渉を防ぐ
 - 一つのサービスが侵害されても被害を限定
 - 最小権限の原則を実現
@@ -57,6 +59,7 @@ nginx       # Webサーバー用
 ### ユーザーとグループの概念
 
 #### ユーザー（User）
+
 ```bash
 # ユーザー情報の確認
 $ id
@@ -75,6 +78,7 @@ username:x:1000:1000:User Name:/home/username:/bin/bash
 ```
 
 #### グループ（Group）
+
 ```bash
 # グループ情報
 $ cat /etc/group | grep developers
@@ -156,6 +160,7 @@ ls test_dir  # ファイル名は見えるが詳細は見えない
 ### 特殊な権限ビット
 
 #### SetUID（Set User ID）
+
 ```bash
 # passwdコマンドの例
 $ ls -la /usr/bin/passwd
@@ -167,6 +172,7 @@ $ ls -la /usr/bin/passwd
 ```
 
 #### SetGID（Set Group ID）
+
 ```bash
 # 共有ディレクトリの設定
 mkdir /shared/project
@@ -178,6 +184,7 @@ chgrp developers /shared/project
 ```
 
 #### Sticky Bit
+
 ```bash
 # /tmpディレクトリの例
 $ ls -ld /tmp
@@ -192,6 +199,7 @@ drwxrwxrwt 15 root root 4096 Mar 15 11:26 /tmp
 ### ファイル権限の変更
 
 #### chmod - 権限の変更
+
 ```bash
 # 数値表記
 chmod 755 script.sh   # rwxr-xr-x
@@ -209,6 +217,7 @@ chmod -R 755 /var/www/html
 ```
 
 #### chown - 所有者の変更
+
 ```bash
 # 所有者のみ変更
 chown alice file.txt
@@ -269,6 +278,7 @@ setfacl -b file.txt
 ### よくある権限設定ミス
 
 #### 1. 過度に緩い権限
+
 ```bash
 # 危険：誰でも書き込める設定ファイル
 chmod 777 /etc/app/config.conf  # 絶対ダメ！
@@ -278,6 +288,7 @@ chmod 644 /etc/app/config.conf  # rootのみ編集可能
 ```
 
 #### 2. 秘密鍵の権限
+
 ```bash
 # SSHが拒否する緩い権限
 chmod 644 ~/.ssh/id_rsa
@@ -288,6 +299,7 @@ chmod 600 ~/.ssh/id_rsa
 ```
 
 #### 3. SetUIDの誤用
+
 ```bash
 # 危険：シェルスクリプトにSetUID
 chmod u+s script.sh  # セキュリティホール！
@@ -298,6 +310,7 @@ chmod u+s script.sh  # セキュリティホール！
 ### 権限昇格攻撃の防止
 
 #### sudo設定のベストプラクティス
+
 ```bash
 # /etc/sudoersの編集（必ずvisudoを使用）
 sudo visudo
@@ -315,6 +328,7 @@ alice ALL=(ALL) NOPASSWD: ALL  # 危険！
 ```
 
 #### ファイル改竄の検出
+
 ```bash
 # ファイルの整合性チェック
 # 1. チェックサムの記録
@@ -332,6 +346,7 @@ sudo aide --check
 ### 実践的なセキュリティ対策
 
 #### 1. 最小インストールの原則
+
 ```bash
 # 不要なパッケージの削除
 sudo apt autoremove
@@ -342,6 +357,7 @@ systemctl list-units --type=service --state=running
 ```
 
 #### 2. ファイルシステムの保護
+
 ```bash
 # /etc/fstabでの設定
 # /tmpをnoexecでマウント
@@ -352,6 +368,7 @@ tmpfs /tmp tmpfs defaults,noexec,nosuid 0 0
 ```
 
 #### 3. 監査ログの活用
+
 ```bash
 # auditdのインストールと設定
 sudo apt install auditd
@@ -616,6 +633,7 @@ chmod +x security_audit.sh
 ### 権限設定のチェックリスト
 
 #### システムファイル
+
 ```bash
 # 重要なシステムファイルの権限
 /etc/passwd     # 644 (rw-r--r--) root:root
@@ -625,6 +643,7 @@ chmod +x security_audit.sh
 ```
 
 #### Webアプリケーション
+
 ```bash
 # Webサーバーのドキュメントルート
 /var/www/html/          # 755 www-data:www-data
@@ -637,6 +656,7 @@ chmod +x security_audit.sh
 ```
 
 #### ユーザーディレクトリ
+
 ```bash
 # ホームディレクトリ
 /home/username/         # 750 または 700
@@ -715,6 +735,7 @@ TCP/IPスタックという、インターネットの基礎技術をLinuxがど
 ## 章末演習問題
 
 ### 問題1：基本理解の確認
+
 以下の文章の空欄を埋めてください。
 
 1. Linuxの基本的な権限は、（　　　）、（　　　）、（　　　）の3つで、それぞれ数値で（　）、（　）、（　）と表現されます。
@@ -722,6 +743,7 @@ TCP/IPスタックという、インターネットの基礎技術をLinuxがど
 3. umaskが022の場合、新規作成されるファイルの権限は（　　　）、ディレクトリの権限は（　　　）になります。
 
 ### 問題2：概念の理解
+
 次の質問に答えてください。
 
 1. 「最小権限の原則」とは何か、なぜ重要なのか、具体例を挙げて説明してください。
@@ -729,6 +751,7 @@ TCP/IPスタックという、インターネットの基礎技術をLinuxがど
 3. ACL（Access Control List）が従来のUNIX権限システムより優れている点を2つ挙げてください。
 
 ### 問題3：実践的な課題
+
 以下のシナリオに対して、適切な権限設定を行うコマンドを記述してください。
 
 1. Webサーバーのドキュメントルート（/var/www/html）を、www-dataユーザーが読み取り可能、管理者グループ（webadmin）が読み書き可能、その他のユーザーはアクセス不可にする。
@@ -738,6 +761,7 @@ TCP/IPスタックという、インターネットの基礎技術をLinuxがど
 3. バックアップスクリプト（/usr/local/bin/backup.sh）を、backupユーザーのみが実行でき、実行時はroot権限で動作するようにする。
 
 ### 問題4：セキュリティ診断
+
 以下のls -laの出力を見て、セキュリティ上の問題点を指摘し、修正方法を提案してください。
 
 ```text
@@ -749,6 +773,7 @@ drwx------  2 root     root      4096 Mar 15 13:00 /home/user/
 ```
 
 ### 問題5：権限管理スクリプト
+
 以下の要件を満たすスクリプトを作成してください。
 
 ```bash
@@ -766,9 +791,11 @@ drwx------  2 root     root      4096 Mar 15 13:00 /home/user/
 ```
 
 ### 問題6：ACLの活用
+
 次のシナリオをACLを使って実現する方法を示してください。
 
 プロジェクトディレクトリ /project/webapp があり：
+
 - alice: 全権限
 - bob: 読み書き権限（実行不可）
 - charlie: 読み取りのみ
@@ -776,6 +803,7 @@ drwx------  2 root     root      4096 Mar 15 13:00 /home/user/
 - 新規作成されるファイルにも自動的に同じACLを適用
 
 ### 問題7：トラブルシューティング
+
 ユーザーから「ファイルが編集できない」という報告がありました。以下の情報から原因を特定し、解決策を提示してください。
 
 ```bash
@@ -795,6 +823,7 @@ other::---
 ```
 
 ### 問題8：発展的課題
+
 1. SELinuxやAppArmorなどのMAC（Mandatory Access Control）システムが、従来のDAC（Discretionary Access Control）に加えて必要な理由を説明してください。
 
 2. コンテナ環境における権限管理の課題と、rootlessコンテナが解決する問題について論じてください。

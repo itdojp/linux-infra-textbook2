@@ -14,17 +14,20 @@ title: "第4章：ファイルシステムという抽象化の威力"
 - ネットワーク: 章によりインターネット接続が必要（例: パッケージ導入、クラウド操作）
 
 ## 📚 この章の前提知識
+
 - ✅ **必要**: ファイルとディレクトリの基本概念
 - ✅ **必要**: Linuxコマンド（ls, cat, echo）の基本操作
 - ✅ **推奨**: 第2章のUNIX哲学の理解
 - ❌ **不要**: ファイルシステムの内部実装知識
 
 ## 🎯 この章の目標
+
 - 「すべてはファイル」というLinuxの核心概念を理解する
 - ファイルシステムの階層構造を理解する
 - デバイスファイルとprocファイルシステムを体験する
 
 ## 🚀 この章でできるようになること
+
 - /procや/sysを使ってシステム情報を取得できる
 - ファイル権限とオーナーシップを理解して管理できる
 - シンボリックリンクとハードリンクを使い分けられる
@@ -46,6 +49,7 @@ Linuxでは、ハードディスクもプリンタもプロセス情報も、す
 想像してください。家にテレビ、エアコン、照明があります。
 
 **従来の方法**（1960年代のコンピュータ）:
+
 ```text
 テレビ専用リモコン → テレビのみ制御
 エアコン専用リモコン → エアコンのみ制御
@@ -53,12 +57,14 @@ Linuxでは、ハードディスクもプリンタもプロセス情報も、す
 ```
 
 **統一リモコン**（Linuxの発想）:
+
 ```text
 スマートフォンアプリ → すべての家電を制御
 同じ操作（ON/OFF、設定変更）でどの機器も操作
 ```
 
 #### 📝 **今すぐ試そう（1分）**
+
 ```bash
 # 通常のファイル操作
 echo "Hello, World!" > test.txt
@@ -82,6 +88,7 @@ cat /dev/zero | head -c 10  # ゼロデータを10バイト読む
 ```
 
 **UNIXの革命的解決策**:
+
 ```text
 あらゆるデバイス
     ↓ 「ファイル」として抽象化
@@ -89,6 +96,7 @@ cat /dev/zero | head -c 10  # ゼロデータを10バイト読む
 ```
 
 #### 📝 **今すぐ試そう（3分）**
+
 ```bash
 # デバイスファイルを実際に体験
 ls -l /dev/zero /dev/null /dev/urandom
@@ -121,7 +129,7 @@ head -c 1000 /dev/zero
 
 Linuxのファイルシステムは、以下のような階層構造で組織されています：
 
-<img src="{{ '/assets/images/diagrams/chapter-03/filesystem-hierarchy.svg' | relative_url }}" alt="Linuxファイルシステム階層構造" style="width: 100%; max-width: 800px; height: auto;">
+![Linuxファイルシステム階層構造]({{ '/assets/images/diagrams/chapter-03/filesystem-hierarchy.svg' | relative_url }})
 
 ### /dev - デバイスファイルの世界
 
@@ -137,16 +145,18 @@ ls -la /dev/
 ```
 
 ファイルタイプの意味：
+
 - `b`：ブロックデバイス（一定サイズのブロック単位でアクセス）
 - `c`：キャラクタデバイス（1バイトずつアクセス）
 
 ### 特殊なデバイスファイル
 
-<img src="{{ '/assets/images/diagrams/chapter-04/device-files-operation.svg' | relative_url }}" alt="Linux特殊デバイスファイルの動作" style="width: 100%; max-width: 800px; height: auto;">
+![Linux特殊デバイスファイルの動作]({{ '/assets/images/diagrams/chapter-04/device-files-operation.svg' | relative_url }})
 
 #### 使用例
 
 **`/dev/null` - ブラックホール:**
+
 ```bash
 # 出力を捨てる
 command_with_lots_of_output > /dev/null
@@ -156,6 +166,7 @@ noisy_command > /dev/null 2>&1
 ```
 
 **`/dev/zero` - 無限のゼロ:**
+
 ```bash
 # 1GBのファイルを作成（すべてゼロで埋める）
 # [注意] `dd` は引数を誤るとブロックデバイス等を上書きし、データを破壊する。
@@ -169,6 +180,7 @@ dd if=/dev/zero of=testfile bs=1M count=1000 conv=fdatasync
 ```
 
 **`/dev/random` と `/dev/urandom` - 乱数生成器:**
+
 ```bash
 # パスワード生成
 tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12
@@ -212,6 +224,7 @@ ls /proc/1234/
 ```
 
 実用例：プロセスが開いているファイルを調べる
+
 ```bash
 # nginxが開いているファイルを見る
 # nginxはmaster/workerで複数PIDになることがあるため、例では最新の1PIDを選ぶ
@@ -621,7 +634,7 @@ sudo mdadm --detail /dev/md0
 
 ### 各RAID構成の特徴比較
 
-<img src="{{ '/assets/images/diagrams/chapter-03/raid-comparison.svg' | relative_url }}" alt="RAID構成詳細比較 - RAID 0、RAID 1、RAID 5の特徴" style="width: 100%; max-width: 1000px; height: auto;">
+![RAID構成詳細比較 - RAID 0、RAID 1、RAID 5の特徴]({{ '/assets/images/diagrams/chapter-03/raid-comparison.svg' | relative_url }})
 
 ### 特徴比較表
 
@@ -642,6 +655,7 @@ sudo mdadm --detail /dev/md0
 ## 章末演習問題
 
 ### 問題1：基本理解の確認
+
 以下の文章の空欄を埋めてください。
 
 1. Linuxの「すべてはファイル」という思想では、デバイスは（　　　）ディレクトリに、プロセス情報は（　　　）ディレクトリに、カーネルパラメータは（　　　）ディレクトリにファイルとして存在する。
@@ -649,6 +663,7 @@ sudo mdadm --detail /dev/md0
 3. 標準入力、標準出力、標準エラー出力のファイルディスクリプタ番号は、それぞれ（　）、（　）、（　）である。
 
 ### 問題2：概念の理解
+
 次の質問に答えてください。
 
 1. なぜLinuxではハードウェアデバイスをファイルとして扱うのか、その利点を3つ挙げて説明してください。
@@ -656,6 +671,7 @@ sudo mdadm --detail /dev/md0
 3. ブロックデバイスとキャラクタデバイスの違いを、具体例を挙げて説明してください。
 
 ### 問題3：実践的思考
+
 以下のタスクをLinuxのファイルシステムを使って実現する方法を説明してください。
 
 1. 現在実行中のすべてのプロセスが開いているファイルの総数を調べたい。
@@ -663,6 +679,7 @@ sudo mdadm --detail /dev/md0
 3. 特定のプロセスのメモリ使用量の変化を5秒ごとに記録したい。
 
 ### 問題4：トラブルシューティング
+
 以下の状況に対して、ファイルシステムの知識を使ってどのように対処するか説明してください。
 
 1. アプリケーションが大量のログを出力していて、ディスクを圧迫している。しかし、ログの内容は不要。
@@ -670,6 +687,7 @@ sudo mdadm --detail /dev/md0
 3. 特定のプロセスがどのポートを使用しているか調べたい。
 
 ### 問題5：応用問題
+
 次のシェルスクリプトを完成させてください。
 
 ```bash
@@ -697,6 +715,7 @@ echo "Process with most open files:"
 ```
 
 ### 問題6：発展的課題
+
 1. Dockerやコンテナ技術が、Linuxの「すべてはファイル」という思想をどのように活用しているか考察してください。特に、cgroupsとnamespacesの実装について言及してください。
 
 2. 「すべてはファイル」という抽象化の限界はどこにあると思いますか？この設計思想では対応が難しい、現代のコンピューティングの要求を挙げてください。
