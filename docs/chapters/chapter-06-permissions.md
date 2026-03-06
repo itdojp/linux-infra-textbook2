@@ -358,10 +358,10 @@ alice ALL=(ALL) NOPASSWD: ALL  # 危険！
 ```bash
 # ファイルの整合性チェック
 # 1. チェックサムの記録
-sudo find /etc -type f -exec md5sum {} \; | sudo tee /root/etc_checksums.txt >/dev/null
+sudo find /etc -type f -exec sha256sum {} \; | sudo tee /root/etc_checksums.txt >/dev/null
 
 # 2. 定期的な確認
-sudo md5sum -c /root/etc_checksums.txt | grep -v "OK$"
+sudo sha256sum -c /root/etc_checksums.txt | grep -v "OK$"
 
 # より高度なツール：AIDE
 sudo apt install aide
@@ -536,7 +536,7 @@ ls -la
 sudo -u nobody cat alice_secret.txt
 ```
 
-### 演習2：SetUIDの危険性
+### 演習2：SetUIDの仕組みを観察する
 
 ```bash
 # SetUID の仕組みを観察する最小プログラム
