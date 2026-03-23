@@ -5,7 +5,8 @@
 - OS: Linux（systemd 前提。例: Ubuntu 22.04/24.04）
 - シェル: bash
 - 権限: 章内で `sudo` を付けた操作は管理者権限が必要
-- ネットワーク: 章によりインターネット接続が必要（例: パッケージ導入、クラウド操作）
+- ネットワーク: 追加パッケージ導入時のみインターネット接続が必要
+- 任意ツール: ACL の例では `acl` パッケージ、演習 2 では `gcc` を使用
 
 ## 6.1 はじめに：なぜ権限管理が必要なのか
 
@@ -139,6 +140,27 @@ drwxr-xr-x  5 alice developers  4096 Mar 15 10:00 project/
 # x = 実行（execute）     = 1
 ```
 
+#### 初学者向けの最小例：自分のホームディレクトリで試す
+
+```bash
+mkdir -p ~/permission-test/minimum
+cd ~/permission-test/minimum
+
+printf '%s\n' 'secret memo' > memo.txt
+cat > hello.sh <<'EOF'
+#!/usr/bin/env bash
+echo "hello"
+EOF
+
+ls -l
+chmod 600 memo.txt
+chmod 755 hello.sh
+ls -l
+./hello.sh
+```
+
+この最小例では、`memo.txt` に `600` を設定して「所有者だけが読み書きできる状態」を確認し、`hello.sh` に `755` を設定して「スクリプトの起動には実行権限が必要である」ことを確認します。いずれも `~/permission-test` 配下で完結するため、業務ファイルを壊さずに試せます。
+
 #### ディレクトリに対する権限の意味
 
 ```bash
@@ -175,9 +197,7 @@ $ ls -la /usr/bin/passwd
 
 ```bash
 # 共有ディレクトリの設定
-mkdir /shared/project
-chmod 2775 /shared/project  # 2がSetGIDビット
-chgrp developers /shared/project
+sudo install -d -m 2775 -o root -g developers /srv/project-share
 
 # このディレクトリ内で作成されたファイルは
 # 自動的にdevelopersグループに属する
@@ -212,24 +232,26 @@ chmod g-w file.txt      # グループから書き込み権限を削除
 chmod o=r file.txt      # その他には読み取りのみ
 chmod a+r file.txt      # 全員に読み取り権限を追加
 
-# 再帰的な変更
-chmod -R 755 /var/www/html
+# 再帰的な変更（検証用ディレクトリで実施）
+chmod -R u=rwX,go=rX ~/permission-test/web-root
 ```
+
+本番ディレクトリに対して再帰的な `chmod` を実行する前に、対象パス・現在の権限・実行中サービスへの影響を確認してください。特に `/var/www` や `/etc` への一括変更は、意図しない停止や情報露出につながります。
 
 #### chown - 所有者の変更
 
 ```bash
 # 所有者のみ変更
-chown alice file.txt
+sudo chown alice file.txt
 
 # 所有者とグループを変更
-chown alice:developers file.txt
+sudo chown alice:developers file.txt
 
 # 再帰的に変更
-chown -R www-data:www-data /var/www
+sudo chown -R www-data:www-data /var/www
 
 # グループのみ変更
-chgrp developers file.txt
+sudo chgrp developers file.txt
 ```
 
 ### umask - デフォルト権限の設定
@@ -273,6 +295,8 @@ setfacl -x u:bob file.txt
 setfacl -b file.txt
 ```
 
+Ubuntu 系では `setfacl` / `getfacl` が見つからない場合、`sudo apt install acl` で追加します。ファイルシステム側で ACL が無効な環境もあるため、検証前に `mount` 出力やディストリビューションの標準設定を確認してください。
+
 ## 6.5 セキュリティインシデントの防止
 
 ### よくある権限設定ミス
@@ -281,10 +305,10 @@ setfacl -b file.txt
 
 ```bash
 # 危険：誰でも書き込める設定ファイル
-chmod 777 /etc/app/config.conf  # 絶対ダメ！
+sudo chmod 777 /etc/app/config.conf  # 絶対ダメ！
 
 # 正しい設定
-chmod 644 /etc/app/config.conf  # rootのみ編集可能
+sudo chmod 644 /etc/app/config.conf  # rootのみ編集可能
 ```
 
 #### 2. 秘密鍵の権限
@@ -306,6 +330,8 @@ chmod u+s script.sh  # セキュリティホール！
 
 # SetUIDは慎重に、できれば使わない
 ```
+
+多くの Linux カーネルでは、シェルスクリプトに対する SetUID は安全性の観点から無効化されています。それでも「危険な設計である」という理解は重要です。
 
 ### 権限昇格攻撃の防止
 
@@ -332,10 +358,10 @@ alice ALL=(ALL) NOPASSWD: ALL  # 危険！
 ```bash
 # ファイルの整合性チェック
 # 1. チェックサムの記録
-find /etc -type f -exec md5sum {} \; > /root/etc_checksums.txt
+sudo find /etc -type f -exec sha256sum {} \; | sudo tee /root/etc_checksums.txt >/dev/null
 
 # 2. 定期的な確認
-md5sum -c /root/etc_checksums.txt | grep -v "OK$"
+sudo sha256sum -c /root/etc_checksums.txt | grep -v "OK$"
 
 # より高度なツール：AIDE
 sudo apt install aide
@@ -385,6 +411,8 @@ sudo aureport --summary
 
 #### 4. ファイアウォール設定の実践
 
+以下は検証用 VM や手元のラボ環境で試してください。遠隔接続中のサーバーでいきなり既定ポリシーを変更すると、自分の SSH セッションまで遮断するおそれがあります。少なくとも別の root セッション、またはコンソールアクセスを確保してから実行します。
+
 ```bash
 # iptablesによる基本設定
 # デフォルトポリシーを拒否に設定
@@ -394,40 +422,39 @@ sudo iptables -P OUTPUT ACCEPT
 
 # 必要なサービスのみ許可
 sudo iptables -A INPUT -i lo -j ACCEPT                    # ローカルループバック
-sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT  # 確立済み接続
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT  # 確立済み接続
 sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT        # SSH
 sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT        # HTTP
 sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT       # HTTPS
 
 # 設定を保存
-sudo iptables-save > /etc/iptables/rules.v4
+sudo iptables-save | sudo tee /etc/iptables/rules.v4 >/dev/null
 
 # ufw（簡易ファイアウォール）の使用
-sudo ufw enable
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw allow ssh
+sudo ufw allow OpenSSH
 sudo ufw allow 'Nginx Full'
+sudo ufw enable
 sudo ufw status verbose
 ```
 
 #### 5. SSH強化設定
 
-```bash
-# /etc/ssh/sshd_configの推奨設定
-sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
+SSH 設定は、現在の接続を切断すると復旧に時間がかかります。既存セッションを開いたまま、構文チェック成功後に再読み込みし、別端末から再接続できることを確認してから作業を終えてください。
 
+```bash
+# バックアップと drop-in ディレクトリの準備
+sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup.$(date +%Y%m%d-%H%M%S)
+sudo install -d -m 755 /etc/ssh/sshd_config.d
+
+# セキュリティ強化設定（Ubuntu 系の例）
+sudo tee /etc/ssh/sshd_config.d/10-hardening.conf >/dev/null << 'EOF'
 # セキュリティ強化設定
-cat >> /etc/ssh/sshd_config << 'EOF'
-# セキュリティ強化設定
-Protocol 2
 PermitRootLogin no
 PasswordAuthentication no
 PubkeyAuthentication yes
-ChallengeResponseAuthentication no
-UsePAM no
-AllowUsers alice bob
-DenyUsers root
+KbdInteractiveAuthentication no
 MaxAuthTries 3
 ClientAliveInterval 300
 ClientAliveCountMax 2
@@ -435,7 +462,7 @@ EOF
 
 # 設定の検証と適用
 sudo sshd -t  # 設定ファイルの構文チェック
-sudo systemctl reload sshd
+sudo systemctl reload ssh
 ```
 
 #### 6. システム監視とアラート
@@ -445,7 +472,7 @@ sudo systemctl reload sshd
 sudo apt install fail2ban
 
 # /etc/fail2ban/jail.local の設定例
-cat > /etc/fail2ban/jail.local << 'EOF'
+sudo tee /etc/fail2ban/jail.local >/dev/null << 'EOF'
 [DEFAULT]
 bantime = 3600
 findtime = 600
@@ -481,6 +508,8 @@ sudo aureport -f
 sudo ausearch -k passwd_changes
 ```
 
+`fail2ban` が参照するログパスはディストリビューションや SSH 実装で異なります。Ubuntu 系では `/var/log/auth.log` が一般的ですが、journald のみを使う環境では別設定が必要です。
+
 ## 6.6 演習：権限設定ミスによる脆弱性を体験
 
 ### 演習1：基本的な権限管理
@@ -507,55 +536,49 @@ ls -la
 sudo -u nobody cat alice_secret.txt
 ```
 
-### 演習2：SetUIDの危険性
+### 演習2：SetUIDの仕組みを観察する
 
 ```bash
-# 危険なプログラムの作成（教育目的のみ）
-cat > vulnerable.c << 'EOF'
+# SetUID の仕組みを観察する最小プログラム
+cat > inspect_euid.c << 'EOF'
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 
-int main(int argc, char *argv[]) {
-    printf("Current UID: %d\n", getuid());
+int main(void) {
+    printf("Real UID: %d\n", getuid());
     printf("Effective UID: %d\n", geteuid());
-    
-    if (argc > 1) {
-        // 危険：ユーザー入力をそのままsystem()に渡す
-        system(argv[1]);
-    }
     return 0;
 }
 EOF
 
 # コンパイルと権限設定
-gcc vulnerable.c -o vulnerable
-chmod u+s vulnerable  # SetUID設定
+gcc inspect_euid.c -o inspect_euid
+ls -l inspect_euid
+chmod u+s inspect_euid
+ls -l inspect_euid
 
-# 実行して権限昇格を確認
-./vulnerable "whoami"
-./vulnerable "cat /etc/shadow"  # root権限で実行される！
+# 実行して real/effective UID を観察
+./inspect_euid
 
 # 後片付け（重要）
-rm vulnerable vulnerable.c
+rm inspect_euid inspect_euid.c
 ```
+
+この演習では、所有者が自分自身のバイナリに SetUID を付けても、実効 UID は基本的に自分のままであることを確認します。`root` 所有バイナリに SetUID を付けた危険な検証は、業務端末や共用サーバーでは実施しないでください。
 
 ### 演習3：共有ディレクトリの設定
 
 ```bash
 # 共有プロジェクトディレクトリの作成
-sudo mkdir /tmp/shared_project
-sudo groupadd project_team
-sudo usermod -aG project_team $USER
+sudo groupadd -f project_team
+sudo install -d -m 3775 -o root -g project_team /tmp/shared_project
 
-# SetGIDとSticky bitの設定
-sudo chmod 3775 /tmp/shared_project  # rwxrwsr-t
-sudo chgrp project_team /tmp/shared_project
+# 自分を補助グループに追加
+sudo usermod -aG project_team "$USER"
 
-# テスト
-cd /tmp/shared_project
-touch myfile.txt
-ls -la  # グループがproject_teamになっているか確認
+# テスト（新しいグループを明示して実行）
+sudo -u "$USER" -g project_team touch /tmp/shared_project/myfile.txt
+ls -la /tmp/shared_project  # グループがproject_teamになっているか確認
 
 # 別ユーザーでのテスト（sudoを使用）
 sudo -u nobody touch /tmp/shared_project/test.txt  # 失敗するはず
@@ -609,7 +632,7 @@ find / -type f -perm -2000 2>/dev/null | head -20
 
 echo
 echo "4. Files without owner:"
-find / -nouser -o -nogroup 2>/dev/null | head -20
+find / \( -nouser -o -nogroup \) 2>/dev/null | head -20
 
 echo
 echo "5. Suspicious permissions on important files:"
@@ -621,7 +644,7 @@ awk -F: '$3 == 0 {print $1}' /etc/passwd
 
 echo
 echo "7. Sudo configuration:"
-sudo grep -v '^#' /etc/sudoers | grep -v '^$'
+sudo grep -Ev '^(#|$)' /etc/sudoers
 EOF
 
 chmod +x security_audit.sh
@@ -718,13 +741,10 @@ echo "Done."
 
 セキュリティは一度設定したら終わりではありません：
 
-```bash
-# 定期的な確認項目
 - 不要なユーザーアカウントの削除
 - 過度に緩い権限の修正
-- SetUID/SetGIDファイルの確認
+- SetUID/SetGID ファイルの棚卸し
 - ログの監視と分析
-```
 
 ### 次章への準備
 
@@ -758,7 +778,7 @@ TCP/IPスタックという、インターネットの基礎技術をLinuxがど
 
 2. 共有ディレクトリ（/shared/project）を作成し、developersグループのメンバーが自由にファイルを作成・編集でき、作成されたファイルは自動的にdevelopersグループに属するようにする。
 
-3. バックアップスクリプト（/usr/local/bin/backup.sh）を、backupユーザーのみが実行でき、実行時はroot権限で動作するようにする。
+3. バックアップスクリプト（/usr/local/bin/backup.sh）を、backupユーザーのみが実行できるようにし、root権限が必要な処理は `sudoers` で個別コマンドに限定して実行できるようにする。
 
 ### 問題4：セキュリティ診断
 

@@ -153,24 +153,30 @@ aws s3 cp huge-file.zip s3://my-bucket/ --storage-class GLACIER
 #### Auto Scalingグループの設定
 
 ```bash
-# 起動設定の作成
-aws autoscaling create-launch-configuration \
-    --launch-configuration-name my-lc \
-    --image-id ami-12345678 \
-    --instance-type t3.micro \
-    --key-name my-key \
-    --security-groups sg-12345678 \
-    --user-data file://userdata.sh
+# Launch Template の作成
+# 新規構成では Launch Configuration ではなく Launch Template を使う
+aws ec2 create-launch-template \
+    --launch-template-name my-web-template \
+    --launch-template-data '{
+      "ImageId":"ami-12345678",
+      "InstanceType":"t3.micro",
+      "KeyName":"my-key",
+      "SecurityGroupIds":["sg-12345678"],
+      "UserData":"'"$(base64 -w0 userdata.sh)"'"
+    }'
 
 # Auto Scalingグループの作成
 aws autoscaling create-auto-scaling-group \
     --auto-scaling-group-name my-asg \
-    --launch-configuration-name my-lc \
+    --launch-template "LaunchTemplateName=my-web-template,Version=\$Latest" \
     --min-size 2 \
     --max-size 10 \
     --desired-capacity 4 \
+    --vpc-zone-identifier subnet-12345678,subnet-abcdef01 \
     --target-group-arns arn:aws:elasticloadbalancing:...
 ```
+
+注記: AWS では新規利用時に Launch Configuration ではなく Launch Template の利用が案内されています。既存環境の保守で Launch Configuration を見かけることはありますが、新規構築や更新時は Launch Template を前提にしてください。
 
 #### スケーリングポリシー
 

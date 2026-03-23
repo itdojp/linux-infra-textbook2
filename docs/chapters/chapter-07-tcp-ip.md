@@ -114,7 +114,12 @@ Settings for eth0:
 #### MACアドレスとARP
 
 ```bash
-# ARPテーブルの確認（隣接機器のMACアドレス）
+# 近年のLinuxでは ip neigh が標準的
+$ ip neigh show
+192.168.1.1 dev eth0 lladdr 00:11:22:33:44:55 REACHABLE
+192.168.1.100 dev eth0 lladdr aa:bb:cc:dd:ee:ff STALE
+
+# arp は古い環境で見かけることがある
 $ arp -n
 Address         HWtype  HWaddress           Flags Mask  Iface
 192.168.1.1     ether   00:11:22:33:44:55   C           eth0
@@ -194,7 +199,8 @@ ping -c 4 google.com                 # 名前解決と疎通の確認
 # 詳細な接続確認
 mtr google.com                        # 継続的なtraceroute
 ss -tuln                             # 開いているポート確認
-netstat -rn                          # ルーティングテーブル表示
+ip route show                        # ルーティングテーブル表示
+# netstat -rn                        # 古い環境で見かける旧来コマンド
 
 # ネットワーク統計情報
 ss -s                                # 接続統計サマリー
@@ -215,8 +221,9 @@ nslookup webserver.example.com
 dig webserver.example.com
 
 # 3. ポート開放確認
-telnet webserver.example.com 80
 nc -zv webserver.example.com 80
+curl -I http://webserver.example.com
+# telnet webserver.example.com 80    # 古い手順で見かけるが、通常は nc / curl を優先する
 
 # 4. ファイアウォール確認
 sudo iptables -L -n
