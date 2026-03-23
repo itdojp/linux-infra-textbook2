@@ -172,6 +172,7 @@ aws autoscaling create-auto-scaling-group \
     --min-size 2 \
     --max-size 10 \
     --desired-capacity 4 \
+    --vpc-zone-identifier subnet-12345678,subnet-abcdef01 \
     --target-group-arns arn:aws:elasticloadbalancing:...
 ```
 
