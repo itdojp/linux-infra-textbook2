@@ -79,7 +79,7 @@ $ sudo virt-install \
 
 ## 9.3 名前空間とcgroupsによる軽量隔離
 
-### Linuxカーネルの隔離機能    
+### Linuxカーネルの隔離機能
 
 Linuxの名前空間（namespace）は、プロセスやネットワーク、ファイルシステムなどの「見える範囲」を分離することで、他の環境から隔離された空間を提供する仕組みです。これに対してcgroups（control groups）は、CPUやメモリ、ディスクI/Oなどの「使える量」を制限する機能です。この2つを組み合わせることで、同じホストOS上に軽量な隔離環境、すなわちコンテナを構築できます。
 
@@ -165,8 +165,14 @@ $ sudo mkdir /sys/fs/cgroup/mylimit
 $ echo "50000 100000" | sudo tee /sys/fs/cgroup/mylimit/cpu.max
 # 100000マイクロ秒中50000マイクロ秒使用可能 = 50%
 
-# プロセスをcgroupに追加
-$ echo $$ | sudo tee /sys/fs/cgroup/mylimit/cgroup.procs
+# 親シェル自身ではなく、CPUを使う子プロセスを cgroup に追加
+$ yes > /dev/null &
+$ STRESS_PID=$!
+$ echo $STRESS_PID | sudo tee /sys/fs/cgroup/mylimit/cgroup.procs
+$ sleep 5
+$ kill $STRESS_PID
+$ wait $STRESS_PID 2>/dev/null || true
+$ sudo rmdir /sys/fs/cgroup/mylimit
 ```
 
 #### メモリ制限の実装
@@ -213,9 +219,13 @@ C
 gcc memory_hog.c -o memory_hog
 
 # cgroup内で実行
-echo $$ | sudo tee /sys/fs/cgroup/memlimit/cgroup.procs
-./memory_hog  # OOM Killerでkillされる場合がある（環境/overcommit設定で挙動が変わる）
+./memory_hog &
+HOG_PID=$!
+echo $HOG_PID | sudo tee /sys/fs/cgroup/memlimit/cgroup.procs
+wait $HOG_PID || true  # OOM Killerでkillされる場合がある（環境/overcommit設定で挙動が変わる）
 # 例: malloc失敗で終了する場合もある。確認: dmesg / journalctl -k
+rm -f memory_hog memory_hog.c
+sudo rmdir /sys/fs/cgroup/memlimit
 EOF
 ```
 
@@ -236,7 +246,12 @@ trap cleanup EXIT
 mkdir -p "$ROOTFS"
 
 # 最小限のLinux環境をコピー（Alpine Linuxを使用）
-wget -O alpine.tar.gz https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.0-x86_64.tar.gz
+ALPINE_VERSION="3.18.0"
+ALPINE_ARCH="x86_64"
+ALPINE_BASE="alpine-minirootfs-${ALPINE_VERSION}-${ALPINE_ARCH}.tar.gz"
+wget -O alpine.tar.gz "https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/${ALPINE_ARCH}/${ALPINE_BASE}"
+# 検証時点の SHA256 は Alpine 公式 release ページで確認してから更新する
+echo "cb107eb5a1ab71aa2ae788a9c014480e003272ef2e7f76a2936ce9acca4218f1  alpine.tar.gz" | sha256sum -c -
 tar -xzf alpine.tar.gz -C "$ROOTFS"
 
 # 2. 名前空間を分離してchrootで起動
@@ -354,14 +369,14 @@ build:
 test:
   stage: test
   script:
-    - docker run $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA pytest
+    - docker run --rm $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA pytest
 
 deploy:
   stage: deploy
   script:
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:latest
-    - kubectl set image deployment/myapp myapp=$CI_REGISTRY_IMAGE:latest
+    - kubectl set image deployment/myapp myapp=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - kubectl rollout status deployment/myapp --timeout=180s
+    - kubectl get deployment myapp -o jsonpath='{.spec.template.spec.containers[0].image}'
 ```
 
 ## 9.5 演習：手動でコンテナの仕組みを再現
@@ -438,6 +453,15 @@ gcc cpu_stress.c -o cpu_stress
 
 # cgroup設定
 sudo mkdir -p /sys/fs/cgroup/cpu_demo
+cleanup() {
+    if [ -n "${PID:-}" ] && kill -0 "$PID" 2>/dev/null; then
+        kill "$PID"
+        wait "$PID" 2>/dev/null || true
+    fi
+    rm -f cpu_stress cpu_stress.c
+    sudo rmdir /sys/fs/cgroup/cpu_demo 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
 
 # この演習では、すでにroot cgroupでcpuコントローラーが有効になっている環境のみを対象とする
 if ! grep -qw cpu /sys/fs/cgroup/cgroup.controllers; then
@@ -471,9 +495,18 @@ sleep 5
 ps -p $PID -o %cpu | tail -1
 
 kill $PID
-sudo rmdir /sys/fs/cgroup/cpu_demo
+wait $PID 2>/dev/null || true
 EOF
 ```
+
+確認の目安:
+
+- `ps -p "$PID" -o %cpu=` の値が制限前後で変化することを確認すると、cgroup の CPU 制御が効いているかを判断しやすくなります。
+- `sudo test ! -d /sys/fs/cgroup/cpu_demo` が真になることを確認すると、演習用 cgroup が cleanup で消えているかを確認できます。
+
+後始末:
+
+- `rm -f cpu_stress cpu_stress.c` を追加して、演習用のバイナリとソースを残さないようにします。
 
 ### 演習3：最小限のコンテナランタイム実装
 
@@ -484,6 +517,14 @@ cat > mini_container.sh << 'EOF'
 
 CONTAINER_ID="mini_$(date +%s)"
 ROOTFS="/tmp/containers/$CONTAINER_ID"
+
+cleanup() {
+    sudo umount "$ROOTFS/proc" 2>/dev/null || true
+    sudo umount "$ROOTFS/sys" 2>/dev/null || true
+    sudo rm -rf -- "$ROOTFS"
+}
+
+trap cleanup EXIT INT TERM
 
 # コンテナイメージの作成関数
 create_rootfs() {
@@ -538,11 +579,10 @@ run_container() {
 # メイン処理
 create_rootfs
 run_container
-
-# 後片付け
-sudo rm -rf -- "$ROOTFS"
 EOF
 ```
+
+Verify: 終了後に `findmnt "$ROOTFS/proc"` や `findmnt "$ROOTFS/sys"` が空であること、`test -d "$ROOTFS"` が偽になることを確認すると、一時 rootfs と mount namespace の後始末を確認しやすくなります。
 
 ### 演習4：コンテナネットワークの構築
 
@@ -550,6 +590,14 @@ EOF
 # container_network.sh
 cat > container_network.sh << 'EOF'
 #!/bin/bash
+set -euo pipefail
+
+cleanup() {
+    sudo ip link del br0 2>/dev/null || true
+    sudo ip netns del container1 2>/dev/null || true
+    sudo ip netns del container2 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
 
 echo "=== Container Network Setup ==="
 
@@ -592,17 +640,19 @@ echo
 echo "Container2 -> Host:"
 sudo ip netns exec container2 ping -c 3 172.20.0.1
 
-# クリーンアップ関数
-cleanup() {
-    sudo ip link del br0
-    sudo ip netns del container1
-    sudo ip netns del container2
-}
-
 echo
-echo "Network setup complete. Type 'cleanup' to remove."
+echo "Network setup complete. Cleanup runs automatically on exit."
 EOF
 ```
+
+確認の目安:
+
+- `sudo ip netns list` に `container1` / `container2` が出ていることを確認すると、名前空間の作成結果を把握しやすくなります。
+- `ip -br link | grep -E 'br0|br-veth1|br-veth2'` の結果で、bridge 側リンクが `UP` になっていることを確認すると、疎通失敗の切り分けがしやすくなります。
+
+後始末:
+
+- 終了後に `sudo ip netns list` で `container1` / `container2` が消えていること、`ip -br link | grep -E 'veth1|veth2|br-veth1|br-veth2'` が空になることを確認すると、演習で作成したリンクが残っていないかを確認できます。
 
 ### 演習5：コンテナイメージのレイヤー構造理解
 
@@ -616,6 +666,15 @@ echo "=== Container Image Layers Demo ==="
 WORK_DIR="/tmp/layer_demo"
 mkdir -p "$WORK_DIR"
 cd "$WORK_DIR"
+
+cleanup() {
+    if mountpoint -q overlay/merged 2>/dev/null; then
+        sudo umount overlay/merged
+    fi
+    rm -rf -- "$WORK_DIR"
+}
+
+trap cleanup EXIT INT TERM
 
 # レイヤー1：ベースシステム
 echo "Creating Layer 1: Base System"
@@ -656,11 +715,10 @@ sudo mount -t overlay overlay \
 
 echo "Merged filesystem contents:"
 ls -la overlay/merged/
-
-sudo umount overlay/merged
-rm -rf -- "$WORK_DIR"
 EOF
 ```
+
+Verify: `findmnt overlay/merged -o FSTYPE,TARGET` で `overlay` が見えていること、終了後に同じコマンドが空になることを確認すると、OverlayFS の mount / unmount が正しく行われたかを判断しやすくなります。
 
 ## 9.6 コンテナ技術の実際
 
@@ -668,9 +726,15 @@ EOF
 
 #### セキュリティ
 ```bash
-# セキュリティスキャン
-docker scan myimage:latest
+# 固定タグまたは digest を指定して脆弱性スキャン
+docker scout cves registry://myimage:v1.0.0
+# より厳密に固定したい場合の例
+docker scout cves registry://myimage@sha256:<digest>
 ```
+
+注記: `latest` のような可変タグは、検証記録や障害調査で同じイメージを再現しにくくなります。スキャン結果を保存する場合は、固定タグか digest を使ってください。
+
+Verify: スキャン結果を記録する場合は、`docker image inspect myimage:v1.0.0 | jq -r '.[0].RepoDigests[0]'` などで、その時点の digest を一緒に残してください。固定タグで運用していても、registry 側の再 push やミラー差分があると、後から同じイメージを特定しにくくなります。
 
 ```dockerfile
 # 非rootユーザーでの実行
@@ -688,7 +752,7 @@ docker logs container_name
 # ログドライバーの設定
 docker run --log-driver=syslog \
     --log-opt syslog-address=tcp://192.168.1.100:514 \
-    myapp:latest
+    myapp:v1.0.0
 ```
 
 #### 監視

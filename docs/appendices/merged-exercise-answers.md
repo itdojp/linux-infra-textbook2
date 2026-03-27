@@ -539,6 +539,8 @@ Dockerは以下の方法でこの思想を活用：
 
 30日以上前に更新された/var/log以下の.logファイルをすべて削除する。
 
+注記: これは挙動説明用の最小例です。実運用では、まず `find /var/log -type f -name "*.log" -mtime +30 -print` で対象を dry-run し、件数とパスを spot check してから削除してください。対話確認を入れるなら `-ok rm -- {} \;`、完全自動化するなら backup / retention を確認した上で `-delete` を使う方が安全です。
+
 #### 2. `ps aux | grep nginx | grep -v grep | awk '{print $2}' | xargs kill -HUP`
 
 nginxプロセスのPIDを取得し、HUPシグナル（設定再読み込み）を送信する。
@@ -621,7 +623,7 @@ cleanup() {
     exit 0
 }
 
-trap cleanup SIGINT SIGTERM
+trap cleanup EXIT INT TERM
 
 echo "監視開始: $LOGFILE"
 TOTAL_ERRORS=0
@@ -646,6 +648,8 @@ tail -f "$LOGFILE" | while read line; do
     fi
 done
 ```
+
+注記: `CACHE_IMAGE` は build cache 用の移動タグです。release 判定や deploy では `IMAGE_NAME` のような commit SHA 付き不変参照を使い、承認済み release tag は別ジョブで付与する方が安全です。
 
 ### 問題6：トラブルシューティング
 
@@ -706,12 +710,14 @@ done
   ```bash
   # デプロイスクリプトの例
   #!/bin/bash
+  IMAGE_TAG=$(git rev-parse --short HEAD)
   git pull origin main
   npm install
   npm test
-  docker build -t app:latest .
-  docker push registry/app:latest
-  kubectl rollout restart deployment/app
+  docker build -t registry/app:${IMAGE_TAG} .
+  docker push registry/app:${IMAGE_TAG}
+  kubectl set image deployment/app app=registry/app:${IMAGE_TAG}
+  kubectl rollout status deployment/app
   ```
 
 - **監視・アラート**：
@@ -727,7 +733,9 @@ done
 
   ```bash
   # サーバープロビジョニング
-  terraform apply -auto-approve
+  terraform plan -out=tfplan
+  terraform apply tfplan
+  terraform output
   ansible-playbook site.yml
   ```
 
@@ -1260,11 +1268,18 @@ sudo ip addr add 192.168.1.100/24 dev eth0
 # 2. デフォルトゲートウェイ設定
 sudo ip route add default via 192.168.1.1
 
-# 3. DNS設定
-echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
-echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
+# 3. DNS設定（systemd-resolved が有効なら一時反映、無効なら一時検証用に /etc/resolv.conf を更新）
+if command -v resolvectl >/dev/null 2>&1; then
+  sudo resolvectl dns eth0 8.8.8.8 8.8.4.4
+  sudo resolvectl domain eth0 '~.'
+else
+  sudo cp -a /etc/resolv.conf /tmp/resolv.conf.backup.$(date +%s)
+  echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+  echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
+fi
 
 # 4. 永続化（Netplan使用の場合）
+sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml.bak 2>/dev/null || true
 cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
 network:
   version: 2
@@ -1278,8 +1293,14 @@ network:
           - 8.8.8.8
           - 8.8.4.4
 EOF
+# 対話環境では netplan try を先に使うと rollback しやすい
+sudo netplan try
 sudo netplan apply
+resolvectl status
 ```
+
+注記: `systemd-resolved` を使う環境では `/etc/resolv.conf` の直接編集を恒久設定に使わず、Netplan / NetworkManager 側を正として反映後に `resolvectl status` で確認します。
+一時切り分けで `resolvectl dns ...` を使った場合は復旧後に `resolvectl revert eth0` で戻し、`/etc/resolv.conf` を直接更新した場合は backup から復元して `diff -u` や `resolvectl status` で整合を確認してください。
 
 ### 問題5：パケットフィルタリング
 
@@ -1308,8 +1329,11 @@ sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
 
 # ルールの保存
+sudo iptables-save > /root/iptables.rules.backup.$(date +%Y%m%d%H%M%S)
 sudo iptables-save > /etc/iptables/rules.v4
 ```
+
+注記: リモート接続中に `iptables` を更新する場合は、適用前に `iptables-save` で rollback 用バックアップを退避し、可能なら `at` や別セッションから自動復旧を仕込んでください。ルールファイルを手編集した場合は `iptables-restore --test < rules.v4` で構文確認してから反映します。
 
 ### 問題6：トラブルシューティングスクリプト
 
@@ -1891,12 +1915,14 @@ echo "  VM memory overhead: ~512MB"
    alias docker=podman
 
    # イメージの移行
-   docker save myapp:latest | podman load
+   docker save myapp:approved-release-tag | podman load
 
    # Docker Compose（docker compose）互換の代替（podman-compose）
    pip3 install podman-compose
    podman-compose up
    ```
+
+   注記: `myapp:latest` のような mutable tag は説明を簡略化するには便利ですが、Docker から Podman へ移送するイメージは固定タグまたは digest で揃える方が再現しやすくなります。
 
 2. **マルチコンテナアプリケーション構築**
 
@@ -1905,16 +1931,16 @@ echo "  VM memory overhead: ~512MB"
    podman pod create --name webapp -p 8080:80
 
    # 各コンテナの起動
-   podman run -d --pod webapp --name frontend nginx
-   podman run -d --pod webapp --name backend node:20
-   podman run -d --pod webapp --name db postgres:13
+   podman run -d --pod webapp --name frontend nginx:1.27-alpine
+   podman run -d --pod webapp --name backend node:22-bookworm
+   podman run -d --pod webapp --name db postgres:16
    ```
 
 3. **Rootlessで特権ポート使用**
 
    ```bash
    # 方法1：ポートフォワーディング
-   podman run -d -p 8080:80 nginx
+   podman run -d -p 8080:80 nginx:1.27-alpine
    # iptablesで80→8080転送
 
    # 方法2：CAP_NET_BIND_SERVICE付与
@@ -1929,7 +1955,7 @@ podman run -d \
   --name nginx-web \
   -p 8080:80 \
   -v /data/web:/usr/share/nginx/html:Z \
-  nginx:latest
+  nginx:<approved-tag>
 
 # 2. systemdサービス作成
 mkdir -p ~/.config/systemd/user
@@ -1959,29 +1985,31 @@ podman run -d \
   --pod webapp-stack \
   --name nginx \
   -v ./nginx.conf:/etc/nginx/nginx.conf:ro \
-  nginx:latest
+  nginx:<approved-tag>
 
 # Node.jsアプリケーション
 podman run -d \
   --pod webapp-stack \
   --name app \
   -v ./app:/app \
-  node:20 npm start
+  node:22-bookworm npm start
 
 # Redis
 podman run -d \
   --pod webapp-stack \
   --name redis \
-  redis:6-alpine
+  redis:7-alpine
 
 # PostgreSQL
 podman run -d \
   --pod webapp-stack \
   --name postgres \
-  -e POSTGRES_PASSWORD=secret \
+  -e POSTGRES_PASSWORD="${DB_PASSWORD:-change-me-for-lab}" \
   -v pgdata:/var/lib/postgresql/data \
-  postgres:13
+  postgres:16
 ```
+
+注記: `DB_PASSWORD` は lab 用の placeholder です。実運用では repository へ平文 password を埋め込まず、env file / secret 管理から注入してください。Pod / マルチコンテナの演習後は `podman pod rm -f webapp-stack` と `podman volume rm pgdata` で残存資産を片付け、固定タグを digest へ置き換える場合は `podman image inspect` で実際に解決された参照を確認してください。
 
 ### 問題6：セキュリティ設定
 
@@ -1998,8 +2026,10 @@ podman run -d \
   --security-opt seccomp=/usr/share/containers/seccomp.json \
   --userns auto \
   --user 1000:1000 \
-  myapp:latest
+  myapp:approved-release-tag
 ```
+
+注記: `nginx:<approved-tag>` や `myapp:approved-release-tag` は mutable tag を避ける意図を示すプレースホルダです。実運用では承認済みの固定タグ、可能なら digest まで含めて管理してください。
 
 ### 問題7：トラブルシューティング
 
@@ -2164,15 +2194,16 @@ stages:
 
 variables:
   IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  LATEST_IMAGE: $CI_REGISTRY_IMAGE:latest
+  CACHE_IMAGE: $CI_REGISTRY_IMAGE:buildcache
 
 build:
   stage: build
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --cache-from $LATEST_IMAGE -t $IMAGE_NAME -t $LATEST_IMAGE .
+    - printf '%s' "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
+    - docker build --cache-from $CACHE_IMAGE -t $IMAGE_NAME -t $CACHE_IMAGE .
     - docker push $IMAGE_NAME
-    - docker push $LATEST_IMAGE
+    - docker push $CACHE_IMAGE
+    - docker logout "$CI_REGISTRY"
 
 test:
   stage: test
@@ -2188,10 +2219,19 @@ security_scan:
 deploy:
   stage: deploy
   script:
+    - kubectl config current-context
+    - kubectl get deployment app -o wide
     - kubectl set image deployment/app app=$IMAGE_NAME
+    - kubectl rollout status deployment/app --timeout=180s
+    # 問題があれば直前 revision に戻す
+    # - kubectl rollout undo deployment/app
   only:
     - main
 ```
+
+注記: この appendix の scan 例も Docker socket が利用できる runner を前提にしています。Podman / rootless を前提にする場合は、registry 上のイメージを直接スキャンできるモードか、daemon socket を要求しない scanner へ読み替えてください。
+
+注記: `CACHE_IMAGE` は build cache 用の移動タグです。release 判定や deploy では `IMAGE_NAME` のような commit SHA 付き不変参照を使い、承認済み release tag は別ジョブで付与する方が安全です。
 
 ### 問題6：トラブルシューティング
 
@@ -2200,7 +2240,7 @@ deploy:
 1. **Dockerfileの最適化**
 
    ```dockerfile
-   FROM node:20-alpine
+   FROM node:22-bookworm
    WORKDIR /app
    # 依存関係を先にコピー
    COPY package*.json ./
@@ -2224,7 +2264,7 @@ deploy:
 
 1. **latestタグの使用**
    - 問題：予期しない変更の可能性
-   - 改善：`FROM node:20-alpine`
+   - 改善：承認済みの固定タグまたは digest を使う（例: `FROM node:22-bookworm`）
 
 2. **rootユーザーでの実行**
    - 問題：コンテナエスケープ時のリスク
@@ -2241,7 +2281,7 @@ deploy:
 改善後：
 
 ```dockerfile
-FROM node:20-alpine
+FROM node:22-bookworm
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 WORKDIR /app
 COPY package*.json ./
@@ -2260,7 +2300,8 @@ CMD ["node", "server.js"]
      - 配布元の信頼性確保
      - コンプライアンス要件の充足
    - 仕組み：
-     - Docker Content Trust (DCT) / Notary
+     - Docker Content Trust (DCT) / Notary（歴史的な仕組みとして理解する）
+     - Sigstore/Cosign や Notation のような現行署名方式
      - 公開鍵暗号による署名
      - レジストリでの署名検証
 
@@ -2464,6 +2505,8 @@ done
 # Crontab設定
 # 0 2 * * * /path/to/daily_backup.sh
 ```
+
+注記: `create-image` の戻り値を受け取った直後は、まだ AMI が利用可能とは限りません。`aws ec2 wait image-available --image-ids "$AMI_ID"` で ready を確認し、必要なら `ManagedBy=daily_backup` などのタグを付けておくと cleanup しやすくなります。整合性要件が高いワークロードでは、`--no-reboot` のまま取得してよいかを事前に判断し、必要なら DB flush や service stop を挟んでください。さらに、最新 AMI から検証用インスタンスを一時起動して boot / health check を確認してから旧世代 AMI を削除します。削除後も `describe-images` と `describe-snapshots` で対象が残っていないことを確認してください。
 
 ### 問題8：発展的課題
 
@@ -2834,7 +2877,7 @@ version: '3.8'
 services:
   # メトリクス収集
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:<approved-tag>
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
@@ -2842,7 +2885,7 @@ services:
 
   # 各サービスのメトリクスエクスポーター
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:<approved-tag>
     ports:
       - "9100:9100"
 
@@ -2870,14 +2913,14 @@ services:
 
   # 分散トレーシング
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:<approved-tag>
     ports:
       - "16686:16686"
       - "6831:6831/udp"
 
   # アラート
   alertmanager:
-    image: prom/alertmanager:latest
+    image: prom/alertmanager:<approved-tag>
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
     ports:
@@ -2885,10 +2928,12 @@ services:
 
   # 可視化
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:<approved-tag>
     ports:
       - "3000:3000"
 ```
+
+注記: 監視系コンポーネントも `latest` を避け、互換性を確認した固定タグか digest で揃える方が安全です。Prometheus / Alertmanager / Grafana / Jaeger は upgrade 互換性と dashboard / rule の差分確認を前提に更新してください。
 
 #### Prometheus設定
 
@@ -3716,7 +3761,10 @@ resource "aws_instance" "web" {
     #!/bin/bash
     dnf update -y
     dnf install -y nginx
-    INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+    IMDS_TOKEN=$(curl -fsS -X PUT "http://169.254.169.254/latest/api/token" \
+      -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+    INSTANCE_ID=$(curl -fsS -H "X-aws-ec2-metadata-token: ${IMDS_TOKEN}" \
+      http://169.254.169.254/latest/meta-data/instance-id)
     echo "Web Server $INSTANCE_ID" > /usr/share/nginx/html/index.html
     systemctl start nginx
     systemctl enable nginx
@@ -3747,6 +3795,8 @@ resource "aws_security_group" "web" {
   }
 }
 ```
+
+注記: `/aws/service/ami-amazon-linux-latest/...` は moving alias です。再現性を優先する環境では、検証済み AMI ID と Launch Template version を review 後に固定し、moving alias は次回 rollout 候補の検出に留める方が安全です。
 
 ### 問題5：モジュール設計
 
@@ -3919,9 +3969,10 @@ env:
   TF_VERSION: '1.3.0'
   AWS_REGION: 'ap-northeast-1'
 
+# 教材では runner drift を避けるため、サンプルでも固定 runner ラベルを使う
 jobs:
   format-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -3934,7 +3985,7 @@ jobs:
         working-directory: ./terraform
 
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: format-check
     steps:
       - uses: actions/checkout@v4
@@ -3944,7 +3995,7 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
 
       - name: Terraform Init
-        run: terraform init -backend=false
+        run: terraform init -backend=false -input=false -lockfile=readonly
         working-directory: ./terraform
 
       - name: Terraform Validate
@@ -3952,7 +4003,7 @@ jobs:
         working-directory: ./terraform
 
   security-scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: validate
     steps:
       - uses: actions/checkout@v4
@@ -3969,9 +4020,12 @@ jobs:
           working_directory: terraform/
 
   plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: security-scan
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -3982,38 +4036,42 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_PLAN_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false -lockfile=readonly
         working-directory: ./terraform
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -out=tfplan -no-color
+        run: terraform plan -input=false -out=tfplan -no-color
         working-directory: ./terraform
         continue-on-error: true
 
       - name: Comment PR
         uses: actions/github-script@v6
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-
-            <details><summary>Show Plan</summary>
-
-            \`\`\`
-            ${process.env.PLAN}
-            \`\`\`
-
-            </details>
-
-            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            const plan = require('child_process').execSync(
+              'terraform show -no-color tfplan',
+              { cwd: './terraform', encoding: 'utf8' }
+            );
+            const summaryLine = plan.split('\n').find(line => line.startsWith('Plan:')) || 'Plan summary not found';
+            const resourceLines = plan
+              .split('\n')
+              .filter(line => line.startsWith('# '))
+              .slice(0, 10)
+              .map(line => '- ' + line.replace(/^#\s+/, ''));
+            const output = [
+              '#### Terraform Plan 📖 `${{ steps.plan.outcome }}`',
+              '',
+              '- Summary: ' + summaryLine,
+              ...(resourceLines.length ? ['', '主要な変更候補:', ...resourceLines] : []),
+              '',
+              '*Pushed by: @${{ github.actor }}, Action: `${{ github.event_name }}`*'
+            ].join('\n');
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -4023,11 +4081,14 @@ jobs:
             })
 
   apply:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: security-scan
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -4038,18 +4099,27 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_PROD_APPLY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false -lockfile=readonly
+        working-directory: ./terraform
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
         working-directory: ./terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply tfplan
+        working-directory: ./terraform
+
+      - name: Terraform Verify
+        run: terraform output
         working-directory: ./terraform
 ```
+
+注記: この workflow は解答用の最小例です。実運用では長期アクセスキーを GitHub Secrets に常設せず、`aws-actions/configure-aws-credentials` で OIDC と `role-to-assume` を使い、shared / production 環境では `plan` artifact と承認済み job だけが `apply tfplan` を実行する形へ分離してください。`AWS_PLAN_ROLE_ARN` は read-only か `plan` 用の最小権限、`AWS_PROD_APPLY_ROLE_ARN` は承認後の apply に限定したロールへ分ける方が安全です。`.terraform.lock.hcl` は VCS 管理し、CI では `terraform init -input=false -lockfile=readonly` を使って provider 差分の混入を止め、lockfile や runner 条件がずれる場合は `plan` を作り直してください。
 
 ### 問題7：ポリシーの実装
 
@@ -4243,6 +4313,8 @@ resource "aws_lambda_function" "dr_failover" {
 }
 ```
 
+注記: この DR 解答は設計の最小例です。実運用や演習では、Route 53 を切り替える前に DR 側 ALB target health または `/health` を確認し、失敗時は DNS を据え置いてください。切替後も failback runbook を別に持ち、演習後は DR 側リソースを縮退または削除して primary へ戻す方が安全です。
+
 ### 問題9：コスト最適化
 
 #### 解答
@@ -4380,10 +4452,10 @@ metadata:
   name: infrastructure
   namespace: argocd
 spec:
-  project: default
+  project: platform-production
   source:
     repoURL: https://github.com/myorg/infrastructure
-    targetRevision: HEAD
+    targetRevision: v1.2.3
     path: terraform
     plugin:
       name: terraform
@@ -4408,6 +4480,8 @@ spec:
 4. ArgoCDがTerraform applyを自動実行
 
 5. 実際の状態とGitの状態を常に同期
+
+注記: この解答は概念を示す最小例です。実運用では `project: default` や `targetRevision: HEAD` のまま使わず、専用 `AppProject` と固定 revision を使い、Terraform の `plan` / `apply` は state lock と承認を分離したパイプラインで扱う方が安全です。
 
 #### 2. IaCツールの比較
 

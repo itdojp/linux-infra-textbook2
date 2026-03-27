@@ -24,10 +24,12 @@
 しかし今は違います。
 
 ```bash
-terraform apply
+terraform plan -out=tfplan
+# review
+terraform apply tfplan
 ```
 
-たった一つのコマンドで、複雑なインフラストラクチャが正確に、再現可能な形で構築されます。これがInfrastructure as Code（IaC）の世界です。
+たった数ステップで、複雑なインフラストラクチャを review 可能かつ再現可能な形で構築できます。これがInfrastructure as Code（IaC）の世界です。
 
 ## 15.2 手作業の限界と人的ミスの排除
 
@@ -229,15 +231,15 @@ if current_state != desired_state:
 
 ```bash
 # 実際のインフラと状態ファイルの差分を確認
-terraform plan
+terraform plan -out=tfplan
 
 # 差分があれば表示される
 # ~ resource "aws_instance" "web" {
 #     ~ instance_type = "t3.micro" -> "t3.small"
 #   }
 
-# 差分を適用
-terraform apply
+# review 後に同じ plan を適用
+terraform apply tfplan
 ```
 
 ## 15.4 再現可能で監査可能なインフラ
@@ -287,10 +289,19 @@ on:
 
 jobs:
   terraform:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<account-id>:role/terraform-plan
+          aws-region: ap-northeast-1
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
       
@@ -298,29 +309,47 @@ jobs:
         run: terraform fmt -check -recursive
       
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false -lockfile=readonly
       
       - name: Terraform Validate
         run: terraform validate
       
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
-
-      - name: Convert plan to text
-        run: terraform show -no-color tfplan > tfplan.txt
+        run: terraform plan -input=false -out=tfplan
       
-      - name: Post Plan to PR
+      - name: Post Plan Summary to PR
         uses: actions/github-script@v6
         with:
           script: |
-            const plan = require('fs').readFileSync('tfplan.txt', 'utf8');
+            const plan = require('child_process').execSync(
+              'terraform show -no-color tfplan',
+              { encoding: 'utf8' }
+            );
+            const summaryLine = plan.split('\n').find(line => line.startsWith('Plan:')) || 'Plan summary not found';
+            const resourceLines = plan
+              .split('\n')
+              .filter(line => line.startsWith('# '))
+              .slice(0, 10)
+              .map(line => '- ' + line.replace(/^#\s+/, ''));
+            const body = [
+              '## Terraform Plan',
+              '',
+              '- Summary: ' + summaryLine,
+              ...(resourceLines.length ? ['', '主要な変更候補:', ...resourceLines] : []),
+            ].join('\n');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `## Terraform Plan\n\`\`\`\n${plan}\n\`\`\``
+              body
             });
 ```
+
+注記: 実運用では、AWS の長期 access key を GitHub Secrets に常設するより、GitHub Actions OIDC で plan 用 role を引き受ける方が監査しやすくなります。workflow 側でも `permissions.id-token: write` を明示し、`aws-actions/configure-aws-credentials` で `role-to-assume` を設定してください。trust policy は `aud=sts.amazonaws.com` と `sub=repo:<org>/<repo>:ref:refs/heads/<branch>` または `repo:<org>/<repo>:environment:<env>` まで絞り、`terraform plan -out=tfplan` を実行した commit と review 対象が一致していることを確認してください。
+
+注記: `.terraform.lock.hcl` は version 管理し、CI では `terraform init -input=false -lockfile=readonly` を使う方が再現しやすくなります。`apply` は `plan` と同じ commit / lockfile / workspace を前提にするか、条件がずれる場合は再度 `plan` して承認し直してください。
+
+注記: `terraform show -no-color tfplan` の出力は、差分だけでなく属性値や output を含むため、環境によっては機微情報や内部構成を露出します。公開 repository の PR コメントへ全面転記する場合は、sensitive output を plan へ含めない設計にするか、要約版だけを投稿して詳細は制限付き artifact に退避してください。
 
 ### 監査証跡（Audit Trail）
 
@@ -412,6 +441,8 @@ terraform plan -refresh-only
 terraform apply -refresh-only
 ```
 
+注記: `terraform apply -refresh-only` は state を実環境の現状へ同期する操作であり、コードへ合わせて実環境を戻すものではありません。手動変更を IaC 側へ戻す場合は `plan` / `apply` を通常モードで実行し、差分レビュー後に適用してください。
+
 ## 15.5 演習：手作業から自動化への段階的移行
 
 ### 演習1：既存インフラのコード化
@@ -470,6 +501,8 @@ EOF
 
 chmod +x import_existing_infra.sh
 ```
+
+注記: `terraform import` の直後は `terraform state list`、`terraform state show aws_instance.<name>`、`terraform plan` の順に確認し、state に取り込まれた実リソースとコード側の属性差分を切り分けてください。誤った ID や resource address を import した場合は、実リソースを消さずに `terraform state rm <address>` で state だけ巻き戻してからやり直す方が安全です。
 
 ### 演習2：モジュール化による再利用性向上
 
@@ -550,6 +583,8 @@ resource "aws_autoscaling_group" "web" {
   }
 }
 
+注記: `version = "$Latest"` は review 外の Launch Template 更新を Auto Scaling Group が拾うため、実運用では `default_version` や明示変数へ固定する方が安全です。`data.aws_ami...` の moving alias や `yum update -y` も、承認済み AMI ID / package version を別途固定できる設計へ寄せると rollback しやすくなります。
+
 # Application Load Balancer
 resource "aws_lb" "web" {
   name               = "${var.environment}-web-alb"
@@ -613,12 +648,15 @@ plan:development:
   stage: plan
   script:
     - terraform workspace select development || terraform workspace new development
-    - terraform plan -var-file=environments/development.tfvars -out=plan.tfplan
-    - terraform show -no-color plan.tfplan > plan.txt
+    - terraform init -input=false -lockfile=readonly
+    - terraform plan -input=false -var-file=environments/development.tfvars -out=plan.tfplan
+    - terraform version -json > terraform-version.json
+    - sha256sum plan.tfplan > plan.tfplan.sha256
   artifacts:
     paths:
       - ${TF_ROOT}/plan.tfplan
-      - ${TF_ROOT}/plan.txt
+      - ${TF_ROOT}/plan.tfplan.sha256
+      - ${TF_ROOT}/terraform-version.json
     expire_in: 7 days
   environment:
     name: development
@@ -629,7 +667,11 @@ apply:development:
   stage: apply
   script:
     - terraform workspace select development
-    - terraform apply -auto-approve plan.tfplan
+    - terraform version -json > current-terraform-version.json
+    - diff -u terraform-version.json current-terraform-version.json
+    - sha256sum -c plan.tfplan.sha256
+    - terraform apply plan.tfplan
+    - rm -f current-terraform-version.json
   dependencies:
     - plan:development
   environment:
@@ -643,12 +685,15 @@ plan:production:
   stage: plan
   script:
     - terraform workspace select production || terraform workspace new production
-    - terraform plan -var-file=environments/production.tfvars -out=plan.tfplan
-    - terraform show -no-color plan.tfplan > plan.txt
+    - terraform init -input=false -lockfile=readonly
+    - terraform plan -input=false -var-file=environments/production.tfvars -out=plan.tfplan
+    - terraform version -json > terraform-version.json
+    - sha256sum plan.tfplan > plan.tfplan.sha256
   artifacts:
     paths:
       - ${TF_ROOT}/plan.tfplan
-      - ${TF_ROOT}/plan.txt
+      - ${TF_ROOT}/plan.tfplan.sha256
+      - ${TF_ROOT}/terraform-version.json
     expire_in: 7 days
   environment:
     name: production
@@ -659,9 +704,15 @@ apply:production:
   stage: apply
   script:
     - terraform workspace select production
-    - terraform apply -auto-approve plan.tfplan
+    - terraform version -json > current-terraform-version.json
+    - diff -u terraform-version.json current-terraform-version.json
+    - sha256sum -c plan.tfplan.sha256
+    - terraform apply plan.tfplan
     # 適用後の検証
-    - ./scripts/validate_deployment.sh
+    - APP_URL=$(terraform output -raw application_url)
+    - test -n "$APP_URL" && test "$APP_URL" != "null"
+    - curl -fsS "$APP_URL/health"
+    - rm -f current-terraform-version.json
   dependencies:
     - plan:production
   environment:
@@ -669,14 +720,14 @@ apply:production:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
-  only:
-    - main
 
 destroy:development:
   stage: destroy
   script:
     - terraform workspace select development
-    - terraform destroy -auto-approve -var-file=environments/development.tfvars
+    - terraform init -input=false -lockfile=readonly
+    - terraform plan -destroy -input=false -var-file=environments/development.tfvars -out=destroy.tfplan
+    - terraform apply -input=false destroy.tfplan
   environment:
     name: development
     action: stop
@@ -684,6 +735,10 @@ destroy:development:
     - if: $CI_COMMIT_BRANCH == "develop"
       when: manual
 ```
+
+注記: `plan.tfplan` の artifact も review 用に機微情報を含む場合があります。保持期間を短くし、protected branch / protected environment と同じ権限境界でのみ取得できるようにしてください。MR 用の共有 runner では、artifact を saved plan に絞り、レビュー面には要約だけを残す方が安全です。適用後検証も `./scripts/validate_deployment.sh` のような外部スクリプト前提にせず、`terraform output`、`curl -f`、必要なら ALB target health 確認まで workflow 内へ明示した方が再現しやすくなります。検証失敗時は直前 release へ戻す手動 rollback job か runbook を別途用意してください。
+
+注記: saved plan を apply へ引き継ぐ例では、runner / container image / Terraform version を固定し、`plan.tfplan.sha256` と `terraform-version.json` のような補助 artifact で整合を確認してから `terraform apply` する方が安全です。shared runner や mutable な実行イメージでは、plan 時と apply 時で provider / OS / Terraform 実装差が混ざらないようにしてください。
 
 ### 演習4：ポリシーアズコード
 
@@ -814,10 +869,26 @@ resource "null_resource" "dr_failover_script" {
     command = <<-EOT
       cat > failover_to_dr.sh << 'EOF'
       #!/bin/bash
+      set -euo pipefail
       echo "Starting failover to DR region..."
       
-      # 1. Route 53の切り替え
-      aws route53 change-resource-record-sets \
+      # 1. DRインスタンスの起動
+      terraform plan -input=false -var="dr_mode=true" -out=dr.tfplan
+      terraform apply -input=false dr.tfplan
+
+      # 2. DR側のヘルス確認
+      HEALTHY_TARGETS=$(aws elbv2 describe-target-health \
+        --target-group-arn ${module.dr_region.target_group_arn} \
+        --query "length(TargetHealthDescriptions[?TargetHealth.State=='healthy'])" \
+        --output text)
+      if [ "$HEALTHY_TARGETS" -lt "${var.instance_count}" ]; then
+        echo "DR targets are not healthy enough: $HEALTHY_TARGETS / ${var.instance_count}" >&2
+        exit 1
+      fi
+      curl -fsS https://${module.dr_region.alb_dns_name}/health
+
+      # 3. Route 53の切り替え
+      CHANGE_ID=$(aws route53 change-resource-record-sets \
         --hosted-zone-id ${aws_route53_zone.main.id} \
         --change-batch '{
           "Changes": [{
@@ -832,10 +903,11 @@ resource "null_resource" "dr_failover_script" {
               }
             }
           }]
-        }'
-      
-      # 2. DRインスタンスの起動
-      terraform apply -var="dr_mode=true" -auto-approve
+        }' \
+        --query 'ChangeInfo.Id' \
+        --output text)
+
+      aws route53 wait resource-record-sets-changed --id "$CHANGE_ID"
       
       echo "Failover completed!"
       EOF
@@ -865,6 +937,8 @@ resource "aws_cloudwatch_metric_alarm" "dr_health" {
   alarm_actions = [aws_sns_topic.alerts.arn]
 }
 ```
+
+注記: この `failover_to_dr.sh` は概念説明用の最小例です。実運用や演習の verify では、`terraform plan -input=false -var="dr_mode=true" -out=dr.tfplan` → `terraform apply -input=false dr.tfplan` で DR 側の構成を先に揃え、ALB target health や `curl -f` / `/health` が通ることを確認してから Route 53 を切り替えてください。DR 側の確認に失敗した場合は DNS を据え置き、演習後は `dr_mode=false` へ戻すか DR 側リソースを停止する rollback 手順を別 runbook として持つ方が安全です。
 
 ## 15.6 IaCのベストプラクティス
 

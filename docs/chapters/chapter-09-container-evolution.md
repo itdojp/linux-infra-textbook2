@@ -1,13 +1,5 @@
 # 第9章：仮想化からコンテナへ - 隔離技術の進化
 
-## 9.0 前提（検証環境）
-
-- OS: Linux（systemd 前提。例: Ubuntu 22.04/24.04）
-- シェル: bash
-- 権限: 章内で `sudo` を付けた操作は管理者権限が必要
-- ネットワーク: 章によりインターネット接続が必要（例: パッケージ導入、クラウド操作）
-- コンテナ関連: cgroup v2 有効を推奨（`mount | grep cgroup2` で確認）
-
 ## 9.1 はじめに：なぜ隔離が必要なのか
 
 あなたがアパートの大家だとしましょう。10部屋あるアパートに10組の家族が住んでいます。各家族にはプライバシーが必要で、他の家族の生活に干渉されたくありません。
@@ -19,7 +11,6 @@
 ### 物理サーバー時代の課題
 
 #### 1990年代～2000年代初頭の状況
-
 ```text
 物理サーバーA：メールサーバー（CPU使用率 5%）
 物理サーバーB：Webサーバー（CPU使用率 10%）
@@ -35,7 +26,6 @@
 ### 仮想化技術の登場
 
 #### VMware、Xen、KVMによる革命
-
 ```text
 物理サーバー（1台）
 ├─ 仮想マシン1：メールサーバー
@@ -49,6 +39,11 @@
 ```
 
 #### 仮想マシンの仕組み
+
+Linux環境では、KVM (Kernel-based Virtual Machine)という仮想化技術が広く利用されています。
+KVMはLinuxカーネルに組み込まれたハイパーバイザー（仮想化ソフトウェア）であり、専用のツール群（`libvirt`など）と組み合わせて利用することで、効率的に仮想マシンを管理できます。
+
+以下は、Linuxホスト上で `virt-install` コマンドを使ってKVM仮想マシンを作成する基本的な例です。（このコマンドは、通常 `sudo` を付けて実行します。）
 
 ```bash
 # KVMを使用した仮想マシンの作成例
@@ -69,7 +64,6 @@ $ sudo virt-install \
 ![仮想マシンの限界](../../docs/assets/images/diagrams/chapter-09/vm-limitations.svg)
 
 **問題点**：
-
 - 各VMに完全なOSが必要（メモリ・ディスク消費）
 - 起動時間が長い（数十秒～数分）
 - オーバーヘッドが大きい
@@ -79,25 +73,19 @@ $ sudo virt-install \
 ![コンテナの革新]({{ '/assets/images/diagrams/chapter-09/container-innovation.svg' | relative_url }})
 
 **利点**：
-
-- 軽量（数十MB）
-- 高速起動（数秒）
-- 効率的なリソース使用
+- 軽量（数十MB）：OS全体ではなく、アプリケーションと最小限のライブラリのみをパッケージ化するため
+- 高速起動（数秒）：完全なOSを起動するのではなく、ホストOSのカーネルを共有するため
+- 効率的なリソース使用：ホストOSのカーネルを共有し、無駄なリソース消費を抑えるため
 
 ## 9.3 名前空間とcgroupsによる軽量隔離
 
 ### Linuxカーネルの隔離機能
 
-Linuxのコンテナは、主に **名前空間（namespace）** と **cgroups（control groups）** という2つのカーネル機能を組み合わせて実現する。
-
-- 名前空間：プロセスから「見える範囲」（プロセス、ネットワーク、ファイルシステムなど）を分離する
-- cgroups：CPUやメモリなどの「使える量」を制限する
-
-この2つを組み合わせることで、同じホストOS上でも、互いに干渉しにくい実行環境を作れる。
+Linuxの名前空間（namespace）は、プロセスやネットワーク、ファイルシステムなどの「見える範囲」を分離することで、他の環境から隔離された空間を提供する仕組みです。これに対してcgroups（control groups）は、CPUやメモリ、ディスクI/Oなどの「使える量」を制限する機能です。この2つを組み合わせることで、同じホストOS上に軽量な隔離環境、すなわちコンテナを構築できます。
 
 #### 名前空間（Namespaces）- 見える範囲の隔離
 
-Linuxの名前空間は、プロセスが見ることができるシステムリソースを制限する：
+Linuxの名前空間は、プロセスが見ることができるシステムリソースを制限します：
 
 ```bash
 # 利用可能な名前空間の種類
@@ -112,7 +100,6 @@ Time    (time)  - システム時刻（Linux 5.6以降）
 ```
 
 #### 名前空間の実験
-
 ```bash
 # 新しいネットワーク名前空間を作成
 $ sudo unshare --net bash
@@ -129,7 +116,6 @@ $ ip link show
 ```
 
 #### PID名前空間の隔離
-
 ```bash
 # pid_namespace_demo.sh
 cat > pid_namespace_demo.sh << 'EOF'
@@ -172,23 +158,24 @@ cgroup2 on /sys/fs/cgroup type cgroup2
 $ cat /sys/fs/cgroup/cgroup.controllers
 cpu io memory pids
 
-# NOTE: cgroup v2 では、親ディレクトリの cgroup.subtree_control で「子で使うコントローラー」を有効化する必要がある。
-#       ただし no internal processes ルールにより、「親 cgroup にまだプロセスが残っている状態」で有効化しようとすると EBUSY などで失敗する。
-#       -> 失敗する場合は、まず `cat /sys/fs/cgroup/cgroup.procs` が空か確認し、空でなければ一時的に別 cgroup へ退避させてから再試行する。
-#       （systemd 管理下では既に有効化済み/書き込み不可の場合がある。その場合は既存設定を確認するか、systemd により委譲された cgroup 内で実験する）
-
-# CPU使用率を50%に制限
-$ echo "+cpu" | sudo tee /sys/fs/cgroup/cgroup.subtree_control
+# CPU使用率を50%に制限（前提: root cgroup で cpu コントローラーが有効）
+$ grep -qw cpu /sys/fs/cgroup/cgroup.subtree_control || \
+    echo "NOTE: cpu コントローラーが root cgroup の subtree_control で有効化されていません（この節はスキップしてください）"
 $ sudo mkdir /sys/fs/cgroup/mylimit
 $ echo "50000 100000" | sudo tee /sys/fs/cgroup/mylimit/cpu.max
 # 100000マイクロ秒中50000マイクロ秒使用可能 = 50%
 
-# プロセスをcgroupに追加
-$ echo $$ | sudo tee /sys/fs/cgroup/mylimit/cgroup.procs
+# 親シェル自身ではなく、CPUを使う子プロセスを cgroup に追加
+$ yes > /dev/null &
+$ STRESS_PID=$!
+$ echo $STRESS_PID | sudo tee /sys/fs/cgroup/mylimit/cgroup.procs
+$ sleep 5
+$ kill $STRESS_PID
+$ wait $STRESS_PID 2>/dev/null || true
+$ sudo rmdir /sys/fs/cgroup/mylimit
 ```
 
 #### メモリ制限の実装
-
 ```bash
 # memory_limit_demo.sh
 cat > memory_limit_demo.sh << 'EOF'
@@ -232,9 +219,13 @@ C
 gcc memory_hog.c -o memory_hog
 
 # cgroup内で実行
-echo $$ | sudo tee /sys/fs/cgroup/memlimit/cgroup.procs
-./memory_hog  # OOM Killerでkillされる場合がある（環境/overcommit設定で挙動が変わる）
+./memory_hog &
+HOG_PID=$!
+echo $HOG_PID | sudo tee /sys/fs/cgroup/memlimit/cgroup.procs
+wait $HOG_PID || true  # OOM Killerでkillされる場合がある（環境/overcommit設定で挙動が変わる）
 # 例: malloc失敗で終了する場合もある。確認: dmesg / journalctl -k
+rm -f memory_hog memory_hog.c
+sudo rmdir /sys/fs/cgroup/memlimit
 EOF
 ```
 
@@ -248,10 +239,19 @@ set -euo pipefail
 
 # 1. ルートファイルシステムの準備
 ROOTFS="/tmp/container_root"
+cleanup() {
+    sudo rm -rf -- "$ROOTFS" alpine.tar.gz
+}
+trap cleanup EXIT
 mkdir -p "$ROOTFS"
 
 # 最小限のLinux環境をコピー（Alpine Linuxを使用）
-wget -O alpine.tar.gz https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.0-x86_64.tar.gz
+ALPINE_VERSION="3.18.0"
+ALPINE_ARCH="x86_64"
+ALPINE_BASE="alpine-minirootfs-${ALPINE_VERSION}-${ALPINE_ARCH}.tar.gz"
+wget -O alpine.tar.gz "https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/${ALPINE_ARCH}/${ALPINE_BASE}"
+# 検証時点の SHA256 は Alpine 公式 release ページで確認してから更新する
+echo "cb107eb5a1ab71aa2ae788a9c014480e003272ef2e7f76a2936ce9acca4218f1  alpine.tar.gz" | sha256sum -c -
 tar -xzf alpine.tar.gz -C "$ROOTFS"
 
 # 2. 名前空間を分離してchrootで起動
@@ -260,16 +260,21 @@ sudo unshare --mount --uts --ipc --net --pid --fork \
     chroot "$ROOTFS" /bin/sh -c '
     # コンテナ内での作業
     hostname container
-    echo "Welcome to manual container!"
-    echo "Hostname: $(hostname)"
-    echo "Process list:"
-    ps aux
-    echo "Network interfaces:"
-    ip addr show
-'
-
-# クリーンアップ
-sudo rm -rf -- "$ROOTFS" alpine.tar.gz
+	    echo "Welcome to manual container!"
+	    echo "Hostname: $(hostname)"
+	    echo "Process list:"
+	    if command -v ps >/dev/null 2>&1; then
+	        ps aux 2>/dev/null || ps
+	    else
+	        echo "(ps is not installed)"
+	    fi
+	    echo "Network interfaces:"
+	    if command -v ip >/dev/null 2>&1; then
+	        ip addr show
+	    else
+	        echo "(ip is not installed)"
+	    fi
+	'
 EOF
 ```
 
@@ -278,7 +283,6 @@ EOF
 ### 「動作環境の違い」問題
 
 #### 従来の問題
-
 ```text
 開発者：「私の環境では動いています」
 運用者：「本番環境では動きません」
@@ -293,7 +297,6 @@ EOF
 ### コンテナによる解決
 
 #### Dockerfileによる環境の定義
-
 ```dockerfile
 # Dockerfile
 FROM python:3.11-slim
@@ -317,7 +320,6 @@ CMD ["flask", "run", "--host=0.0.0.0"]
 ```
 
 #### イメージのビルドと配布
-
 ```bash
 # 開発環境でビルド
 docker build -t myapp:v1.0 .
@@ -333,7 +335,6 @@ docker run -d -p 80:5000 registry.example.com/myapp:v1.0
 ### 迅速なデプロイメントの実現
 
 #### 従来のデプロイメント
-
 ```text
 1. サーバーのプロビジョニング（30分）
 2. OSのインストール・設定（1時間）
@@ -344,7 +345,6 @@ docker run -d -p 80:5000 registry.example.com/myapp:v1.0
 ```
 
 #### コンテナベースのデプロイメント
-
 ```text
 1. コンテナイメージのプル（1分）
 2. コンテナの起動（5秒）
@@ -369,14 +369,14 @@ build:
 test:
   stage: test
   script:
-    - docker run $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA pytest
+    - docker run --rm $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA pytest
 
 deploy:
   stage: deploy
   script:
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:latest
-    - kubectl set image deployment/myapp myapp=$CI_REGISTRY_IMAGE:latest
+    - kubectl set image deployment/myapp myapp=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - kubectl rollout status deployment/myapp --timeout=180s
+    - kubectl get deployment myapp -o jsonpath='{.spec.template.spec.containers[0].image}'
 ```
 
 ## 9.5 演習：手動でコンテナの仕組みを再現
@@ -453,6 +453,15 @@ gcc cpu_stress.c -o cpu_stress
 
 # cgroup設定
 sudo mkdir -p /sys/fs/cgroup/cpu_demo
+cleanup() {
+    if [ -n "${PID:-}" ] && kill -0 "$PID" 2>/dev/null; then
+        kill "$PID"
+        wait "$PID" 2>/dev/null || true
+    fi
+    rm -f cpu_stress cpu_stress.c
+    sudo rmdir /sys/fs/cgroup/cpu_demo 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
 
 # この演習では、すでにroot cgroupでcpuコントローラーが有効になっている環境のみを対象とする
 if ! grep -qw cpu /sys/fs/cgroup/cgroup.controllers; then
@@ -486,9 +495,18 @@ sleep 5
 ps -p $PID -o %cpu | tail -1
 
 kill $PID
-sudo rmdir /sys/fs/cgroup/cpu_demo
+wait $PID 2>/dev/null || true
 EOF
 ```
+
+確認の目安:
+
+- `ps -p "$PID" -o %cpu=` の値が制限前後で変化することを確認すると、cgroup の CPU 制御が効いているかを判断しやすくなります。
+- `sudo test ! -d /sys/fs/cgroup/cpu_demo` が真になることを確認すると、演習用 cgroup が cleanup で消えているかを確認できます。
+
+後始末:
+
+- `rm -f cpu_stress cpu_stress.c` を追加して、演習用のバイナリとソースを残さないようにします。
 
 ### 演習3：最小限のコンテナランタイム実装
 
@@ -496,32 +514,39 @@ EOF
 # mini_container.sh - 最小限のコンテナランタイム
 cat > mini_container.sh << 'EOF'
 #!/bin/bash
-set -euo pipefail
 
 CONTAINER_ID="mini_$(date +%s)"
 ROOTFS="/tmp/containers/$CONTAINER_ID"
 
+cleanup() {
+    sudo umount "$ROOTFS/proc" 2>/dev/null || true
+    sudo umount "$ROOTFS/sys" 2>/dev/null || true
+    sudo rm -rf -- "$ROOTFS"
+}
+
+trap cleanup EXIT INT TERM
+
 # コンテナイメージの作成関数
 create_rootfs() {
-    mkdir -p "$ROOTFS"/{bin,lib,lib64,etc,proc,sys,dev,tmp}
+    mkdir -p $ROOTFS/{bin,lib,lib64,etc,proc,sys,dev,tmp}
     
     # 必要なバイナリをコピー
     for bin in sh ls cat echo ps mount umount; do
-        cp "/bin/$bin" "$ROOTFS/bin/" 2>/dev/null || \
-        cp "/usr/bin/$bin" "$ROOTFS/bin/" 2>/dev/null
+        cp /bin/$bin $ROOTFS/bin/ 2>/dev/null || \
+        cp /usr/bin/$bin $ROOTFS/bin/ 2>/dev/null
     done
     
     # 共有ライブラリをコピー
-    for bin in "$ROOTFS"/bin/*; do
-        ldd "$bin" 2>/dev/null | grep -oE '/[^ ]+' | while read -r lib; do
-            mkdir -p "$ROOTFS$(dirname "$lib")"
-            cp "$lib" "$ROOTFS$lib" 2>/dev/null || true
-        done || true
+    for bin in $ROOTFS/bin/*; do
+        ldd $bin 2>/dev/null | grep -oE '/[^ ]+' | while read lib; do
+            mkdir -p $ROOTFS$(dirname $lib)
+            cp $lib $ROOTFS$lib 2>/dev/null
+        done
     done
     
     # 基本的な設定ファイル
-    echo "container" > "$ROOTFS/etc/hostname"
-    echo "127.0.0.1 localhost" > "$ROOTFS/etc/hosts"
+    echo "container" > $ROOTFS/etc/hostname
+    echo "127.0.0.1 localhost" > $ROOTFS/etc/hosts
 }
 
 # コンテナ実行関数
@@ -531,11 +556,11 @@ run_container() {
     sudo unshare --mount --uts --ipc --net --pid --fork \
         bash -c "
         # procとsysをマウント
-        mount -t proc proc \"$ROOTFS/proc\"
-        mount -t sysfs sys \"$ROOTFS/sys\"
+        mount -t proc proc $ROOTFS/proc
+        mount -t sysfs sys $ROOTFS/sys
         
         # ルートファイルシステムを変更
-        chroot \"$ROOTFS\" /bin/sh -c '
+        chroot $ROOTFS /bin/sh -c '
             hostname \$(cat /etc/hostname)
             echo \"Welcome to mini container!\"
             echo \"Container ID: $CONTAINER_ID\"
@@ -546,19 +571,18 @@ run_container() {
         '
         
         # クリーンアップ
-        umount \"$ROOTFS/proc\"
-        umount \"$ROOTFS/sys\"
+        umount $ROOTFS/proc
+        umount $ROOTFS/sys
     "
 }
 
 # メイン処理
 create_rootfs
 run_container
-
-# 後片付け
-sudo rm -rf -- "$ROOTFS"
 EOF
 ```
+
+Verify: 終了後に `findmnt "$ROOTFS/proc"` や `findmnt "$ROOTFS/sys"` が空であること、`test -d "$ROOTFS"` が偽になることを確認すると、一時 rootfs と mount namespace の後始末を確認しやすくなります。
 
 ### 演習4：コンテナネットワークの構築
 
@@ -566,6 +590,14 @@ EOF
 # container_network.sh
 cat > container_network.sh << 'EOF'
 #!/bin/bash
+set -euo pipefail
+
+cleanup() {
+    sudo ip link del br0 2>/dev/null || true
+    sudo ip netns del container1 2>/dev/null || true
+    sudo ip netns del container2 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
 
 echo "=== Container Network Setup ==="
 
@@ -608,17 +640,19 @@ echo
 echo "Container2 -> Host:"
 sudo ip netns exec container2 ping -c 3 172.20.0.1
 
-# クリーンアップ関数
-cleanup() {
-    sudo ip link del br0
-    sudo ip netns del container1
-    sudo ip netns del container2
-}
-
 echo
-echo "Network setup complete. Type 'cleanup' to remove."
+echo "Network setup complete. Cleanup runs automatically on exit."
 EOF
 ```
+
+確認の目安:
+
+- `sudo ip netns list` に `container1` / `container2` が出ていることを確認すると、名前空間の作成結果を把握しやすくなります。
+- `ip -br link | grep -E 'br0|br-veth1|br-veth2'` の結果で、bridge 側リンクが `UP` になっていることを確認すると、疎通失敗の切り分けがしやすくなります。
+
+後始末:
+
+- 終了後に `sudo ip netns list` で `container1` / `container2` が消えていること、`ip -br link | grep -E 'veth1|veth2|br-veth1|br-veth2'` が空になることを確認すると、演習で作成したリンクが残っていないかを確認できます。
 
 ### 演習5：コンテナイメージのレイヤー構造理解
 
@@ -626,13 +660,21 @@ EOF
 # layer_demo.sh
 cat > layer_demo.sh << 'EOF'
 #!/bin/bash
-set -euo pipefail
 
 echo "=== Container Image Layers Demo ==="
 
 WORK_DIR="/tmp/layer_demo"
 mkdir -p "$WORK_DIR"
 cd "$WORK_DIR"
+
+cleanup() {
+    if mountpoint -q overlay/merged 2>/dev/null; then
+        sudo umount overlay/merged
+    fi
+    rm -rf -- "$WORK_DIR"
+}
+
+trap cleanup EXIT INT TERM
 
 # レイヤー1：ベースシステム
 echo "Creating Layer 1: Base System"
@@ -673,22 +715,26 @@ sudo mount -t overlay overlay \
 
 echo "Merged filesystem contents:"
 ls -la overlay/merged/
-
-sudo umount overlay/merged
-rm -rf -- "$WORK_DIR"
 EOF
 ```
+
+Verify: `findmnt overlay/merged -o FSTYPE,TARGET` で `overlay` が見えていること、終了後に同じコマンドが空になることを確認すると、OverlayFS の mount / unmount が正しく行われたかを判断しやすくなります。
 
 ## 9.6 コンテナ技術の実際
 
 ### 本番環境での考慮事項
 
 #### セキュリティ
-
 ```bash
-# セキュリティスキャン
-docker scan myimage:latest
+# 固定タグまたは digest を指定して脆弱性スキャン
+docker scout cves registry://myimage:v1.0.0
+# より厳密に固定したい場合の例
+docker scout cves registry://myimage@sha256:<digest>
 ```
+
+注記: `latest` のような可変タグは、検証記録や障害調査で同じイメージを再現しにくくなります。スキャン結果を保存する場合は、固定タグか digest を使ってください。
+
+Verify: スキャン結果を記録する場合は、`docker image inspect myimage:v1.0.0 | jq -r '.[0].RepoDigests[0]'` などで、その時点の digest を一緒に残してください。固定タグで運用していても、registry 側の再 push やミラー差分があると、後から同じイメージを特定しにくくなります。
 
 ```dockerfile
 # 非rootユーザーでの実行
@@ -699,7 +745,6 @@ COPY --chown=appuser:appuser . /app
 ```
 
 #### ログ管理
-
 ```bash
 # コンテナログの確認
 docker logs container_name
@@ -707,11 +752,10 @@ docker logs container_name
 # ログドライバーの設定
 docker run --log-driver=syslog \
     --log-opt syslog-address=tcp://192.168.1.100:514 \
-    myapp:latest
+    myapp:v1.0.0
 ```
 
 #### 監視
-
 ```bash
 # リソース使用状況
 docker stats
@@ -753,7 +797,6 @@ Kubernetes（現在）
 ## 章末演習問題
 
 ### 問題1：基本理解の確認
-
 以下の文章の空欄を埋めてください。
 
 1. コンテナ技術で使用されるLinuxカーネルの機能は、（　　　　　）と（　　　　　）です。
@@ -761,7 +804,6 @@ Kubernetes（現在）
 3. PID名前空間を使用すると、コンテナ内のプロセスはPID（　）から始まります。
 
 ### 問題2：概念の理解
-
 次の質問に答えてください。
 
 1. 仮想マシンとコンテナの違いを、リソース使用効率、起動速度、セキュリティの観点から比較してください。
@@ -769,7 +811,6 @@ Kubernetes（現在）
 3. cgroupsがコンテナ技術において果たす役割を具体例を交えて説明してください。
 
 ### 問題3：実践的な課題
-
 以下のシナリオに対する解決策を示してください。
 
 1. コンテナ内でメモリを100MBまでに制限する方法
@@ -777,7 +818,6 @@ Kubernetes（現在）
 3. ホストのディレクトリをコンテナ内にマウントする際のセキュリティ考慮事項
 
 ### 問題4：コンテナ作成
-
 以下の要件を満たすDockerfileを作成してください。
 
 - ベースイメージ：Ubuntu 22.04
@@ -787,7 +827,6 @@ Kubernetes（現在）
 - ヘルスチェックを実装
 
 ### 問題5：名前空間の実験
-
 以下の動作を確認するスクリプトを作成してください。
 
 ```bash
@@ -804,29 +843,24 @@ Kubernetes（現在）
 ```
 
 ### 問題6：パフォーマンス比較
-
 仮想マシンとコンテナのパフォーマンスを比較する実験を設計してください。
 
 比較項目：
-
 - 起動時間
 - メモリ使用量
 - CPU使用効率
 - ディスクI/O性能
 
 ### 問題7：トラブルシューティング
-
 コンテナが起動しない場合の段階的なトラブルシューティング手順を作成してください。
 
 確認項目：
-
 - イメージの存在
 - リソースの制限
 - ネットワーク設定
 - 権限設定
 
 ### 問題8：発展的課題
-
 1. コンテナのセキュリティを強化するための技術（seccomp、AppArmor、SELinux）について、それぞれの役割と実装方法を説明してください。
 
 2. マイクロサービスアーキテクチャにおいて、コンテナ技術が果たす役割と課題について論じてください。

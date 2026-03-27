@@ -83,19 +83,19 @@ OSは道路上の車両の流れを管理し、事故を防ぎ、効率的な交
    1. **サーバーリソース使用状況**
       - CPU、メモリ、ディスクI/Oを確認
       - 閾値：CPU80%以上、メモリ90%以上で問題あり
-   
+
    2. **ネットワーク状況**
       - 帯域使用率、パケットロス率
       - レイテンシの測定
-   
+
    3. **アプリケーションログ**
       - エラーログの確認
       - 処理時間の長いリクエストの特定
-   
+
    4. **データベースの状態**
       - スロークエリの確認
       - 接続数、ロック状況
-   
+
    5. **外部サービスの応答**
       - API呼び出しのレスポンスタイム
       - CDNの状態確認
@@ -201,12 +201,12 @@ while true; do
     echo "=== $(date) ==="
     # メモリ使用率上位5プロセスを表示
     ps aux --sort=-%mem | head -6 | tail -5
-    
+
     # 50%を超えるプロセスをチェック
     ps aux --sort=-%mem | awk 'NR>1 && $4>50 {
         print "ALERT: Process " $11 " is using " $4 "% memory (PID: " $2 ")"
     }'
-    
+
     sleep 60
 done
 ```
@@ -350,7 +350,7 @@ while true; do
     # センサーの場所は環境により異なる
     temp=$(cat /sys/class/thermal/thermal_zone0/temp)
     temp_c=$(echo "scale=2; $temp / 1000" | bc)
-    
+
     echo "$timestamp: ${temp_c}°C" >> "$LOG_FILE"
     sleep 300  # 5分ごと
 done
@@ -515,6 +515,8 @@ Dockerは以下の方法でこの思想を活用：
 
 30日以上前に更新された/var/log以下の.logファイルをすべて削除する。
 
+注記: これは挙動説明用の最小例です。実運用では、まず `find /var/log -type f -name "*.log" -mtime +30 -print` で対象を dry-run し、件数とパスを spot check してから削除してください。対話確認を入れるなら `-ok rm -- {} \;`、完全自動化するなら backup / retention を確認した上で `-delete` を使う方が安全です。
+
 **2. `ps aux | grep nginx | grep -v grep | awk '{print $2}' | xargs kill -HUP`**
 
 nginxプロセスのPIDを取得し、HUPシグナル（設定再読み込み）を送信する。
@@ -597,7 +599,7 @@ cleanup() {
     exit 0
 }
 
-trap cleanup SIGINT SIGTERM
+trap cleanup EXIT INT TERM
 
 echo "監視開始: $LOGFILE"
 TOTAL_ERRORS=0
@@ -609,7 +611,7 @@ tail -f "$LOGFILE" | while read line; do
         echo "$line" >> "$ERROR_LOG"
         ERROR_COUNT=$((ERROR_COUNT + 1))
         TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
-        
+
         # 1分間のチェック
         CURRENT_TIME=$(date +%s)
         if [ $((CURRENT_TIME - LAST_CHECK)) -ge 60 ]; then
@@ -622,6 +624,8 @@ tail -f "$LOGFILE" | while read line; do
     fi
 done
 ```
+
+注記: `CACHE_IMAGE` は build cache 用の移動タグです。release 判定や deploy では `IMAGE_NAME` のような commit SHA 付き不変参照を使い、承認済み release tag は別ジョブで付与する方が安全です。
 
 ### 問題6：トラブルシューティング
 
@@ -643,7 +647,7 @@ df -h | grep -v "Filesystem" | while read line
 do
     usage=$(echo $line | awk '{print $5}' | sed 's/%//')
     mount=$(echo $line | awk '{print $6}')
-    
+
     # 数値比較には -gt を使用
     if [ "$usage" -gt "$threshold" ]; then
         echo "Warning: $mount is $usage% full"
@@ -672,12 +676,14 @@ done
   ```bash
   # デプロイスクリプトの例
   #!/bin/bash
+  IMAGE_TAG=$(git rev-parse --short HEAD)
   git pull origin main
   npm install
   npm test
-  docker build -t app:latest .
-  docker push registry/app:latest
-  kubectl rollout restart deployment/app
+  docker build -t registry/app:${IMAGE_TAG} .
+  docker push registry/app:${IMAGE_TAG}
+  kubectl set image deployment/app app=registry/app:${IMAGE_TAG}
+  kubectl rollout status deployment/app
   ```
 
 - **監視・アラート**：
@@ -691,7 +697,9 @@ done
 - **インフラ自動化**：
   ```bash
   # サーバープロビジョニング
-  terraform apply -auto-approve
+  terraform plan -out=tfplan
+  terraform apply tfplan
+  terraform output
   ansible-playbook site.yml
   ```
 
@@ -768,7 +776,7 @@ while kill -0 $PID 2>/dev/null; do
     vmsize=$(grep VmSize /proc/$PID/status | awk '{print $2}')
     vmrss=$(grep VmRSS /proc/$PID/status | awk '{print $2}')
     vmswap=$(grep VmSwap /proc/$PID/status | awk '{print $2}')
-    
+
     echo "$timestamp,$vmsize,$vmrss,$vmswap" >> "$OUTPUT"
     sleep 10
 done
@@ -785,19 +793,19 @@ ALERT_FILE="/var/log/process_alert.log"
 
 while true; do
     count=$(ps aux | wc -l)
-    
+
     if [ $count -gt $THRESHOLD ]; then
         msg="警告: プロセス数が${count}個に達しました (閾値: $THRESHOLD)"
         echo "$(date): $msg" >> "$ALERT_FILE"
-        
+
         # メール送信やSlack通知など
         # echo "$msg" | mail -s "Process Alert" admin@example.com
-        
+
         # 詳細情報を記録
         echo "=== Top 10 processes by count ===" >> "$ALERT_FILE"
         ps aux --sort=-pid | head -10 >> "$ALERT_FILE"
     fi
-    
+
     sleep 60
 done
 ```
@@ -917,12 +925,12 @@ while true; do
     # プロセスの確認
     pids=($(pgrep -x "$PROCESS_NAME"))
     count=${#pids[@]}
-    
+
     if [ $count -eq 0 ]; then
         log "Process not found, starting $PROCESS_NAME"
         # プロセスを起動（実際のコマンドに置き換える）
         $PROCESS_NAME &
-        
+
     elif [ $count -gt 1 ]; then
         log "Multiple instances found ($count), keeping oldest"
         # 最も古いPID以外を終了
@@ -934,7 +942,7 @@ while true; do
     else
         log "Process running normally (PID: ${pids[0]})"
     fi
-    
+
     sleep $CHECK_INTERVAL
 done
 ```
@@ -1211,11 +1219,18 @@ sudo ip addr add 192.168.1.100/24 dev eth0
 # 2. デフォルトゲートウェイ設定
 sudo ip route add default via 192.168.1.1
 
-# 3. DNS設定
-echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
-echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
+# 3. DNS設定（systemd-resolved が有効なら一時反映、無効なら一時検証用に /etc/resolv.conf を更新）
+if command -v resolvectl >/dev/null 2>&1; then
+  sudo resolvectl dns eth0 8.8.8.8 8.8.4.4
+  sudo resolvectl domain eth0 '~.'
+else
+  sudo cp -a /etc/resolv.conf /tmp/resolv.conf.backup.$(date +%s)
+  echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+  echo "nameserver 8.8.4.4" | sudo tee -a /etc/resolv.conf
+fi
 
 # 4. 永続化（Netplan使用の場合）
+sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml.bak 2>/dev/null || true
 cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
 network:
   version: 2
@@ -1229,8 +1244,14 @@ network:
           - 8.8.8.8
           - 8.8.4.4
 EOF
+# 対話環境では netplan try を先に使うと rollback しやすい
+sudo netplan try
 sudo netplan apply
+resolvectl status
 ```
+
+注記: `systemd-resolved` を使う環境では `/etc/resolv.conf` の直接編集を恒久設定に使わず、Netplan / NetworkManager 側を正として反映後に `resolvectl status` で確認します。
+一時切り分けで `resolvectl dns ...` を使った場合は復旧後に `resolvectl revert eth0` で戻し、`/etc/resolv.conf` を直接更新した場合は backup から復元して `diff -u` や `resolvectl status` で整合を確認してください。
 
 ### 問題5：パケットフィルタリング
 
@@ -1259,8 +1280,11 @@ sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
 
 # ルールの保存
+sudo iptables-save > /root/iptables.rules.backup.$(date +%Y%m%d%H%M%S)
 sudo iptables-save > /etc/iptables/rules.v4
 ```
+
+注記: リモート接続中に `iptables` を更新する場合は、適用前に `iptables-save` で rollback 用バックアップを退避し、可能なら `at` や別セッションから自動復旧を仕込んでください。ルールファイルを手編集した場合は `iptables-restore --test < rules.v4` で構文確認してから反映します。
 
 ### 問題6：トラブルシューティングスクリプト
 
@@ -1450,19 +1474,19 @@ echo "  \"tests\": ["
 # 各DNSサーバーでテスト
 for i in "${!DNS_SERVERS[@]}"; do
     dns="${DNS_SERVERS[$i]}"
-    
+
     # 応答時間測定
     start_time=$(date +%s.%N)
     result=$(dig @"$dns" "$DOMAIN" +short 2>/dev/null)
     end_time=$(date +%s.%N)
     response_time=$(echo "$end_time - $start_time" | bc)
-    
+
     # IPアドレス取得
     ips=$(echo "$result" | grep -E '^[0-9.]+$' | tr '\n' ' ')
-    
+
     # DNSSEC検証
     dnssec=$(dig @"$dns" "$DOMAIN" +dnssec +short | grep -c "RRSIG")
-    
+
     # JSON形式で出力
     echo "    {"
     echo "      \"server\": \"$dns\","
@@ -1470,7 +1494,7 @@ for i in "${!DNS_SERVERS[@]}"; do
     echo "      \"ips\": \"$ips\","
     echo "      \"dnssec\": $([ $dnssec -gt 0 ] && echo "true" || echo "false")"
     echo -n "    }"
-    
+
     [ $i -lt $((${#DNS_SERVERS[@]} - 1)) ] && echo ","
 done
 
@@ -1491,13 +1515,13 @@ function preresolve(qname, qtype)
             {ip = "192.0.2.2", weight = 30, healthy = true},
             {ip = "192.0.2.3", weight = 20, healthy = true}
         }
-        
+
         -- ヘルスチェック（簡易版）
         for _, server in ipairs(servers) do
             -- 実際にはTCPチェックなどを実装
             server.healthy = checkHealth(server.ip)
         end
-        
+
         -- 重み付き選択
         local total_weight = 0
         for _, server in ipairs(servers) do
@@ -1505,10 +1529,10 @@ function preresolve(qname, qtype)
                 total_weight = total_weight + server.weight
             end
         end
-        
+
         local random = math.random(total_weight)
         local current = 0
-        
+
         for _, server in ipairs(servers) do
             if server.healthy then
                 current = current + server.weight
@@ -1761,7 +1785,7 @@ echo "  VM memory overhead: ~512MB"
    - **seccomp**：システムコールのフィルタリング
    - **AppArmor**：アプリケーションレベルのアクセス制御
    - **SELinux**：強制アクセス制御
-   
+
    実装例：
    ```bash
    docker run --security-opt seccomp=profile.json \
@@ -1816,32 +1840,34 @@ echo "  VM memory overhead: ~512MB"
    ```bash
    # エイリアス設定
    alias docker=podman
-   
+
    # イメージの移行
-   docker save myapp:latest | podman load
-   
+   docker save myapp:approved-release-tag | podman load
+
    # docker-compose（Compose v1）互換の代替（podman-compose）
    pip3 install podman-compose
    podman-compose up
    ```
 
+   注記: `myapp:latest` のような mutable tag は説明を簡略化するには便利ですが、Docker から Podman へ移送するイメージは固定タグまたは digest で揃える方が再現しやすくなります。
+
 2. **マルチコンテナアプリケーション構築**
    ```bash
    # Podの作成
    podman pod create --name webapp -p 8080:80
-   
+
    # 各コンテナの起動
-   podman run -d --pod webapp --name frontend nginx
-   podman run -d --pod webapp --name backend node:20
-   podman run -d --pod webapp --name db postgres:13
+   podman run -d --pod webapp --name frontend nginx:1.27-alpine
+   podman run -d --pod webapp --name backend node:22-bookworm
+   podman run -d --pod webapp --name db postgres:16
    ```
 
 3. **Rootlessで特権ポート使用**
    ```bash
    # 方法1：ポートフォワーディング
-   podman run -d -p 8080:80 nginx
+   podman run -d -p 8080:80 nginx:1.27-alpine
    # iptablesで80→8080転送
-   
+
    # 方法2：CAP_NET_BIND_SERVICE付与
    sudo setcap cap_net_bind_service=+ep $(which podman)
    ```
@@ -1854,7 +1880,7 @@ podman run -d \
   --name nginx-web \
   -p 8080:80 \
   -v /data/web:/usr/share/nginx/html:Z \
-  nginx:latest
+  nginx:<approved-tag>
 
 # 2. systemdサービス作成
 mkdir -p ~/.config/systemd/user
@@ -1884,29 +1910,31 @@ podman run -d \
   --pod webapp-stack \
   --name nginx \
   -v ./nginx.conf:/etc/nginx/nginx.conf:ro \
-  nginx:latest
+  nginx:<approved-tag>
 
 # Node.jsアプリケーション
 podman run -d \
   --pod webapp-stack \
   --name app \
   -v ./app:/app \
-  node:20 npm start
+  node:22-bookworm npm start
 
 # Redis
 podman run -d \
   --pod webapp-stack \
   --name redis \
-  redis:6-alpine
+  redis:7-alpine
 
 # PostgreSQL
 podman run -d \
   --pod webapp-stack \
   --name postgres \
-  -e POSTGRES_PASSWORD=secret \
+  -e POSTGRES_PASSWORD="${DB_PASSWORD:-change-me-for-lab}" \
   -v pgdata:/var/lib/postgresql/data \
-  postgres:13
+  postgres:16
 ```
+
+注記: `DB_PASSWORD` は lab 用の placeholder です。実運用では repository へ平文 password を埋め込まず、env file / secret 管理から注入してください。Pod / マルチコンテナの演習後は `podman pod rm -f webapp-stack` と `podman volume rm pgdata` で残存資産を片付け、固定タグを digest へ置き換える場合は `podman image inspect` で実際に解決された参照を確認してください。
 
 ### 問題6：セキュリティ設定
 
@@ -1923,8 +1951,10 @@ podman run -d \
   --security-opt seccomp=/usr/share/containers/seccomp.json \
   --userns auto \
   --user 1000:1000 \
-  myapp:latest
+  myapp:approved-release-tag
 ```
+
+注記: `nginx:<approved-tag>` や `myapp:approved-release-tag` は mutable tag を避ける意図を示すプレースホルダです。実運用では承認済みの固定タグ、可能なら digest まで含めて管理してください。
 
 ### 問題7：トラブルシューティング
 
@@ -1961,13 +1991,13 @@ podman run -d \
    ```bash
    # Pod→Kubernetesマニフェスト生成
    podman generate kube mypod > mypod.yaml
-   
+
    # 内容の確認と編集
    vi mypod.yaml
-   
+
    # Kubernetesマニフェスト→Pod実行
    podman play kube mypod.yaml
-   
+
    # 実用例：開発環境でPodman、本番でKubernetes
    ```
 
@@ -1976,7 +2006,7 @@ podman run -d \
      - 段階的移行（新規プロジェクトから）
      - 互換性レイヤーの活用
      - トレーニングプログラムの実施
-   
+
    - **ベストプラクティス**：
      - Rootlessコンテナの標準化
      - systemd統合によるライフサイクル管理
@@ -2081,15 +2111,16 @@ stages:
 
 variables:
   IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  LATEST_IMAGE: $CI_REGISTRY_IMAGE:latest
+  CACHE_IMAGE: $CI_REGISTRY_IMAGE:buildcache
 
 build:
   stage: build
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --cache-from $LATEST_IMAGE -t $IMAGE_NAME -t $LATEST_IMAGE .
+    - printf '%s' "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
+    - docker build --cache-from $CACHE_IMAGE -t $IMAGE_NAME -t $CACHE_IMAGE .
     - docker push $IMAGE_NAME
-    - docker push $LATEST_IMAGE
+    - docker push $CACHE_IMAGE
+    - docker logout "$CI_REGISTRY"
 
 test:
   stage: test
@@ -2099,16 +2130,25 @@ test:
 security_scan:
   stage: scan
   script:
-    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock 
+    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock
         aquasec/trivy image --severity HIGH,CRITICAL $IMAGE_NAME
 
 deploy:
   stage: deploy
   script:
+    - kubectl config current-context
+    - kubectl get deployment app -o wide
     - kubectl set image deployment/app app=$IMAGE_NAME
+    - kubectl rollout status deployment/app --timeout=180s
+    # 問題があれば直前 revision に戻す
+    # - kubectl rollout undo deployment/app
   only:
     - main
 ```
+
+注記: この appendix の scan 例も Docker socket が利用できる runner を前提にしています。Podman / rootless を前提にする場合は、registry 上のイメージを直接スキャンできるモードか、daemon socket を要求しない scanner へ読み替えてください。
+
+注記: `CACHE_IMAGE` は build cache 用の移動タグです。release 判定や deploy では `IMAGE_NAME` のような commit SHA 付き不変参照を使い、承認済み release tag は別ジョブで付与する方が安全です。
 
 ### 問題6：トラブルシューティング
 
@@ -2116,7 +2156,7 @@ deploy:
 
 1. **Dockerfileの最適化**
    ```dockerfile
-   FROM node:20-alpine
+   FROM node:22-bookworm
    WORKDIR /app
    # 依存関係を先にコピー
    COPY package*.json ./
@@ -2140,7 +2180,7 @@ deploy:
 
 1. **latestタグの使用**
    - 問題：予期しない変更の可能性
-   - 改善：`FROM node:20-alpine`
+   - 改善：承認済みの固定タグまたは digest を使う（例: `FROM node:22-bookworm`）
 
 2. **rootユーザーでの実行**
    - 問題：コンテナエスケープ時のリスク
@@ -2156,7 +2196,7 @@ deploy:
 
 改善後：
 ```dockerfile
-FROM node:20-alpine
+FROM node:22-bookworm
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 WORKDIR /app
 COPY package*.json ./
@@ -2175,7 +2215,8 @@ CMD ["node", "server.js"]
      - 配布元の信頼性確保
      - コンプライアンス要件の充足
    - 仕組み：
-     - Docker Content Trust (DCT) / Notary
+     - Docker Content Trust (DCT) / Notary（歴史的な仕組みとして理解する）
+     - Sigstore/Cosign や Notation のような現行署名方式
      - 公開鍵暗号による署名
      - レジストリでの署名検証
 
@@ -2261,14 +2302,14 @@ Resources:
       Target: CPU 70%
   - Launch Template:
       Instance Type: t3.medium (リザーブド推奨)
-      
+
   # 3. セキュリティ
   - Security Groups:
       - ALB: 80/443 from 0.0.0.0/0
       - Web: 80 from ALB SG only
       - SSH: 22 from Bastion only
   - Web Application Firewall (WAF)
-  
+
   # 4. モニタリング
   - CloudWatch Alarms
   - VPC Flow Logs
@@ -2361,10 +2402,10 @@ for ami in $OLD_AMIS; do
         --image-ids $ami \
         --query 'Images[0].BlockDeviceMappings[*].Ebs.SnapshotId' \
         --output text)
-    
+
     # AMI削除
     aws ec2 deregister-image --image-id $ami
-    
+
     # スナップショット削除
     for snap in $SNAPSHOT_IDS; do
         aws ec2 delete-snapshot --snapshot-id $snap
@@ -2375,6 +2416,8 @@ done
 # 0 2 * * * /path/to/daily_backup.sh
 ```
 
+注記: `create-image` の戻り値を受け取った直後は、まだ AMI が利用可能とは限りません。`aws ec2 wait image-available --image-ids "$AMI_ID"` で ready を確認し、必要なら `ManagedBy=daily_backup` などのタグを付けておくと cleanup しやすくなります。整合性要件が高いワークロードでは、`--no-reboot` のまま取得してよいかを事前に判断し、必要なら DB flush や service stop を挟んでください。さらに、最新 AMI から検証用インスタンスを一時起動して boot / health check を確認してから旧世代 AMI を削除します。削除後も `describe-images` と `describe-snapshots` で対象が残っていないことを確認してください。
+
 ### 問題8：発展的課題
 
 1. **マルチリージョンDR戦略**
@@ -2384,20 +2427,20 @@ done
      - RDS with automated backups
      - S3 with Cross-Region Replication
      - Route 53 health checks
-   
+
    DR Region (Osaka):
      - Pilot Light approach
      - Minimal resources always running
      - Database replica (async)
      - Pre-configured AMIs
-   
+
    Failover Process:
      1. Route 53 detects failure (1-2 min)
      2. Scale up DR environment (5 min)
      3. Promote RDS read replica (5 min)
      4. Update DNS records (5 min)
      Total RTO: ~15 minutes
-   
+
    Data Sync:
      - RDS: Async replication (RPO: <5 min)
      - S3: Cross-region replication (RPO: <15 min)
@@ -2415,7 +2458,7 @@ done
      - 学習曲線
      - 初期設定の複雑さ
      - 状態管理の必要性
-   
+
    - **CloudFormation vs Terraform**：
      - CloudFormation：
        - AWS公式、完全統合
@@ -2488,10 +2531,10 @@ VPC: 10.0.0.0/16
 # ルートテーブル
 Public Route Table:
   0.0.0.0/0 -> Internet Gateway
-  
+
 Private Route Table (AZ-1):
   0.0.0.0/0 -> NAT Gateway-1
-  
+
 Private Route Table (AZ-2):
   0.0.0.0/0 -> NAT Gateway-2
 
@@ -2501,12 +2544,12 @@ Web-SG:
     - 80/tcp from 0.0.0.0/0
     - 443/tcp from 0.0.0.0/0
     - 22/tcp from Bastion-SG
-    
+
 App-SG:
   Inbound:
     - 8080/tcp from Web-SG
     - 22/tcp from Bastion-SG
-    
+
 DB-SG:
   Inbound:
     - 3306/tcp from App-SG
@@ -2588,13 +2631,13 @@ Primary Region (Tokyo):
   - RDS Multi-AZ
   - Route 53 weighted routing (100%)
 
-DR Region (Osaka):  
+DR Region (Osaka):
   VPC: 172.16.0.0/16
   - Pilot light configuration
   - Minimal resources (1-2 instances)
   - RDS read replica
   - Route 53 weighted routing (0%)
-  
+
 Network Connectivity:
   - VPC Peering between regions
   - S3 Cross-Region Replication
@@ -2630,19 +2673,19 @@ Failover Process:
      1. ポートスキャン
         - 検知方法：同一送信元から複数ポートへの接続試行
         - 閾値：100ポート/分以上
-     
+
      2. DDoS攻撃
         - 検知方法：特定IPへの大量トラフィック
         - 閾値：1000リクエスト/秒以上
-     
+
      3. データ流出
         - 検知方法：内部から外部への異常な大量データ転送
         - 閾値：1GB/時間以上
-     
+
      4. 不正アクセス
         - 検知方法：拒否されたトラフィックの急増
         - 閾値：REJECTアクション50回/分以上
-   
+
    実装:
      - Lambda関数でリアルタイム処理
      - Amazon Athenaでバッチ分析
@@ -2734,7 +2777,7 @@ version: '3.8'
 services:
   # メトリクス収集
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:<approved-tag>
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
@@ -2742,7 +2785,7 @@ services:
 
   # 各サービスのメトリクスエクスポーター
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:<approved-tag>
     ports:
       - "9100:9100"
 
@@ -2770,14 +2813,14 @@ services:
 
   # 分散トレーシング
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:<approved-tag>
     ports:
       - "16686:16686"
       - "6831:6831/udp"
 
   # アラート
   alertmanager:
-    image: prom/alertmanager:latest
+    image: prom/alertmanager:<approved-tag>
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
     ports:
@@ -2785,10 +2828,12 @@ services:
 
   # 可視化
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:<approved-tag>
     ports:
       - "3000:3000"
 ```
+
+注記: 監視系コンポーネントも `latest` を避け、互換性を確認した固定タグか digest で揃える方が安全です。Prometheus / Alertmanager / Grafana / Jaeger は upgrade 互換性と dashboard / rule の差分確認を前提に更新してください。
 
 **Prometheus設定：**
 
@@ -3017,12 +3062,12 @@ async def process_order(order_data):
     # 並列実行
     user_task = asyncio.create_task(user_service.get_user(order_data.user_id))
     inventory_task = asyncio.create_task(check_inventory(order_data.items))
-    
+
     user_info, inventory_status = await asyncio.gather(user_task, inventory_task)
-    
+
     # External APIは結果に応じて非同期に
     asyncio.create_task(notify_external_system(order_data))
-    
+
     return process_result
 ```
 
@@ -3032,8 +3077,8 @@ async def process_order(order_data):
 CREATE INDEX idx_users_active ON users(id) WHERE status = 'active';
 
 -- クエリの最適化
-SELECT id, name, email 
-FROM users 
+SELECT id, name, email
+FROM users
 WHERE id = ? AND status = 'active'
 -- 必要なカラムのみ選択
 ```
@@ -3154,28 +3199,28 @@ from datetime import datetime, timedelta
 class PredictiveScaler:
     def __init__(self):
         self.model = Prophet(changepoint_prior_scale=0.05)
-        
+
     def train(self, historical_data):
         # データの準備
         df = pd.DataFrame(historical_data)
         df.columns = ['ds', 'y']  # Prophet expects these column names
-        
+
         # 週次の季節性を追加
         self.model.add_seasonality(
             name='daily_peak',
             period=1,
             fourier_order=5
         )
-        
+
         self.model.fit(df)
-    
+
     def predict_next_hours(self, hours=6):
         future = self.model.make_future_dataframe(
             periods=hours,
             freq='H'
         )
         forecast = self.model.predict(future)
-        
+
         # スケーリング推奨の生成
         recommendations = []
         for _, row in forecast.tail(hours).iterrows():
@@ -3186,7 +3231,7 @@ class PredictiveScaler:
                     'predicted_cpu': row['yhat'],
                     'recommended_replicas': replicas
                 })
-        
+
         return recommendations
 ```
 
@@ -3291,7 +3336,7 @@ class ChaosExperimentMonitor:
     def __init__(self, prometheus_url):
         self.prom = PrometheusConnect(url=prometheus_url)
         self.baseline_metrics = {}
-        
+
     def capture_baseline(self, duration_minutes=30):
         """実験前のベースラインを記録"""
         queries = {
@@ -3299,7 +3344,7 @@ class ChaosExperimentMonitor:
             'latency_p95': 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))',
             'throughput': 'rate(http_requests_total[5m])'
         }
-        
+
         for name, query in queries.items():
             result = self.prom.custom_query_range(
                 query=query,
@@ -3308,20 +3353,20 @@ class ChaosExperimentMonitor:
                 step='1m'
             )
             self.baseline_metrics[name] = self.calculate_stats(result)
-    
+
     def monitor_experiment(self, experiment_duration_minutes=5):
         """実験中のメトリクスを監視"""
         alerts = []
-        
+
         # リアルタイム監視
         for minute in range(experiment_duration_minutes):
             current_metrics = self.get_current_metrics()
-            
+
             # ベースラインとの比較
             for metric_name, current_value in current_metrics.items():
                 baseline = self.baseline_metrics[metric_name]
                 deviation = abs(current_value - baseline['mean']) / baseline['std']
-                
+
                 if deviation > 3:  # 3σを超えたら異常
                     alerts.append({
                         'metric': metric_name,
@@ -3330,11 +3375,11 @@ class ChaosExperimentMonitor:
                         'deviation': deviation,
                         'timestamp': datetime.now()
                     })
-            
+
             time.sleep(60)
-        
+
         return alerts
-    
+
     def generate_report(self, alerts):
         """実験レポートの生成"""
         report = {
@@ -3348,27 +3393,27 @@ class ChaosExperimentMonitor:
             },
             'recommendations': self.generate_recommendations(alerts)
         }
-        
+
         return report
-    
+
     def generate_recommendations(self, alerts):
         """改善提案の生成"""
         recommendations = []
-        
+
         if any(a['metric'] == 'error_rate' for a in alerts):
             recommendations.append({
                 'issue': 'Error rate increased during database latency',
                 'recommendation': 'Implement circuit breaker pattern',
                 'priority': 'high'
             })
-        
+
         if any(a['metric'] == 'latency_p95' for a in alerts):
             recommendations.append({
                 'issue': 'Latency propagation observed',
                 'recommendation': 'Add database connection pooling and caching',
                 'priority': 'medium'
             })
-        
+
         return recommendations
 ```
 
@@ -3473,7 +3518,7 @@ locals {
     dev  = 1
     prod = 3
   }
-  
+
   instance_type = {
     dev  = "t3.micro"
     prod = "t3.small"
@@ -3485,9 +3530,9 @@ resource "aws_instance" "web" {
   count         = local.instance_count[var.environment]
   instance_type = local.instance_type[var.environment]
   ami           = data.aws_ami.amazon_linux_2.id
-  
+
   vpc_security_group_ids = [aws_security_group.web.id]
-  
+
   tags = {
     Name        = "${var.environment}-web-${count.index + 1}"
     Environment = var.environment
@@ -3496,14 +3541,14 @@ resource "aws_instance" "web" {
 
 resource "aws_security_group" "web" {
   name_prefix = "${var.environment}-web-sg-"
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -3515,7 +3560,7 @@ resource "aws_security_group" "web" {
 # ロードバランサー（本番環境のみ）
 resource "aws_lb" "web" {
   count = var.environment == "prod" ? 1 : 0
-  
+
   name               = "${var.environment}-web-alb"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb[0].id]
@@ -3524,16 +3569,16 @@ resource "aws_lb" "web" {
 
 resource "aws_security_group" "alb" {
   count = var.environment == "prod" ? 1 : 0
-  
+
   name_prefix = "${var.environment}-alb-sg-"
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   egress {
     from_port       = 0
     to_port         = 0
@@ -3563,19 +3608,22 @@ data "aws_ssm_parameter" "amazon_linux_2023_ami" {
 resource "aws_instance" "web" {
   instance_type = "t3.micro"
   ami           = data.aws_ssm_parameter.amazon_linux_2023_ami.value
-  
+
   vpc_security_group_ids = [aws_security_group.web.id]
-  
+
   user_data = <<-EOF
     #!/bin/bash
     dnf update -y
     dnf install -y nginx
-    INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+    IMDS_TOKEN=$(curl -fsS -X PUT "http://169.254.169.254/latest/api/token" \
+      -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+    INSTANCE_ID=$(curl -fsS -H "X-aws-ec2-metadata-token: ${IMDS_TOKEN}" \
+      http://169.254.169.254/latest/meta-data/instance-id)
     echo "Web Server $INSTANCE_ID" > /usr/share/nginx/html/index.html
     systemctl start nginx
     systemctl enable nginx
   EOF
-  
+
   tags = {
     Name        = "web-server"
     Environment = "production"
@@ -3585,14 +3633,14 @@ resource "aws_instance" "web" {
 
 resource "aws_security_group" "web" {
   name_prefix = "web-sg-"
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -3601,6 +3649,8 @@ resource "aws_security_group" "web" {
   }
 }
 ```
+
+注記: `/aws/service/ami-amazon-linux-latest/...` は moving alias です。再現性を優先する環境では、検証済み AMI ID と Launch Template version を review 後に固定し、moving alias は次回 rollout 候補の検出に留める方が安全です。
 
 ### 問題5：モジュール設計
 
@@ -3629,7 +3679,7 @@ resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
-  
+
   tags = {
     Name        = "${var.environment}-vpc"
     Environment = var.environment
@@ -3641,9 +3691,9 @@ resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index)
   availability_zone = var.availability_zones[count.index]
-  
+
   map_public_ip_on_launch = true
-  
+
   tags = {
     Name        = "${var.environment}-public-${var.availability_zones[count.index]}"
     Environment = var.environment
@@ -3656,7 +3706,7 @@ resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 100)
   availability_zone = var.availability_zones[count.index]
-  
+
   tags = {
     Name        = "${var.environment}-private-${var.availability_zones[count.index]}"
     Environment = var.environment
@@ -3666,7 +3716,7 @@ resource "aws_subnet" "private" {
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
-  
+
   tags = {
     Name        = "${var.environment}-igw"
     Environment = var.environment
@@ -3676,12 +3726,12 @@ resource "aws_internet_gateway" "main" {
 resource "aws_eip" "nat" {
   count  = length(var.availability_zones)
   domain = "vpc"
-  
+
   tags = {
     Name        = "${var.environment}-nat-eip-${count.index}"
     Environment = var.environment
   }
-  
+
   depends_on = [aws_internet_gateway.main]
 }
 
@@ -3689,7 +3739,7 @@ resource "aws_nat_gateway" "main" {
   count         = length(var.availability_zones)
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
-  
+
   tags = {
     Name        = "${var.environment}-nat-${count.index}"
     Environment = var.environment
@@ -3698,12 +3748,12 @@ resource "aws_nat_gateway" "main" {
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
-  
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.main.id
   }
-  
+
   tags = {
     Name        = "${var.environment}-public-rt"
     Environment = var.environment
@@ -3713,12 +3763,12 @@ resource "aws_route_table" "public" {
 resource "aws_route_table" "private" {
   count  = length(var.availability_zones)
   vpc_id = aws_vpc.main.id
-  
+
   route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.main[count.index].id
   }
-  
+
   tags = {
     Name        = "${var.environment}-private-rt-${count.index}"
     Environment = var.environment
@@ -3773,102 +3823,110 @@ env:
   TF_VERSION: '1.3.0'
   AWS_REGION: 'ap-northeast-1'
 
+# 教材では runner drift を避けるため、サンプルでも固定 runner ラベルを使う
 jobs:
   format-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
         working-directory: ./terraform
 
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: format-check
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Terraform Init
-        run: terraform init -backend=false
+        run: terraform init -backend=false -input=false -lockfile=readonly
         working-directory: ./terraform
-      
+
       - name: Terraform Validate
         run: terraform validate
         working-directory: ./terraform
 
   security-scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: validate
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@v12.3080.0
         with:
           directory: terraform/
           framework: terraform
-      
+
       - name: Run tfsec
         uses: aquasecurity/tfsec-action@v1.0.0
         with:
           working_directory: terraform/
 
   plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: security-scan
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_PLAN_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-      
+
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false -lockfile=readonly
         working-directory: ./terraform
-      
+
       - name: Terraform Plan
         id: plan
-        run: terraform plan -out=tfplan -no-color
+        run: terraform plan -input=false -out=tfplan -no-color
         working-directory: ./terraform
         continue-on-error: true
-      
+
       - name: Comment PR
         uses: actions/github-script@v6
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            
-            <details><summary>Show Plan</summary>
-            
-            \`\`\`
-            ${process.env.PLAN}
-            \`\`\`
-            
-            </details>
-            
-            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            
+            const plan = require('child_process').execSync(
+              'terraform show -no-color tfplan',
+              { cwd: './terraform', encoding: 'utf8' }
+            );
+            const summaryLine = plan.split('\n').find(line => line.startsWith('Plan:')) || 'Plan summary not found';
+            const resourceLines = plan
+              .split('\n')
+              .filter(line => line.startsWith('# '))
+              .slice(0, 10)
+              .map(line => '- ' + line.replace(/^#\s+/, ''));
+            const output = [
+              '#### Terraform Plan 📖 `${{ steps.plan.outcome }}`',
+              '',
+              '- Summary: ' + summaryLine,
+              ...(resourceLines.length ? ['', '主要な変更候補:', ...resourceLines] : []),
+              '',
+              '*Pushed by: @${{ github.actor }}, Action: `${{ github.event_name }}`*'
+            ].join('\n');
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -3877,33 +3935,45 @@ jobs:
             })
 
   apply:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: security-scan
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_PROD_APPLY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
-      
+
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false -lockfile=readonly
         working-directory: ./terraform
-      
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+        working-directory: ./terraform
+
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply tfplan
+        working-directory: ./terraform
+
+      - name: Terraform Verify
+        run: terraform output
         working-directory: ./terraform
 ```
+
+注記: この workflow は解答用の最小例です。実運用では長期アクセスキーを GitHub Secrets に常設せず、`aws-actions/configure-aws-credentials` で OIDC と `role-to-assume` を使い、shared / production 環境では `plan` artifact と承認済み job だけが `apply tfplan` を実行する形へ分離してください。`AWS_PLAN_ROLE_ARN` は read-only か `plan` 用の最小権限、`AWS_PROD_APPLY_ROLE_ARN` は承認後の apply に限定したロールへ分ける方が安全です。`.terraform.lock.hcl` は VCS 管理し、CI では `terraform init -input=false -lockfile=readonly` を使って provider 差分の混入を止め、lockfile や runner 条件がずれる場合は `plan` を作り直してください。
 
 ### 問題7：ポリシーの実装
 
@@ -3982,21 +4052,21 @@ provider "aws" {
 # RDS Multi-AZ with Read Replica
 resource "aws_db_instance" "primary" {
   provider = aws.primary
-  
+
   identifier     = "primary-database"
   engine         = "mysql"
   engine_version = "8.0"
-  
+
   multi_az                = true
   backup_retention_period = 7
   backup_window          = "03:00-04:00"
-  
+
   enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
 }
 
 resource "aws_db_instance" "dr_replica" {
   provider = aws.dr
-  
+
   replicate_source_db = aws_db_instance.primary.id
   identifier          = "dr-replica"
 }
@@ -4005,7 +4075,7 @@ resource "aws_db_instance" "dr_replica" {
 resource "aws_s3_bucket" "primary" {
   provider = aws.primary
   bucket   = "myapp-primary-data"
-  
+
   versioning {
     enabled = true
   }
@@ -4013,18 +4083,18 @@ resource "aws_s3_bucket" "primary" {
 
 resource "aws_s3_bucket_replication_configuration" "primary_to_dr" {
   provider = aws.primary
-  
+
   role   = aws_iam_role.replication.arn
   bucket = aws_s3_bucket.primary.id
-  
+
   rule {
     id     = "replicate-to-dr"
     status = "Enabled"
-    
+
     destination {
       bucket        = aws_s3_bucket.dr.arn
       storage_class = "STANDARD_IA"
-      
+
       replication_time {
         status = "Enabled"
         time {
@@ -4049,12 +4119,12 @@ resource "aws_route53_record" "www" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "www.example.com"
   type    = "A"
-  
+
   set_identifier = "Primary"
   failover_routing_policy {
     type = "PRIMARY"
   }
-  
+
   alias {
     name                   = aws_lb.primary.dns_name
     zone_id                = aws_lb.primary.zone_id
@@ -4066,12 +4136,12 @@ resource "aws_route53_record" "www_dr" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "www.example.com"
   type    = "A"
-  
+
   set_identifier = "DR"
   failover_routing_policy {
     type = "SECONDARY"
   }
-  
+
   alias {
     name                   = aws_lb.dr.dns_name
     zone_id                = aws_lb.dr.zone_id
@@ -4086,7 +4156,7 @@ resource "aws_lambda_function" "dr_failover" {
   role          = aws_iam_role.lambda.arn
   handler       = "index.handler"
   runtime       = "python3.12"
-  
+
   environment {
     variables = {
       DR_RDS_INSTANCE = aws_db_instance.dr_replica.id
@@ -4095,6 +4165,8 @@ resource "aws_lambda_function" "dr_failover" {
   }
 }
 ```
+
+注記: この DR 解答は設計の最小例です。実運用や演習では、Route 53 を切り替える前に DR 側 ALB target health または `/health` を確認し、失敗時は DNS を据え置いてください。切替後も failback runbook を別に持ち、演習後は DR 側リソースを縮退または削除して primary へ戻す方が安全です。
 
 ### 問題9：コスト最適化
 
@@ -4107,11 +4179,11 @@ resource "aws_lambda_function" "dr_failover" {
 resource "aws_autoscaling_schedule" "dev_start" {
   scheduled_action_name  = "dev-start"
   autoscaling_group_name = aws_autoscaling_group.dev.name
-  
+
   min_size         = 1
   max_size         = 2
   desired_capacity = 1
-  
+
   # 平日9時に起動（UTC 0時 = JST 9時）
   recurrence = "0 0 * * MON-FRI"
 }
@@ -4119,11 +4191,11 @@ resource "aws_autoscaling_schedule" "dev_start" {
 resource "aws_autoscaling_schedule" "dev_stop" {
   scheduled_action_name  = "dev-stop"
   autoscaling_group_name = aws_autoscaling_group.dev.name
-  
+
   min_size         = 0
   max_size         = 0
   desired_capacity = 0
-  
+
   # 平日18時に停止（UTC 9時 = JST 18時）
   recurrence = "0 9 * * MON-FRI"
 }
@@ -4132,11 +4204,11 @@ resource "aws_autoscaling_schedule" "dev_stop" {
 resource "aws_autoscaling_schedule" "staging_night" {
   scheduled_action_name  = "staging-scale-down"
   autoscaling_group_name = aws_autoscaling_group.staging.name
-  
+
   min_size         = 1
   max_size         = 2
   desired_capacity = 1
-  
+
   # 毎日20時に縮小（UTC 11時 = JST 20時）
   recurrence = "0 11 * * *"
 }
@@ -4144,11 +4216,11 @@ resource "aws_autoscaling_schedule" "staging_night" {
 resource "aws_autoscaling_schedule" "staging_day" {
   scheduled_action_name  = "staging-scale-up"
   autoscaling_group_name = aws_autoscaling_group.staging.name
-  
+
   min_size         = 2
   max_size         = 4
   desired_capacity = 2
-  
+
   # 毎日8時に拡大（UTC 23時前日 = JST 8時）
   recurrence = "0 23 * * *"
 }
@@ -4156,30 +4228,30 @@ resource "aws_autoscaling_schedule" "staging_day" {
 # 本番環境：トラフィックに応じた自動スケーリング
 resource "aws_autoscaling_group" "production" {
   name = "production-asg"
-  
+
   min_size         = 3
   max_size         = 20
   desired_capacity = 5
-  
+
   # ターゲット追跡スケーリング
   target_group_arns = [aws_lb_target_group.production.arn]
-  
+
   mixed_instances_policy {
     instances_distribution {
       on_demand_base_capacity                  = 3
       on_demand_percentage_above_base_capacity = 30
       spot_allocation_strategy                 = "capacity-optimized"
     }
-    
+
     launch_template {
       launch_template_specification {
         launch_template_id = aws_launch_template.production.id
       }
-      
+
       override {
         instance_type = "t3.large"
       }
-      
+
       override {
         instance_type = "t3a.large"
       }
@@ -4191,12 +4263,12 @@ resource "aws_autoscaling_policy" "cpu_target" {
   name                   = "cpu-target-tracking"
   autoscaling_group_name = aws_autoscaling_group.production.name
   policy_type            = "TargetTrackingScaling"
-  
+
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
-    
+
     target_value = 65.0
   }
 }
@@ -4205,13 +4277,13 @@ resource "aws_autoscaling_policy" "request_count_target" {
   name                   = "request-count-tracking"
   autoscaling_group_name = aws_autoscaling_group.production.name
   policy_type            = "TargetTrackingScaling"
-  
+
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
       resource_label         = "${aws_lb.production.arn_suffix}/${aws_lb_target_group.production.arn_suffix}"
     }
-    
+
     target_value = 1000.0
   }
 }
@@ -4233,10 +4305,10 @@ metadata:
   name: infrastructure
   namespace: argocd
 spec:
-  project: default
+  project: platform-production
   source:
     repoURL: https://github.com/myorg/infrastructure
-    targetRevision: HEAD
+    targetRevision: v1.2.3
     path: terraform
     plugin:
       name: terraform
@@ -4256,6 +4328,8 @@ spec:
 3. PRがマージされるとArgoCDが変更を検知
 4. ArgoCDがTerraform applyを自動実行
 5. 実際の状態とGitの状態を常に同期
+
+注記: この解答は概念を示す最小例です。実運用では `project: default` や `targetRevision: HEAD` のまま使わず、専用 `AppProject` と固定 revision を使い、Terraform の `plan` / `apply` は state lock と承認を分離したパイプラインで扱う方が安全です。
 
 **2. IaCツールの比較**
 
@@ -4286,9 +4360,9 @@ func TestVPCModule(t *testing.T) {
         TerraformDir: "../modules/vpc",
     }
     defer terraform.Destroy(t, terraformOptions)
-    
+
     terraform.InitAndApply(t, terraformOptions)
-    
+
     // VPCが作成されたか確認
     vpcId := terraform.Output(t, terraformOptions, "vpc_id")
     assert.NotEmpty(t, vpcId)
