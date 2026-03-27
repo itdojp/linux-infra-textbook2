@@ -472,7 +472,7 @@ podman run -d --pod webapp-pod --name db \
 echo
 echo "Testing inter-container communication..."
 podman exec web sh -c 'apt update && apt install -y postgresql-client'
-podman exec web sh -c "PGPASSWORD=$DB_PASSWORD psql -h localhost -U postgres -c \"SELECT version();\""
+podman exec -e PGPASSWORD="$DB_PASSWORD" web psql -h localhost -U postgres -c "SELECT version();"
 
 # 4. Podの状態確認
 echo

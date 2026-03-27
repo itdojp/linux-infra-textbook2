@@ -293,6 +293,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
       
@@ -318,7 +319,7 @@ jobs:
         run: terraform plan -input=false -out=tfplan
       
       - name: Post Plan Summary to PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const plan = require('child_process').execSync(
@@ -345,7 +346,7 @@ jobs:
             });
 ```
 
-注記: 実運用では、AWS の長期 access key を GitHub Secrets に常設するより、GitHub Actions OIDC で plan 用 role を引き受ける方が監査しやすくなります。workflow 側でも `permissions.id-token: write` を明示し、`aws-actions/configure-aws-credentials` で `role-to-assume` を設定してください。trust policy は `aud=sts.amazonaws.com` と `sub=repo:<org>/<repo>:ref:refs/heads/<branch>` または `repo:<org>/<repo>:environment:<env>` まで絞り、`terraform plan -out=tfplan` を実行した commit と review 対象が一致していることを確認してください。
+注記: 実運用では、AWS の長期 access key を GitHub Secrets に常設するより、GitHub Actions OIDC で plan 用 role を引き受ける方が監査しやすくなります。workflow 側でも `permissions.id-token: write` を明示し、`aws-actions/configure-aws-credentials` で `role-to-assume` を設定してください。trust policy は `aud=sts.amazonaws.com` と `sub=repo:<org>/<repo>:ref:refs/heads/<branch>` または `repo:<org>/<repo>:environment:<env>` に加え、この章のように `pull_request` トリガーで動かす場合は `sub=repo:<org>/<repo>:pull_request` まで、実際の `sub` 形式に合わせて絞ってください。`terraform plan -out=tfplan` を実行した commit と review 対象が一致していることも確認してください。
 
 注記: `.terraform.lock.hcl` は version 管理し、CI では `terraform init -input=false -lockfile=readonly` を使う方が再現しやすくなります。`apply` は `plan` と同じ commit / lockfile / workspace を前提にするか、条件がずれる場合は再度 `plan` して承認し直してください。
 
@@ -670,7 +671,7 @@ apply:development:
     - terraform version -json > current-terraform-version.json
     - diff -u terraform-version.json current-terraform-version.json
     - sha256sum -c plan.tfplan.sha256
-    - terraform apply plan.tfplan
+    - terraform apply -input=false -auto-approve plan.tfplan
     - rm -f current-terraform-version.json
   dependencies:
     - plan:development
@@ -707,7 +708,7 @@ apply:production:
     - terraform version -json > current-terraform-version.json
     - diff -u terraform-version.json current-terraform-version.json
     - sha256sum -c plan.tfplan.sha256
-    - terraform apply plan.tfplan
+    - terraform apply -input=false -auto-approve plan.tfplan
     # 適用後の検証
     - APP_URL=$(terraform output -raw application_url)
     - test -n "$APP_URL" && test "$APP_URL" != "null"
@@ -727,7 +728,7 @@ destroy:development:
     - terraform workspace select development
     - terraform init -input=false -lockfile=readonly
     - terraform plan -destroy -input=false -var-file=environments/development.tfvars -out=destroy.tfplan
-    - terraform apply -input=false destroy.tfplan
+    - terraform apply -input=false -auto-approve destroy.tfplan
   environment:
     name: development
     action: stop
