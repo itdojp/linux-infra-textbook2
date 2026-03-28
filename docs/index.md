@@ -32,6 +32,12 @@ permalink: /
 - （推奨）ターミナル/コマンドライン操作の経験（例: cd/ls/cat など）
 - （推奨）ネットワークの基礎用語（IP/DNS/HTTP の概要）
 
+## 安全に学習するための注意
+
+- 本書のコマンドや設定例は、検証用の Linux 環境で試すことを前提としています。本番サーバーや共有環境で、そのまま実行しないでください。
+- ディストリビューションやバージョンによって、利用できるパッケージ、サービス管理方法、ネットワーク診断コマンドが異なる場合があります。
+- クラウド関連の章や自動化の章では、権限、課金、削除対象、適用範囲を事前に確認してください。
+
 ## 所要時間
 
 - 通読: 約3.5〜5時間（本文量ベース概算。コードブロック除外、400〜600文字/分換算）
@@ -103,6 +109,18 @@ permalink: /
 教育・研究・個人学習での利用は自由です。一方、商用利用には事前許諾が必要です。
 
 [ライセンス条件の詳細](https://github.com/itdojp/it-engineer-knowledge-architecture/blob/main/LICENSE.md)
+
+## 利用と更新情報
+
+- リポジトリ: [itdojp/linux-infra-textbook2](https://github.com/itdojp/linux-infra-textbook2)
+- 更新差分を追う場合は、GitHub のコミット履歴と Pull Request を参照してください。
+- ディストリビューションやクラウドの仕様差がある箇所は、検証環境のバージョンと公式ドキュメントを併せて確認してください。
+
+## 関連書籍
+
+- Linux の最初の入口を補いたい場合: [図解でわかるLinux基礎](https://itdojp.github.io/illustrated-linux-basics-book/)
+- コンテナ運用を深めたい場合: [Podman完全ガイド](https://itdojp.github.io/podman-book/)
+- トラブル対応を強化したい場合: [ITインフラトラブルシューティング大全](https://itdojp.github.io/IT-infra-troubleshooting-book/)
 
 **お問い合わせ**  
 株式会社アイティードゥ（ITDO Inc.）  

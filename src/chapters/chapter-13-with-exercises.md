@@ -557,34 +557,47 @@ WEB_SG_ID=$(aws ec2 create-security-group \
     --query 'GroupId' \
     --output text)
 
+# 公開範囲の入力
+WEB_CIDR="${WEB_CIDR:-0.0.0.0/0}"
+SSH_CIDR="${SSH_CIDR:-$(curl -fsS https://checkip.amazonaws.com)/32}"
+
 # ルールの追加
 aws ec2 authorize-security-group-ingress \
     --group-id $WEB_SG_ID \
     --protocol tcp \
     --port 80 \
-    --cidr 0.0.0.0/0
+    --cidr $WEB_CIDR
 
 aws ec2 authorize-security-group-ingress \
     --group-id $WEB_SG_ID \
     --protocol tcp \
     --port 443 \
-    --cidr 0.0.0.0/0
+    --cidr $WEB_CIDR
 
 aws ec2 authorize-security-group-ingress \
     --group-id $WEB_SG_ID \
     --protocol tcp \
     --port 22 \
-    --cidr $(curl -s https://checkip.amazonaws.com)/32
+    --cidr $SSH_CIDR
+
+aws ec2 describe-security-groups \
+    --group-ids $WEB_SG_ID \
+    --query "SecurityGroups[0].IpPermissions[*].[FromPort,ToPort,IpRanges[*].CidrIp]" \
+    --output table
 
 echo "VPC setup completed!"
 echo "VPC ID: $VPC_ID"
 echo "Public Subnet: $PUBLIC_SUBNET_ID"
 echo "Private Subnet: $PRIVATE_SUBNET_ID"
 echo "Web Security Group: $WEB_SG_ID"
+echo "WEB_CIDR: $WEB_CIDR"
+echo "SSH_CIDR: $SSH_CIDR"
 EOF
 
 chmod +x basic_vpc_setup.sh
 ```
+
+注記: `WEB_CIDR=0.0.0.0/0` は internet-facing な HTTP/HTTPS 公開を説明するための最小例です。内部 ALB、VPN、社内プロキシ、踏み台経由などの前提がある場合は、`WEB_CIDR` と `SSH_CIDR` を要件に合わせて最小化してください。
 
 ### 演習2：高可用性ネットワーク設計
 
@@ -689,6 +702,8 @@ EOF
 
 chmod +x ha_network_setup.sh
 ```
+
+注記: NAT Gateway と EIP は作成後も課金が続くため、演習では `aws ec2 wait nat-gateway-available --nat-gateway-ids ...` で ready を確認したうえで、`vpc_id` / subnet IDs / NAT Gateway / AllocationId を `.ha-network.env` へ退避しておく方が安全です。後始末は `delete-nat-gateway` → `wait nat-gateway-deleted` → `release-address` → subnet / VPC 削除の順にし、最後に `describe-nat-gateways` と `describe-addresses` で残存がないことを確認してください。
 
 ### 演習3：ネットワークセキュリティの実装
 
@@ -965,6 +980,8 @@ EOF
 chmod +x hybrid_cloud_network.sh
 ```
 
+注記: `VPC_ID=\"vpc-12345\"` のようなプレースホルダは、そのまま実行しないでください。演習前に `aws sts get-caller-identity` と `aws ec2 describe-vpcs --vpc-ids \"$VPC_ID\"` で対象環境を確認し、VPN / VGW / CGW / TGW を作成した場合は `describe-vpn-connections` で `State=available` を確認してから設定ファイルを保存します。cleanup は `delete-vpn-connection` → `detach-vpn-gateway` → `delete-vpn-gateway` → `delete-customer-gateway` → `delete-transit-gateway` の順に戻してください。
+
 ### 演習5：ネットワークパフォーマンス最適化
 
 ```bash
@@ -1014,17 +1031,18 @@ setup_placement_group() {
 # ネットワークパフォーマンステスト
 network_performance_test() {
     echo "Running network performance tests..."
+    TEST_AMI_ID="${TEST_AMI_ID:-resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64}"
     
     # iperf3サーバーの起動
     cat > iperf-server-userdata.sh << 'USERDATA'
 #!/bin/bash
-yum install -y iperf3
+dnf install -y iperf3
 iperf3 -s -D
 USERDATA
     
     # テスト用インスタンスの起動
     server_id=$(aws ec2 run-instances \
-        --image-id ami-12345678 \
+        --image-id "$TEST_AMI_ID" \
         --instance-type c5n.large \
         --placement GroupName=high-performance-cluster \
         --user-data file://iperf-server-userdata.sh \
@@ -1032,14 +1050,23 @@ USERDATA
         --output text)
     
     client_id=$(aws ec2 run-instances \
-        --image-id ami-12345678 \
+        --image-id "$TEST_AMI_ID" \
         --instance-type c5n.large \
         --placement GroupName=high-performance-cluster \
         --query 'Instances[0].InstanceId' \
         --output text)
     
-    # テスト結果の収集
+    aws ec2 wait instance-status-ok --instance-ids "$server_id" "$client_id"
+
+    server_private_ip=$(aws ec2 describe-instances \
+        --instance-ids "$server_id" \
+        --query 'Reservations[0].Instances[0].PrivateIpAddress' \
+        --output text)
+
     echo "Instances launched. Run iperf3 tests after they're ready."
+    echo "Server private IP: $server_private_ip"
+    echo "Client example: iperf3 -c $server_private_ip -t 5"
+    echo "Cleanup: aws ec2 terminate-instances --instance-ids $server_id $client_id && rm -f iperf-server-userdata.sh"
 }
 
 # VPCピアリング最適化

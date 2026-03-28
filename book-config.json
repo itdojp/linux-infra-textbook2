@@ -1,20 +1,102 @@
 {
-  "title": "Linuxインフラ教本 - サーバー構築・運用の基礎",
-  "description": "Linuxインフラ教本 - サーバー構築・運用の基礎",
+  "title": "実践Linux インフラエンジニア入門",
+  "description": "コンテナ・クラウド時代に必要なLinuxインフラエンジニアの基礎技術を実践的に学べる技術書",
   "author": "ITDO Inc.（株式会社アイティードゥ）",
   "version": "1.0.1",
   "language": "ja",
   "license": "CC-BY-NC-SA-4.0",
   "repository": {
-    "url": "https://github.com/itdojp/linux-infra-textbook.git",
+    "url": "https://github.com/itdojp/linux-infra-textbook2.git",
     "branch": "main"
   },
   "structure": {
     "chapters": [
       {
         "id": "chapter01",
-        "title": "第1章：基礎概念",
-        "description": "基本的な概念と原理"
+        "title": "第1章：ITインフラの全体像とLinuxの位置づけ",
+        "description": "Linux を学ぶ意義と IT インフラ全体の中での位置づけ"
+      },
+      {
+        "id": "chapter02",
+        "title": "第2章：Linuxというオペレーティングシステムの設計思想",
+        "description": "OS の役割と Linux の設計思想を理解する"
+      },
+      {
+        "id": "chapter03",
+        "title": "第3章：ファイルシステムという抽象化の威力",
+        "description": "ファイルシステムを通じて Linux の抽象化モデルを学ぶ"
+      },
+      {
+        "id": "chapter04",
+        "title": "第4章：シェルとコマンド - 対話的管理の基礎",
+        "description": "シェルとコマンドライン操作の基本を理解する"
+      },
+      {
+        "id": "chapter05",
+        "title": "第5章：プロセスとシグナル - 並行処理の制御",
+        "description": "プロセス管理とシグナルによる制御を学ぶ"
+      },
+      {
+        "id": "chapter06",
+        "title": "第6章：権限管理 - セキュリティの第一歩",
+        "description": "権限管理の基礎とセキュリティの考え方を整理する"
+      },
+      {
+        "id": "chapter07",
+        "title": "第7章：TCP/IPスタックとLinux",
+        "description": "Linux から見たネットワーク基盤を理解する"
+      },
+      {
+        "id": "chapter08",
+        "title": "第8章：名前解決とサービス発見",
+        "description": "DNS とサービス発見の基礎を学ぶ"
+      },
+      {
+        "id": "chapter09",
+        "title": "第9章：仮想化からコンテナへ - 隔離技術の進化",
+        "description": "仮想化からコンテナまでの技術進化を理解する"
+      },
+      {
+        "id": "chapter10",
+        "title": "第10章：Podmanという選択 - エンタープライズ向けコンテナ",
+        "description": "Podman を中心にコンテナ運用の基礎を学ぶ"
+      },
+      {
+        "id": "chapter11",
+        "title": "第11章：イメージとレジストリ - 配布可能な実行環境",
+        "description": "イメージ作成とレジストリ運用を理解する"
+      },
+      {
+        "id": "chapter12",
+        "title": "第12章：AWSという巨大なデータセンター",
+        "description": "クラウドの基礎として AWS の見方を学ぶ"
+      },
+      {
+        "id": "chapter13",
+        "title": "第13章：仮想ネットワークの設計と実装",
+        "description": "クラウド上の仮想ネットワーク設計を理解する"
+      },
+      {
+        "id": "chapter14",
+        "title": "第14章：監視とログ - システムの可観測性",
+        "description": "監視とログ管理の基本を整理する"
+      },
+      {
+        "id": "chapter15",
+        "title": "第15章：自動化への道 - Infrastructure as Code",
+        "description": "自動化と Infrastructure as Code の基礎を学ぶ"
+      }
+    ],
+    "appendices": [
+      {
+        "id": "answers",
+        "title": "演習問題解答集",
+        "description": "本文の演習問題に対する解答と補足"
+      },
+      {
+        "id": "glossary",
+        "title": "用語集",
+        "description": "本文で使う主要用語の整理"
       }
     ]
   },
@@ -26,16 +108,16 @@
     "enableMobileOptimization": true
   },
   "ux": {
-    "profile": "B",
+    "profile": "A",
     "modules": {
       "quickStart": false,
-      "readingGuide": false,
-      "checklistPack": true,
-      "troubleshootingFlow": true,
+      "readingGuide": true,
+      "checklistPack": false,
+      "troubleshootingFlow": false,
       "conceptMap": false,
-      "figureIndex": true,
-      "legalNotice": false,
-      "glossary": false
+      "figureIndex": false,
+      "legalNotice": true,
+      "glossary": true
     }
   },
   "shared": {

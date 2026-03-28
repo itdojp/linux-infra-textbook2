@@ -83,7 +83,7 @@ docker run -d \
     --name node-exporter \
     -p 9100:9100 \
     -v "/:/host:ro,rslave" \
-    quay.io/prometheus/node-exporter:latest \
+    quay.io/prometheus/node-exporter:<approved-tag> \
     --path.rootfs=/host
 
 # Prometheusの起動
@@ -265,7 +265,7 @@ volumes:
 ```python
 # distributed_tracing.py - OpenTelemetryによるトレーシング
 from opentelemetry import trace
-from opentelemetry.exporter.jaeger import JaegerExporter
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
@@ -275,14 +275,13 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 trace.set_tracer_provider(TracerProvider())
 tracer = trace.get_tracer(__name__)
 
-# Jaegerエクスポーターの設定
-jaeger_exporter = JaegerExporter(
-    agent_host_name="localhost",
-    agent_port=6831,
+# OTLPエクスポーターの設定
+otlp_exporter = OTLPSpanExporter(
+    endpoint="http://localhost:4318/v1/traces"
 )
 
 # スパンプロセッサーの追加
-span_processor = BatchSpanProcessor(jaeger_exporter)
+span_processor = BatchSpanProcessor(otlp_exporter)
 trace.get_tracer_provider().add_span_processor(span_processor)
 
 # 自動計装
@@ -310,6 +309,8 @@ def process_request():
         return jsonify(processed)
 ```
 
+注記: 新規実装では Jaeger exporter 直送より、OTLP exporter で OpenTelemetry Collector や Jaeger の OTLP endpoint へ送る構成の方が移行しやすくなります。このコードは trace の流れを説明する最小例として読み、実運用では collector 経由の認証・バッファリング・送信先切替も設計してください。
+
 ## 14.4 予防的メンテナンスと迅速な障害対応
 
 ### 異常検知システムの構築
@@ -320,6 +321,12 @@ import numpy as np
 from sklearn.ensemble import IsolationForest
 from prometheus_api_client import PrometheusConnect
 import pandas as pd
+import time
+from datetime import datetime, timedelta
+
+def send_alert(anomaly):
+    """説明用の最小スタブ。本番では ChatOps / PagerDuty 等に接続する。"""
+    print(f"[alert] {anomaly['severity']}: {anomaly['metric']}")
 
 class AnomalyDetector:
     def __init__(self, prometheus_url):
@@ -672,7 +679,7 @@ version: '3.8'
 
 services:
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:<approved-tag>
     ports:
       - "9090:9090"
     volumes:
@@ -686,23 +693,23 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:<approved-tag>
     ports:
       - "3000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
 
   alertmanager:
-    image: prom/alertmanager:latest
+    image: prom/alertmanager:<approved-tag>
     ports:
       - "9093:9093"
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:<approved-tag>
     ports:
       - "9100:9100"
     volumes:
@@ -715,7 +722,7 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:<approved-tag>
     ports:
       - "8080:8080"
     volumes:
@@ -730,14 +737,50 @@ volumes:
   grafana-data:
 COMPOSE
 
+cat > alertmanager.yml << 'ALERTMANAGER'
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: default-email
+
+receivers:
+  - name: default-email
+ALERTMANAGER
+
 # 起動スクリプト
 cat > start_monitoring.sh << 'START'
 #!/bin/bash
+set -euo pipefail
+docker compose -f docker-compose-monitoring.yml config >/dev/null
 docker compose -f docker-compose-monitoring.yml up -d
+docker compose -f docker-compose-monitoring.yml ps
+
+wait_http() {
+    local url="$1"
+    local name="$2"
+    for i in $(seq 1 30); do
+        if curl -fsS "$url" >/dev/null; then
+            echo "$name is ready"
+            return 0
+        fi
+        sleep 2
+    done
+    echo "$name is not ready. Inspect docker compose status and logs." >&2
+    docker compose -f docker-compose-monitoring.yml ps >&2
+    docker compose -f docker-compose-monitoring.yml logs --tail=50 >&2
+    return 1
+}
+
+wait_http http://localhost:9090/-/ready Prometheus
+wait_http http://localhost:3000/api/health Grafana
+wait_http http://localhost:9093/-/ready Alertmanager
+
 echo "Monitoring stack is starting..."
 echo "Prometheus: http://localhost:9090"
-echo "Grafana: http://localhost:3000 (admin/admin)"
+echo "Grafana: http://localhost:3000 (admin/<configured-password>)"
 echo "Alertmanager: http://localhost:9093"
+echo "Cleanup: docker compose -f docker-compose-monitoring.yml down -v"
 START
 
 chmod +x start_monitoring.sh
@@ -746,6 +789,9 @@ EOF
 
 chmod +x monitoring_stack_setup.sh
 ```
+
+注記: 監視スタックの image は `latest` ではなく、互換性確認済みの固定タグまたは digest に置き換えてください。`GRAFANA_ADMIN_PASSWORD` も `.env` や secret 管理から注入し、既定値の `admin` を恒常運用に使わないでください。
+注記: `docker compose ... up -d` の直後は process が起動しただけで、ready になっていない場合があります。`config`、`ps`、各コンポーネントの health endpoint で到達性を確認し、検証後は `down -v` で volume を含めて cleanup してください。
 
 ### 演習2：ログ分析パイプラインの構築
 
@@ -968,7 +1014,7 @@ import requests
 import time
 import random
 from opentelemetry import trace
-from opentelemetry.exporter.jaeger import JaegerExporter
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
@@ -983,12 +1029,11 @@ logging.basicConfig(level=logging.INFO)
 trace.set_tracer_provider(TracerProvider())
 tracer = trace.get_tracer(__name__)
 
-jaeger_exporter = JaegerExporter(
-    agent_host_name="localhost",
-    agent_port=6831,
+otlp_exporter = OTLPSpanExporter(
+    endpoint="http://localhost:4318/v1/traces"
 )
 
-span_processor = BatchSpanProcessor(jaeger_exporter)
+span_processor = BatchSpanProcessor(otlp_exporter)
 trace.get_tracer_provider().add_span_processor(span_processor)
 
 # 自動計装
@@ -1119,6 +1164,8 @@ def analyze_trace(trace_id):
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
 ```
+
+注記: Jaeger UI を使う場合も、新規実装では Jaeger agent 直送より OTLP endpoint（例: `http://localhost:4318/v1/traces`）か OpenTelemetry Collector を経由する方が、認証・バッファリング・送信先切替を後から追加しやすくなります。
 
 ### 演習4：予測的アラートシステム
 

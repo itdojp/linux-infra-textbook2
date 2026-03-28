@@ -310,6 +310,8 @@ alice ALL=(ALL) NOPASSWD: ALL  # 危険！
 %developers ALL=(ALL) /usr/bin/docker
 ```
 
+本番運用では `/etc/sudoers` を直接追記するより、`/etc/sudoers.d/` に用途別の drop-in を作り、保存前に `visudo -cf /etc/sudoers.d/<filename>` で構文検証する方が安全です。新しい sudo ルールは別セッションで検証してから元の root シェルを閉じ、臨時ルールは作業後に削除してください。なお `docker` グループ付与は実質的に root 相当の権限委譲になるため、sudo 権限と同等の審査対象として扱う必要があります。
+
 #### ファイル改竄の検出
 ```bash
 # ファイルの整合性チェック

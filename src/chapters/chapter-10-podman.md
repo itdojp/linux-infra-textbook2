@@ -175,7 +175,7 @@ $ podman run -v /shared:/shared:z nginx  # 共有ラベル
 ```bash
 # イメージの脆弱性スキャン（例：Trivy）
 # ※Podman本体のサブコマンドとしてscanが提供されるかは、バージョン/拡張/依存により異なる
-$ trivy image nginx:latest
+$ trivy image nginx:1.27-alpine
 ```
 
 ### 運用性の向上
@@ -208,9 +208,9 @@ $ podman run --log-opt max-size=10m --log-opt max-file=3 nginx
 
 ```bash
 # Dockerとほぼ同じコマンド体系
-podman pull nginx:latest
+podman pull nginx:1.27-alpine
 podman images
-podman run -d --name web -p 8080:80 nginx
+podman run -d --name web -p 8080:80 nginx:1.27-alpine
 podman ps
 podman logs web
 podman exec -it web sh
@@ -261,7 +261,7 @@ $ cat docker-compose.yml
 version: '3'
 services:
   web:
-    image: nginx:latest
+    image: nginx:1.27-alpine
     ports:
       - "8080:80"
   db:
@@ -275,6 +275,8 @@ $ podman-compose ps
 $ podman-compose logs
 $ podman-compose down
 ```
+
+注記: ここでの `nginx:1.27-alpine` は説明用の固定タグ例であり、継続運用では自組織で承認した固定タグまたは digest に置き換えてください。`POSTGRES_PASSWORD: secret` も lab 用の最小例であり、`.env` や secret 管理からの機密値注入へ置き換える前提です。
 
 ## 10.6 演習：DockerとPodmanの違いを実体験
 
@@ -397,15 +399,24 @@ systemctl --user status webapp.service
 
 # 5. 自動起動の確認
 echo
-echo "Service will start automatically on boot"
+echo "Service will start automatically when the user session starts"
 systemctl --user list-unit-files | grep webapp
+systemctl --user is-enabled webapp.service
+systemctl --user is-active webapp.service
+journalctl --user -u webapp.service -n 20 --no-pager || true
+
+echo
+echo "Linger state (enable only if you need boot-time start without login):"
+loginctl show-user "$USER" -p Linger || true
 
 # クリーンアップオプション
 echo
 echo "To clean up, run:"
 echo "  systemctl --user stop webapp.service"
 echo "  systemctl --user disable webapp.service"
+echo "  rm -f ~/.config/systemd/user/webapp.service && systemctl --user daemon-reload"
 echo "  podman rm -f webapp"
+echo "  sudo loginctl disable-linger $USER   # lab 用に linger を有効化した場合のみ"
 EOF
 
 chmod +x systemd_integration.sh
@@ -429,15 +440,16 @@ podman pod create --name webapp-pod \
 # 2. Pod内でコンテナを起動
 echo
 echo "Starting containers in pod..."
-podman run -d --pod webapp-pod --name web nginx
+DB_PASSWORD="${DB_PASSWORD:-change-me-for-lab}"
+podman run -d --pod webapp-pod --name web nginx:1.27
 podman run -d --pod webapp-pod --name db \
-    -e POSTGRES_PASSWORD=secret postgres:13
+    -e POSTGRES_PASSWORD="$DB_PASSWORD" postgres:16
 
 # 3. Pod内のコンテナ間通信
 echo
 echo "Testing inter-container communication..."
 podman exec web sh -c 'apt update && apt install -y postgresql-client'
-podman exec web sh -c 'PGPASSWORD=secret psql -h localhost -U postgres -c "SELECT version();"'
+podman exec -e PGPASSWORD="$DB_PASSWORD" web psql -h localhost -U postgres -c "SELECT version();"
 
 # 4. Podの状態確認
 echo
@@ -457,6 +469,8 @@ echo "Cleaning up..."
 podman pod stop webapp-pod
 podman pod rm webapp-pod
 EOF
+
+注記: `DB_PASSWORD` は lab 用の placeholder です。実運用では repository へ平文を埋め込まず、env file / secret 管理 / CI secret から注入してください。
 
 chmod +x pod_demo.sh
 ```

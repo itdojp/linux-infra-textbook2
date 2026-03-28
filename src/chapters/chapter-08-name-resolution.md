@@ -118,6 +118,8 @@ $ ls -la /etc/resolv.conf
 lrwxrwxrwx 1 root root 39 Mar 15 10:00 /etc/resolv.conf -> ../run/systemd/resolve/stub-resolv.conf
 ```
 
+`systemd-resolved` を使う環境では、`/etc/resolv.conf` が `/run/systemd/resolve/` 配下へのシンボリックリンクになり、ファイルを直接書き換えても恒久設定にならない場合があります。恒久的に DNS サーバーや検索ドメインを変える場合は `resolved.conf` や NetworkManager / netplan 側で管理し、反映後は `resolvectl status` で有効設定を確認してください。
+
 #### /etc/hosts - ローカル名前解決
 ```bash
 $ cat /etc/hosts
@@ -397,6 +399,9 @@ echo "1. Testing unreachable DNS server:"
 echo "   nameserver 192.0.2.1" | sudo tee /etc/resolv.conf.test
 sudo cp /etc/resolv.conf /etc/resolv.conf.backup
 sudo cp /etc/resolv.conf.test /etc/resolv.conf
+if [ -L /etc/resolv.conf ] && readlink -f /etc/resolv.conf | grep -q '/run/systemd/resolve/'; then
+    echo "   note: systemd-resolved 管理下のため、この置換は一時的な障害注入テストです。恒久設定は resolved.conf.d / NetworkManager / netplan 側で行います。"
+fi
 
 timeout 5 nslookup example.com
 if [ $? -ne 0 ]; then
@@ -405,6 +410,10 @@ fi
 
 # 元に戻す
 sudo cp /etc/resolv.conf.backup /etc/resolv.conf
+if [ -L /etc/resolv.conf ] && readlink -f /etc/resolv.conf | grep -q '/run/systemd/resolve/'; then
+    echo "   note: 復旧後も ls -l /etc/resolv.conf と resolvectl status で symlink と有効設定を確認します。"
+    echo "   note: interface 単位の一時変更を戻す場合は sudo resolvectl revert <interface> も検討します。"
+fi
 
 # 2. 不正なDNS応答
 echo
@@ -665,9 +674,15 @@ dig +norecurse @権威サーバー ドメイン名                      # 権威
 
 # 解決策:
 sudo systemctl restart systemd-resolved
-# または
-echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+# または一時切り分けとして DNS を差し替える
+if command -v resolvectl >/dev/null 2>&1; then
+    sudo resolvectl dns "$(resolvectl status | awk '/Link [0-9]+ \\(/ {gsub(/[()]/,"",$3); print $3; exit}')" 8.8.8.8
+else
+    echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+fi
 ```
+
+注記: `systemd-resolved` 環境では `/etc/resolv.conf` の直接編集を恒久設定に使わず、一時切り分け後は `resolved.conf` / NetworkManager / netplan 側へ戻して `resolvectl status` で反映を確認してください。
 
 #### パターン2: 一部のドメインだけ解決できない
 ```bash
@@ -742,7 +757,7 @@ EOF
 
 #### 3. 内部名と外部名の混在
 ```bash
-# /etc/resolv.confの適切な設定
+# /etc/resolv.confの適切な設定（systemd-resolved を使わない環境向け）
 cat > /etc/resolv.conf << EOF
 # 内部DNSを優先
 nameserver 192.168.1.1
@@ -754,6 +769,8 @@ nameserver 8.8.8.8
 search internal.local example.com
 EOF
 ```
+
+注記: `systemd-resolved` を使う環境では `/etc/resolv.conf` の直接編集を恒久設定に使わず、`/etc/systemd/resolved.conf.d/*.conf`、NetworkManager、netplan のいずれかで同等設定を管理し、反映後は `resolvectl status` で有効設定を確認してください。
 
 ## 8.8 まとめ：名前が繋ぐネットワーク
 

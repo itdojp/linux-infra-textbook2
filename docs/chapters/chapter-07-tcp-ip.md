@@ -151,6 +151,8 @@ default via 192.168.1.1 dev eth0 proto dhcp metric 100
 192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10
 ```
 
+注記: `ip addr add ... dev eth0` は実ホストの NIC 設定を直接変更します。SSH 先や本番機でそのまま実行すると、アドレス競合や接続断を招く場合があります。未使用アドレスへ読み替え、終了後は `sudo ip addr del 192.168.1.20/24 dev eth0` で戻してください。可能なら dummy interface や network namespace で試す方が安全です。
+
 #### パケットの旅路を追跡
 
 ```bash
@@ -190,6 +192,10 @@ cat /proc/net/snmp
 ## ネットワーク診断の実践コマンド
 
 ### 基本的な接続確認
+
+注記: 現行の Linux ディストリビューションでは、ルーティングやソケット確認に `ip` / `ss` を使う説明が主流です。`netstat` は古い手順や既存運用で見かけることがありますが、本書では新規学習では `ip route` と `ss` を優先します。
+
+補足: `mtr`、`iftop`、`host`、`nc` などはディストリビューションによって別パッケージです。導入前に `command -v mtr` や `command -v nc` で存在確認を行い、未導入なら対象 OS のパッケージマネージャで追加してください。
 
 ```bash
 # ネットワーク接続の基本確認
@@ -416,7 +422,7 @@ $ ss -i | grep -A1 "cubic"
 
 ```bash
 # tcpdumpでHTTP通信をキャプチャ
-$ sudo tcpdump -i any -A -s 0 'tcp port 80' -w http_capture.pcap
+$ sudo tcpdump -i any -s 0 'tcp port 80' -w http_capture.pcap
 
 # 別ターミナルでHTTPリクエスト送信
 $ curl http://example.com
@@ -430,11 +436,13 @@ $ wireshark http_capture.pcap
 $ tcpdump -r http_capture.pcap -A | less
 ```
 
+注記: `-w` は生パケットを保存する用途、`-A` は保存済み pcap を ASCII 表示で読む用途として分ける方が確認しやすくなります。まず `http_capture.pcap` を保存し、その後 `tcpdump -r` で内容を見ると、キャプチャ失敗と表示条件を切り分けやすくなります。
+
 ### 演習2：TCP 3ウェイハンドシェイクの観察
 
 ```bash
-# SYNパケットのみをキャプチャ
-$ sudo tcpdump -i any 'tcp[tcpflags] & (tcp-syn) != 0' -nn
+# 3-way handshake を観察しやすいよう、最初の 3 パケットだけをキャプチャ
+$ sudo tcpdump -i any -c 3 'tcp port 80 and host google.com' -nn
 
 # 別ターミナルで接続
 $ nc google.com 80
@@ -458,16 +466,31 @@ $ dig google.com
 cat > dns_analyzer.sh << 'EOF'
 #!/bin/bash
 echo "=== DNS Query Analysis ==="
-sudo tcpdump -i any -c 10 port 53 -nn 2>/dev/null | while read line; do
-    if echo "$line" | grep -q "A?"; then
-        query=$(echo "$line" | grep -oE "[a-zA-Z0-9.-]+\. \(")
-        echo "Query: ${query% (}"
-    elif echo "$line" | grep -q "A "; then
-        answer=$(echo "$line" | grep -oE "A [0-9.]+")
+timeout 15 sudo tcpdump -i any -c 4 port 53 -nn 2>/dev/null | while read line; do
+    if echo "$line" | awk '/ A\\? / { found=1 } END { exit(found ? 0 : 1) }'; then
+        query=$(echo "$line" | grep -oE "[a-zA-Z0-9.-]+\\. " | head -n1)
+        echo "Query: ${query%. }"
+    elif echo "$line" | awk '/ A [0-9.]+( \([0-9]+\))?$/ { found=1 } END { exit(found ? 0 : 1) }'; then
+        answer=$(echo "$line" | grep -oE "A [0-9.]+" | head -n1)
         echo "Answer: $answer"
     fi
 done
 EOF
+```
+
+確認手順の例:
+
+1. `chmod +x dns_analyzer.sh`
+2. 別ターミナルで `./dns_analyzer.sh`
+3. もう一方のターミナルで `dig A google.com`
+4. `Query:` と `Answer:` が出たら成功
+
+期待する出力例:
+
+```text
+=== DNS Query Analysis ===
+Query: google.com
+Answer: A 142.250.199.14
 ```
 
 ### 演習4：ネットワーク遅延の分析
@@ -670,7 +693,12 @@ net.ipv4.tcp_tw_reuse = 1
 EOF
 ```
 
+注記: `sysctl` の値は workload と kernel 依存です。現行値を `sysctl -a | grep` などで退避し、本番へそのまま適用せず、隔離環境で 1 項目ずつ変更して効果と副作用を確認してください。特に `net.ipv4.tcp_tw_reuse` は負荷特性や接続先の前提を誤ると、期待どおりの効果が得られない場合があります。
+
 ### ネットワーク名前空間
+
+> ⚠️ 注意
+> この演習は検証用環境で実施してください。`test_ns` / `veth0` / `veth1` は固定名なので、再実行前に既存の namespace や veth が残っていないか確認します。終了後は `sudo ip netns delete test_ns`、`sudo ip link delete veth0` などで後始末し、ホスト側のネットワーク設定を元に戻してください。
 
 ```bash
 # ネットワーク名前空間の作成
@@ -688,8 +716,17 @@ $ sudo ip link set veth1 netns test_ns
 $ sudo ip addr add 10.0.0.1/24 dev veth0
 $ sudo ip netns exec test_ns ip addr add 10.0.0.2/24 dev veth1
 
+# インターフェースを有効化
+$ sudo ip link set veth0 up
+$ sudo ip netns exec test_ns ip link set lo up
+$ sudo ip netns exec test_ns ip link set veth1 up
+
 # 通信テスト
-$ ping 10.0.0.2
+$ ping -c 3 10.0.0.2
+
+# 後始末
+$ sudo ip link delete veth0
+$ sudo ip netns delete test_ns
 ```
 
 ## 7.8 まとめ：ネットワークは層の積み重ね
@@ -791,6 +828,8 @@ iptablesを使用して以下のファイアウォールルールを実装して
 ### 問題7：パフォーマンス分析
 
 以下のコマンドの出力から、ネットワークパフォーマンスの問題を分析してください。
+
+注記: この設問では、古い環境で採取された `netstat -s` の出力例も扱います。現在の環境で同種の確認を行う場合は、`ss -s` や `ss -i` を併用してください。
 
 ```bash
 $ netstat -s | grep -i retrans
