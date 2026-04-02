@@ -113,7 +113,7 @@ permalink: /
 ## 利用と更新情報
 
 - リポジトリ: [itdojp/linux-infra-textbook2](https://github.com/itdojp/linux-infra-textbook2)
-- 更新差分を追う場合は、GitHub のコミット履歴と Pull Request を参照してください。
+- 更新差分を追う場合は、GitHub のコミット履歴と PR 一覧を参照してください。
 - ディストリビューションやクラウドの仕様差がある箇所は、検証環境のバージョンと公式ドキュメントを併せて確認してください。
 
 ## 関連書籍
