@@ -61,7 +61,7 @@ $ sudo virt-install \
 
 ### 仮想マシンの限界
 
-![仮想マシンの限界](../../docs/assets/images/diagrams/chapter-09/vm-limitations.svg)
+![仮想マシンの限界]({{ '/assets/images/diagrams/chapter-09/vm-limitations.svg' | relative_url }})
 
 **問題点**：
 - 各VMに完全なOSが必要（メモリ・ディスク消費）
