@@ -2,9 +2,9 @@
 
 コンテナ・クラウド時代に必要な Linux インフラの基礎技術を、原理と実務の文脈を結び付けて学ぶための技術書です。
 
-- 公開ページ（GitHub Pages）: https://itdojp.github.io/linux-infra-textbook2/
+- 公開ページ（GitHub Pages）: [linux-infra-textbook2](https://itdojp.github.io/linux-infra-textbook2/)
 - 目次（リポジトリ内）: `docs/index.md`
-- シリーズ: https://github.com/itdojp/it-engineer-knowledge-architecture
+- シリーズ: [it-engineer-knowledge-architecture](https://github.com/itdojp/it-engineer-knowledge-architecture)
 
 ## この本でできるようになること
 
@@ -26,7 +26,7 @@
 
 ## フィードバック（誤り指摘・改善提案）
 
-誤字脱字、技術的な誤り、改善提案は Issues / Pull Request で受け付けます。手順は `CONTRIBUTING.md` を参照してください。
+誤字脱字、技術的な誤り、改善提案は Issues / PR で受け付けます。手順は `CONTRIBUTING.md` を参照してください。
 
 ## 執筆・ビルド（貢献者向け）
 
