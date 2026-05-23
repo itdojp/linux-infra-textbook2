@@ -38,6 +38,39 @@ permalink: /
 - ディストリビューションやバージョンによって、利用できるパッケージ、サービス管理方法、ネットワーク診断コマンドが異なる場合があります。
 - クラウド関連の章や自動化の章では、権限、課金、削除対象、適用範囲を事前に確認してください。
 
+## 検証環境とレビューゲート（2026年5月23日確認）
+
+本書のコマンド例は、Ubuntu LTS 系を含む systemd 前提の Linux 環境で学ぶことを想定します。
+Ubuntu の公式リリース一覧では、2026年4月23日に Ubuntu 26.04 LTS が公開され、22.04 LTS / 24.04 LTS / 26.04 LTS がいずれもサポート対象に含まれています。
+本文中の表示例やパッケージ名はディストリビューション、カーネル、systemd、Podman、AWS CLI、Terraform のバージョンによって変わるため、演習前に次を記録してください。
+
+```bash
+cat /etc/os-release
+uname -a
+systemctl --version
+podman --version 2>/dev/null || true
+aws --version 2>/dev/null || true
+terraform version 2>/dev/null || true
+```
+
+| 操作の種類 | 例 | 実行前ゲート |
+| --- | --- | --- |
+| 読み取り中心 | `ls`, `cat`, `ip addr show`, `journalctl --since` | 検証環境の OS / kernel / tool version を記録する |
+| ローカル状態変更 | `sudo`, `systemctl`, `ip addr add`, `chmod`, `chown`, `dd` | disposable VM / container / network namespace を優先し、戻し方を確認する |
+| 外部サービス変更 | `aws ...`, `terraform apply`, DNS / routing / IAM 変更 | 検証専用 account / profile / region、課金上限、削除手順、認証主体を確認する |
+
+AWS 演習では、root ユーザーや長期アクセスキーの常用を避け、IAM Identity Center や `AssumeRole` による一時認証情報を優先します。
+実行前に `aws sts get-caller-identity`、`AWS_PROFILE`、`AWS_REGION` / `AWS_DEFAULT_REGION` を確認し、演習後は作成リソースと課金対象を削除します。
+IAM Identity Center は、AWS 公式の Prescriptive Guidance でも複数アカウントへの centrally managed access の推奨アプローチとして説明されています。
+
+本書へ改善 PR を出す場合は、Issue に確認範囲、変更判断、検証結果を残し、GitHub Copilot review の本文・inline comment・suggestion を全件確認します。
+未解決 review thread が 0 件、CI green、merge 後 main checks、公開サイト反映確認までを完了条件とします。
+
+参考:
+
+- [Ubuntu project documentation: List of current releases](https://documentation.ubuntu.com/project/release-team/list-of-releases/)
+- [AWS Prescriptive Guidance: AWS IAM Identity Center](https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture-identity-management/workforce-iam-identity-center.html)
+
 ## 所要時間
 
 - 通読: 約3.5〜5時間（本文量ベース概算。コードブロック除外、400〜600文字/分換算）
@@ -130,6 +163,6 @@ Email: [knowledge@itdo.jp](mailto:knowledge@itdo.jp)
 
 **著者:** ITDO Inc. <knowledge@itdo.jp>  
 **バージョン:** 1.0.1  
-**最終更新:** 2026年2月20日
+**最終更新:** 2026年5月23日
 
 {% include page-navigation.html %}
