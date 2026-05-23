@@ -23,13 +23,23 @@
 
 しかし今は違います。
 
+> 実行前ゲート
+>
+> `terraform apply` は実クラウドリソース、課金、ネットワーク到達性、IAM 権限に影響します。
+> 演習では検証専用 workspace / state backend / AWS profile を用い、`terraform plan` の差分、destroy / replace の有無、予想コスト、ロールバック手順を確認してから適用します。
+> 共有環境や本番相当環境では、`-auto-approve` を標準手順にせず、PR review、承認、短期認証情報、state lock、適用後の smoke check を必須ゲートにします。
+> `tfplan` には変数、data source の戻り値、リソース属性などの機微情報が含まれる場合があるため、repository へ commit したり公開 Issue / PR に添付したりしません。
+
 ```bash
 terraform plan -out=tfplan
-# review
+terraform show -no-color tfplan | less
+sha256sum tfplan > tfplan.sha256
+# 差分、削除/置換、課金、認証主体、対象 workspace を review 後に適用
 terraform apply tfplan
 ```
 
-たった数ステップで、複雑なインフラストラクチャを review 可能かつ再現可能な形で構築できます。これがInfrastructure as Code（IaC）の世界です。
+たった数ステップに見えても、実際には plan の差分確認、承認、適用、適用後確認までを含めて運用します。
+複雑なインフラストラクチャを review 可能かつ再現可能な形で構築できることが、Infrastructure as Code（IaC）の価値です。
 
 ## 15.2 手作業の限界と人的ミスの排除
 
