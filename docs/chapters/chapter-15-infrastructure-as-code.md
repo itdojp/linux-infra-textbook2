@@ -28,6 +28,7 @@
 > `terraform apply` は実クラウドリソース、課金、ネットワーク到達性、IAM 権限に影響します。
 > 演習では検証専用 workspace / state backend / AWS profile を用い、`terraform plan` の差分、destroy / replace の有無、予想コスト、ロールバック手順を確認してから適用します。
 > 共有環境や本番相当環境では、`-auto-approve` を標準手順にせず、PR review、承認、短期認証情報、state lock、適用後の smoke check を必須ゲートにします。
+> `tfplan` には変数、data source の戻り値、リソース属性などの機微情報が含まれる場合があるため、repository へ commit したり公開 Issue / PR に添付したりしません。
 
 ```bash
 terraform plan -out=tfplan

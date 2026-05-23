@@ -2,3 +2,9 @@ node_modules/
 docs/_site/
 docs/.jekyll-cache/
 docs/.jekyll-metadata
+# Terraform local plan artifacts may contain sensitive values
+*.tfplan
+tfplan
+tfplan.sha256
+plan.tfplan
+plan.tfplan.sha256

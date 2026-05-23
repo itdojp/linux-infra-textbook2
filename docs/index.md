@@ -61,6 +61,7 @@ terraform version 2>/dev/null || true
 
 AWS 演習では、root ユーザーや長期アクセスキーの常用を避け、IAM Identity Center や `AssumeRole` による一時認証情報を優先します。
 実行前に `aws sts get-caller-identity`、`AWS_PROFILE`、`AWS_REGION` / `AWS_DEFAULT_REGION` を確認し、演習後は作成リソースと課金対象を削除します。
+Issue / PR に検証結果を投稿する場合は、Account ID、ARN、hostname、public IP、内部 CIDR、profile 名など、組織や個人を特定し得る値をマスクします。
 IAM Identity Center は、AWS 公式の Prescriptive Guidance でも複数アカウントへの centrally managed access の推奨アプローチとして説明されています。
 
 本書へ改善 PR を出す場合は、Issue に確認範囲、変更判断、検証結果を残し、GitHub Copilot review の本文・inline comment・suggestion を全件確認します。
