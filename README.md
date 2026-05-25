@@ -32,6 +32,11 @@
 
 ローカルでのプレビュー手順は `QUICK-START.md` を参照してください。
 
+### 品質ゲート
+
+- `npm run check:metadata`: `book-config.json` を基準に、package / Jekyll / トップページ / ナビゲーション / 公開ページ / 必須アセットの整合性を確認します。
+- `npm test`: メタデータ整合性、docs sanity、Markdown lint、リンク確認をまとめて実行します。
+
 ## ライセンス
 
 本書は Creative Commons BY-NC-SA 4.0 で提供されています。詳細は `LICENSE.md` を参照してください。

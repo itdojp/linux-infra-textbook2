@@ -3,7 +3,7 @@ layout: book
 order: 1
 title: "実践Linux インフラエンジニア入門"
 description: "コンテナ・クラウド時代に必要なLinuxインフラエンジニアの基礎技術を実践的に学べる技術書"
-author: "株式会社アイティードゥ"
+author: "ITDO Inc.（株式会社アイティードゥ）"
 version: "1.0.1"
 permalink: /
 ---
