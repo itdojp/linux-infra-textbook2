@@ -39,18 +39,19 @@ function isInside(base, target) {
 }
 
 function resolveRepoPath(relPath, label, options = {}) {
+  const reportError = options.reportError || addError;
   if (typeof relPath !== 'string' || relPath.trim() === '') {
-    addError(`${label} must be a non-empty relative path.`);
+    reportError(`${label} must be a non-empty relative path.`);
     return null;
   }
   if (path.isAbsolute(relPath)) {
-    addError(`${label} must be relative, got absolute path: ${relPath}`);
+    reportError(`${label} must be relative, got absolute path: ${relPath}`);
     return null;
   }
 
   const absPath = path.resolve(repoRoot, relPath);
   if (!isInside(repoRoot, absPath)) {
-    addError(`${label} escapes repository root: ${relPath}`);
+    reportError(`${label} escapes repository root: ${relPath}`);
     return null;
   }
 
@@ -58,7 +59,7 @@ function resolveRepoPath(relPath, label, options = {}) {
     try {
       fs.lstatSync(absPath);
     } catch (err) {
-      addError(`${label} target not found: ${relPath}`);
+      reportError(`${label} target not found: ${relPath}`);
       return null;
     }
 
@@ -66,17 +67,17 @@ function resolveRepoPath(relPath, label, options = {}) {
     try {
       realPath = fs.realpathSync(absPath);
     } catch (err) {
-      addError(`${label} cannot be resolved: ${relPath} (${err.message})`);
+      reportError(`${label} cannot be resolved: ${relPath} (${err.message})`);
       return null;
     }
 
     if (!isInside(repoRootReal, realPath)) {
-      addError(`${label} resolves outside repository root: ${relPath} -> ${realPath}`);
+      reportError(`${label} resolves outside repository root: ${relPath} -> ${realPath}`);
       return null;
     }
 
     if (options.file && !fs.statSync(absPath).isFile()) {
-      addError(`${label} must point to a file: ${relPath}`);
+      reportError(`${label} must point to a file: ${relPath}`);
       return null;
     }
   }
@@ -207,9 +208,13 @@ function collectEntries(config) {
       addError(`book-config.json structure.${section} must be an array.`);
       continue;
     }
-    for (const item of items) {
+    items.forEach((item, index) => {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) {
+        addError(`book-config.json structure.${section}[${index}] must be an object.`);
+        return;
+      }
       entries.push({ ...item, section });
-    }
+    });
   }
   return entries;
 }
@@ -251,11 +256,17 @@ function docsCandidatesForPath(routePath, label) {
 
 function resolveDocsPage(routePath, label) {
   const candidates = docsCandidatesForPath(routePath, label);
+  const candidateErrors = [];
+  const collectCandidateError = (message) => candidateErrors.push(message);
   for (const candidate of candidates) {
-    const abs = resolveRepoPath(candidate, `${label} candidate`, { mustExist: false });
+    const abs = resolveRepoPath(candidate, `${label} candidate`, { mustExist: false, reportError: collectCandidateError });
     if (!abs) continue;
     if (!fs.existsSync(abs)) continue;
-    return resolveRepoPath(candidate, `${label} target`, { mustExist: true, file: true });
+    const resolved = resolveRepoPath(candidate, `${label} target`, { mustExist: true, file: true, reportError: collectCandidateError });
+    if (resolved) return resolved;
+  }
+  for (const candidateError of candidateErrors) {
+    addError(candidateError);
   }
   addError(`${label} target page not found for route ${routePath}; tried ${candidates.join(', ')}`);
   return null;
@@ -375,7 +386,7 @@ function validateNavigation(config, nav) {
 
   for (const section of Object.keys(expected)) {
     const actualItems = nav[section] || [];
-    const expectedItems = expected[section];
+    const expectedItems = expected[section].filter((item) => item && typeof item === 'object' && !Array.isArray(item));
     assertEqual(actualItems.length, expectedItems.length, `docs/_data/navigation.yml ${section} item count`);
     const max = Math.min(actualItems.length, expectedItems.length);
     for (let i = 0; i < max; i += 1) {
