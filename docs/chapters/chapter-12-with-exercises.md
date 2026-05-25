@@ -174,7 +174,7 @@ aws autoscaling create-auto-scaling-group \
 
 注記: 手動演習では `Version=$Latest` でも構いませんが、CI/CD や複数人運用では意図しないテンプレート更新を拾わないよう、検証済みの明示バージョンを固定する方が安全です。
 
-注記: AWS 公式では Launch Configuration の代わりに Launch Template の利用が推奨されています。既存環境の保守で Launch Configuration を見かけることはありますが、新規構築や更新時は Launch Template を前提にしてください。特に新しい EC2 インスタンスタイプへの追随や新規アカウントでの制約を考えると、演習でも Launch Template を基準に読む方が安全です。確認先: https://docs.aws.amazon.com/autoscaling/ec2/userguide/migrate-to-launch-templates.html
+注記: AWS 公式では Launch Configuration の代わりに Launch Template の利用が推奨されています。既存環境の保守で Launch Configuration を見かけることはありますが、新規構築や更新時は Launch Template を前提にしてください。特に新しい EC2 インスタンスタイプへの追随や新規アカウントでの制約を考えると、演習でも Launch Template を基準に読む方が安全です。確認先: [AWS Auto Scaling User Guide](https://docs.aws.amazon.com/autoscaling/ec2/userguide/migrate-to-launch-templates.html)
 
 #### スケーリングポリシー
 ```bash
