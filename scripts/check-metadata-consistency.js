@@ -30,7 +30,12 @@ function readText(relPath) {
 }
 
 function readJson(relPath) {
-  return JSON.parse(readText(relPath));
+  try {
+    return JSON.parse(readText(relPath));
+  } catch (err) {
+    addError(`${relPath} must be readable JSON: ${err.message}`);
+    return {};
+  }
 }
 
 function isInside(base, target) {
@@ -327,6 +332,8 @@ function validateMetadata(config, pkg, lock, docsConfig, indexFrontMatter, readm
   assertEqual(indexFrontMatter.version, config.version, 'docs/index.md front matter version');
 
   assertContains(readme, config.homepage, 'README.md online URL');
+  assertContains(readme, 'npm ci', 'README.md dependency installation command');
+  assertContains(readme, 'npm run check:security', 'README.md security audit command');
   assertContains(readme, 'npm run check:metadata', 'README.md quality gate');
   assertContains(readme, 'npm test', 'README.md test command');
 }
