@@ -31,10 +31,18 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-          cache-dependency-path: book-formatter/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            book-formatter/package-lock.json
 
-      - name: Metadata consistency check
-        run: npm run check:metadata
+      - name: Install local npm dependencies
+        run: npm ci
+
+      - name: Local npm security audit
+        run: npm run check:security
+
+      - name: Local npm QA
+        run: npm test
 
       - name: Install dependencies (book-formatter)
         working-directory: book-formatter
@@ -49,10 +57,6 @@ jobs:
           else
             echo "dir=." >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Docs sanity check (copy/paste breaking typos)
-        shell: bash
-        run: bash scripts/check-docs-sanity.sh "${{ steps.scan.outputs.dir }}"
 
       - name: Unicode check (fail on warnings)
         run: node book-formatter/scripts/check-unicode.js "${{ steps.scan.outputs.dir }}" --allowlist .book-formatter/unicode-allowlist.json --fail-on warn

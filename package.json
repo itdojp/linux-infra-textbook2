@@ -8,9 +8,9 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "cd docs && bundle exec jekyll serve --livereload",
-    "build": "cd docs && bundle exec jekyll build",
-    "build:gh-pages": "cd docs && bundle exec jekyll build",
+    "start": "cd docs && (bundle check || bundle install) && bundle exec jekyll serve --livereload",
+    "build": "cd docs && (bundle check || bundle install) && bundle exec jekyll build",
+    "build:gh-pages": "cd docs && (bundle check || bundle install) && bundle exec jekyll build",
     "preview": "npm run build && cd docs && npx http-server _site -p 8080 --silent",
     "deploy": "gh-pages -d docs/_site",
     "clean": "rm -rf docs/_site docs/.jekyll-cache",
@@ -19,15 +19,15 @@
     "lint:light": "markdownlint 'docs/**/*.md' --ignore node_modules",
     "check-links": "markdown-link-check docs/**/*.md",
     "help": "echo 'Available commands:\n  npm start - Start development server\n  npm run build - Build the book\n  npm run preview - Local preview\n  npm run deploy - Deploy to GitHub Pages'",
+    "check:security": "npm audit",
     "check:metadata": "node scripts/check-metadata-consistency.js",
     "check:docs-sanity": "bash scripts/check-docs-sanity.sh docs"
   },
-  "dependencies": {},
   "devDependencies": {
-    "markdownlint-cli": "^0.37.0",
-    "markdown-link-check": "^3.11.2",
-    "gh-pages": "^6.0.0",
-    "http-server": "^14.1.1"
+    "gh-pages": "^6.3.0",
+    "http-server": "^14.1.1",
+    "markdown-link-check": "^3.14.2",
+    "markdownlint-cli": "^0.48.0"
   },
   "keywords": [
     "book",
