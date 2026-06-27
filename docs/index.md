@@ -1,14 +1,14 @@
 ---
 layout: book
 order: 1
-title: "実践Linux インフラエンジニア入門"
-description: "コンテナ・クラウド時代に必要なLinuxインフラエンジニアの基礎技術を実践的に学べる技術書"
+title: "実践 Linux インフラエンジニア入門"
+description: "コンテナ・クラウド時代に必要な Linux インフラエンジニアの基礎技術を実践的に学べる技術書"
 author: "ITDO Inc.（株式会社アイティードゥ）"
 version: "1.0.1"
 permalink: /
 ---
 
-# 実践Linux インフラエンジニア入門
+# 実践 Linux インフラエンジニア入門
 
 コンテナ・クラウド時代の基礎技術
 
@@ -17,13 +17,13 @@ permalink: /
 - Linux を土台とするインフラストラクチャの基本概念（OS・ファイルシステム・プロセス・ネットワーク）を、コンテナやクラウドの前提として整理し直せるようになる。
 - シェルやコマンド、権限管理、TCP/IP、名前解決など、日常的に必要となる基礎技術について、構造と目的を説明しながら設定・操作ができるようになる。
 - コンテナ技術（Podman など）や仮想化の背景を理解し、オンプレ／クラウド環境での運用イメージを持ちながら設計・選定の議論に参加できるようになる。
-- 監視・ログ・Infrastructure as Code といった運用技術を含めて、現代的なLinuxインフラ環境の全体像を俯瞰し、自身の学習計画やキャリア形成に結びつけられるようになる。
+- 監視・ログ・Infrastructure as Code といった運用技術を含めて、現代的な Linux インフラ環境の全体像を俯瞰し、自身の学習計画やキャリア形成に結びつけられるようになる。
 
 ## 読み方ガイド
 
-- Linux そのものに不慣れな読者は、第1部（第1〜3章）で「なぜLinuxを学ぶか」と OS/ファイルシステムの抽象化を押さえたうえで、第2部以降の基礎技術に進むことを推奨する。
+- Linux そのものに不慣れな読者は、第1部（第1〜3章）で「なぜ Linux を学ぶか」と OS/ファイルシステムの抽象化を押さえたうえで、第2部以降の基礎技術に進むことを推奨する。
 - すでに基本コマンドに慣れており、「ネットワークやコンテナの基礎」を強化したい読者は、第2部の該当章を確認しつつ、第3部（ネットワーク）、第4部（コンテナ）の順に重点的に読む読み方も有効である。
-- クラウドやIaCに関心が高い読者は、第5〜6部（AWS・仮想ネットワーク・監視・自動化）の章を先に読み、必要に応じて前半の章に戻って Linux 側の基礎を補完する形でもよい。
+- クラウドや IaC に関心が高い読者は、第5〜6部（AWS・仮想ネットワーク・監視・自動化）の章を先に読み、必要に応じて前半の章に戻って Linux 側の基礎を補完する形でもよい。
 - 既にインフラに携わっている読者は、興味のある部から読み始めつつ、演習問題や付録の解答集を通じて自分の理解度をチェックする使い方を想定している。
 
 ## 前提知識
@@ -83,10 +83,10 @@ IAM Identity Center は、AWS 公式の Prescriptive Guidance でも複数アカ
 
 - **[はじめに](introduction/)** - 本書の目的と構成
 
-### 第1部：なぜLinuxを学ぶのか
+### 第1部：なぜ Linux を学ぶのか
 
-- **[第1章：ITインフラの全体像とLinuxの位置づけ](chapters/chapter-01-linux-overview)**
-- **[第2章：Linuxというオペレーティングシステムの設計思想](chapters/chapter-02-linux-philosophy)**
+- **[第1章：ITインフラの全体像と Linux の位置づけ](chapters/chapter-01-linux-overview)**
+- **[第2章：Linux というオペレーティングシステムの設計思想](chapters/chapter-02-linux-philosophy)**
 - **[第3章：ファイルシステムという抽象化の威力](chapters/chapter-03-filesystem-abstraction)**
 
 ### 第2部：基礎技術の本質を理解する
@@ -97,18 +97,18 @@ IAM Identity Center は、AWS 公式の Prescriptive Guidance でも複数アカ
 
 ### 第3部：ネットワークという基盤技術
 
-- **[第7章：TCP/IPスタックとLinux](chapters/chapter-07-tcp-ip)**
+- **[第7章：TCP/IP スタックと Linux](chapters/chapter-07-tcp-ip)**
 - **[第8章：名前解決とサービス発見](chapters/chapter-08-name-resolution)**
 
 ### 第4部：コンテナ技術の本質
 
 - **[第9章：仮想化からコンテナへ - 隔離技術の進化](chapters/chapter-09-container-evolution)**
-- **[第10章：Podmanという選択 - エンタープライズ向けコンテナ](chapters/chapter-10-podman)**
+- **[第10章：Podman という選択 - エンタープライズ向けコンテナ](chapters/chapter-10-podman)**
 - **[第11章：イメージとレジストリ - 配布可能な実行環境](chapters/chapter-11-with-exercises)**
 
 ### 第5部：クラウドという新しいインフラ
 
-- **[第12章：AWSという巨大なデータセンター](chapters/chapter-12-with-exercises)**
+- **[第12章：AWS という巨大なデータセンター](chapters/chapter-12-with-exercises)**
 - **[第13章：仮想ネットワークの設計と実装](chapters/chapter-13-with-exercises)**
 
 ### 第6部：統合と実践
@@ -122,7 +122,7 @@ IAM Identity Center は、AWS 公式の Prescriptive Guidance でも複数アカ
 
 ## 概要
 
-本書は、Linux初心者がITインフラエンジニアとして必要な基礎技術を「原理から理解する」ことを目的とします。各技術の誕生背景、解決する課題、実務での位置づけを明確にすることで、変化の激しい技術環境でも応用が利く基礎力を養成します。
+本書は、Linux 初心者がITインフラエンジニアとして必要な基礎技術を「原理から理解する」ことを目的とします。各技術の誕生背景、解決する課題、実務での位置づけを明確にすることで、変化の激しい技術環境でも応用が利く基礎力を養成します。
 
 ### 想定読者
 
@@ -152,8 +152,8 @@ IAM Identity Center は、AWS 公式の Prescriptive Guidance でも複数アカ
 
 ## 関連書籍
 
-- Linux の最初の入口を補いたい場合: [図解でわかるLinux基礎](https://itdojp.github.io/illustrated-linux-basics-book/)
-- コンテナ運用を深めたい場合: [Podman完全ガイド](https://itdojp.github.io/podman-book/)
+- Linux の最初の入口を補いたい場合: [図解でわかる Linux基礎](https://itdojp.github.io/illustrated-linux-basics-book/)
+- コンテナ運用を深めたい場合: [Podman 完全ガイド](https://itdojp.github.io/podman-book/)
 - トラブル対応を強化したい場合: [ITインフラトラブルシューティング大全](https://itdojp.github.io/IT-infra-troubleshooting-book/)
 
 **お問い合わせ**  

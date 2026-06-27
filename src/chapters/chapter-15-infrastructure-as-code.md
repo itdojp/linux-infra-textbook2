@@ -21,7 +21,7 @@ terraform plan -out=tfplan
 terraform apply tfplan
 ```
 
-たった数ステップで、複雑なインフラストラクチャを review 可能かつ再現可能な形で構築できる。これがInfrastructure as Code（IaC）の世界です。
+たった数ステップで、複雑なインフラストラクチャを review 可能かつ再現可能な形で構築できる。これが Infrastructure as Code（IaC）の世界です。
 
 ## 15.2 手作業の限界と人的ミスの排除
 
@@ -181,7 +181,7 @@ if current_state != desired_state:
 
 ### 状態管理の仕組み
 
-#### Terraformの状態管理
+#### Terraform の状態管理
 ```hcl
 # terraform.tfstate - 現在の状態を記録
 {
@@ -591,7 +591,7 @@ output "autoscaling_group_name" {
 }
 ```
 
-### 演習3：CI/CDパイプラインの構築
+### 演習3：CI/CD パイプラインの構築
 
 ```yaml
 # .gitlab-ci.yml - GitLab CI/CD設定
@@ -918,7 +918,7 @@ resource "aws_cloudwatch_metric_alarm" "dr_health" {
 
 注記: この `failover_to_dr.sh` は概念説明用の最小例です。実運用や演習の verify では、`terraform plan -input=false -var="dr_mode=true" -out=dr.tfplan` → `terraform apply -input=false dr.tfplan` で DR 側の構成を先に揃え、ALB target health や `curl -f` / `/health` が通ることを確認してから Route 53 を切り替えてください。DR 側の確認に失敗した場合は DNS を据え置き、演習後は `dr_mode=false` へ戻すか DR 側リソースを停止する rollback 手順を別 runbook として持つ方が安全です。
 
-## 15.6 IaCのベストプラクティス
+## 15.6 IaC のベストプラクティス
 
 ### コード構造とモジュール設計
 
@@ -1143,9 +1143,9 @@ resource "aws_budgets_budget" "monthly" {
 
 ## 15.7 まとめ：コードがインフラになる時代
 
-### Infrastructure as Codeがもたらした革命
+### Infrastructure as Code がもたらした革命
 
-本書の最終章で学んだIaCは、インフラ管理に以下の革命をもたらしました：
+本書の最終章で学んだ IaC は、インフラ管理に以下の革命をもたらしました：
 
 1. **再現性**：同じコードから同じインフラが生成される
 2. **バージョン管理**：インフラの変更履歴が追跡可能
@@ -1182,7 +1182,7 @@ resource "aws_budgets_budget" "monthly" {
 
 15章にわたる長い旅、お疲れさまでした。
 
-Linuxの基礎から始まり、コンテナ、クラウド、そしてInfrastructure as Codeまで、現代のインフラ技術の全体像を学んできました。
+Linux の基礎から始まり、コンテナ、クラウド、そして Infrastructure as Code まで、現代のインフラ技術の全体像を学んできました。
 
 しかし、これは終わりではなく始まりです。技術は日々進化し、新しいツールやプラクティスが生まれています。
 

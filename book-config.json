@@ -1,6 +1,6 @@
 {
-  "title": "実践Linux インフラエンジニア入門",
-  "description": "コンテナ・クラウド時代に必要なLinuxインフラエンジニアの基礎技術を実践的に学べる技術書",
+  "title": "実践 Linux インフラエンジニア入門",
+  "description": "コンテナ・クラウド時代に必要な Linux インフラエンジニアの基礎技術を実践的に学べる技術書",
   "author": "ITDO Inc.（株式会社アイティードゥ）",
   "version": "1.0.1",
   "language": "ja",
@@ -21,13 +21,13 @@
     "chapters": [
       {
         "id": "chapter01",
-        "title": "第1章：ITインフラの全体像とLinuxの位置づけ",
+        "title": "第1章：ITインフラの全体像と Linux の位置づけ",
         "description": "Linux を学ぶ意義と IT インフラ全体の中での位置づけ",
         "path": "/chapters/chapter-01-linux-overview/"
       },
       {
         "id": "chapter02",
-        "title": "第2章：Linuxというオペレーティングシステムの設計思想",
+        "title": "第2章：Linux というオペレーティングシステムの設計思想",
         "description": "OS の役割と Linux の設計思想を理解する",
         "path": "/chapters/chapter-02-linux-philosophy/"
       },
@@ -57,7 +57,7 @@
       },
       {
         "id": "chapter07",
-        "title": "第7章：TCP/IPスタックとLinux",
+        "title": "第7章：TCP/IP スタックと Linux",
         "description": "Linux から見たネットワーク基盤を理解する",
         "path": "/chapters/chapter-07-tcp-ip/"
       },
@@ -75,7 +75,7 @@
       },
       {
         "id": "chapter10",
-        "title": "第10章：Podmanという選択 - エンタープライズ向けコンテナ",
+        "title": "第10章：Podman という選択 - エンタープライズ向けコンテナ",
         "description": "Podman を中心にコンテナ運用の基礎を学ぶ",
         "path": "/chapters/chapter-10-podman/"
       },
@@ -87,7 +87,7 @@
       },
       {
         "id": "chapter12",
-        "title": "第12章：AWSという巨大なデータセンター",
+        "title": "第12章：AWS という巨大なデータセンター",
         "description": "クラウドの基礎として AWS の見方を学ぶ",
         "path": "/chapters/chapter-12-with-exercises/"
       },
