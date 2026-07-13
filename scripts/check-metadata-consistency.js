@@ -17,7 +17,17 @@ function findRepoRoot(startDir) {
   }
 }
 
-const repoRoot = findRepoRoot(process.cwd());
+function requestedRoot() {
+  const rootFlagIndex = process.argv.indexOf('--root');
+  if (rootFlagIndex < 0) return process.cwd();
+  const requested = process.argv[rootFlagIndex + 1];
+  if (!requested) {
+    throw new Error('--root requires a repository path.');
+  }
+  return requested;
+}
+
+const repoRoot = findRepoRoot(requestedRoot());
 const repoRootReal = fs.realpathSync(repoRoot);
 const errors = [];
 
@@ -285,6 +295,155 @@ function firstHeading(markdownBody) {
   return '';
 }
 
+const QUICK_START = {
+  id: 'quick-start',
+  title: 'クイックスタート',
+  route: '/quick-start/',
+  page: 'docs/quick-start/index.md',
+};
+
+function routeLinkExists(markdown, route) {
+  const routeWithoutLeadingSlash = route.replace(/^\//, '');
+  return [
+    `](${route}`,
+    `](${routeWithoutLeadingSlash}`,
+    `href="${route}`,
+    `href="${routeWithoutLeadingSlash}`,
+  ].some((needle) => markdown.includes(needle));
+}
+
+function existingDocsPage(routePath) {
+  const candidates = docsCandidatesForPath(routePath, `quickStart route ${routePath}`);
+  const candidateErrors = [];
+  const collectCandidateError = (message) => candidateErrors.push(message);
+  for (const candidate of candidates) {
+    const abs = resolveRepoPath(candidate, `quickStart route ${routePath} candidate`, {
+      mustExist: false, reportError: collectCandidateError,
+    });
+    if (!abs || !fs.existsSync(abs)) continue;
+    const resolved = resolveRepoPath(candidate, `quickStart route ${routePath} target`, {
+      mustExist: true, file: true, reportError: collectCandidateError,
+    });
+    if (resolved) return resolved;
+  }
+  for (const candidateError of candidateErrors) {
+    addError(candidateError);
+  }
+  return null;
+}
+
+function validateQuickStart(config, entries, nav, indexMarkdown) {
+  const moduleValue = config.ux && config.ux.modules
+    ? config.ux.modules.quickStart
+    : undefined;
+  if (typeof moduleValue !== 'boolean') {
+    addError('book-config.json ux.modules.quickStart must be a boolean.');
+  }
+
+  const structureEntries = entries.filter((entry) => (
+    entry.id === QUICK_START.id || entry.path === QUICK_START.route
+  ));
+  const navigationEntries = (nav.introduction || []).filter((item) => item.path === QUICK_START.route);
+  const quickStartPage = existingDocsPage(QUICK_START.route);
+  const topLinkExists = routeLinkExists(indexMarkdown, QUICK_START.route);
+
+  if (moduleValue !== true) {
+    // The root QUICK-START.md is intentionally not a public reader route. It must
+    // not make a false module flag pass as if the reader-facing contract existed.
+    if (structureEntries.length > 0) {
+      addError('quickStart is disabled but book-config.json still declares the reader-facing quick-start entry.');
+    }
+    if (navigationEntries.length > 0) {
+      addError('quickStart is disabled but docs/_data/navigation.yml still exposes /quick-start/.');
+    }
+    if (quickStartPage) {
+      addError('quickStart is disabled but docs contains the reader-facing /quick-start/ page.');
+    }
+    if (topLinkExists) {
+      addError('quickStart is disabled but docs/index.md still links to /quick-start/.');
+    }
+    return;
+  }
+
+  if (structureEntries.length !== 1) {
+    addError(`quickStart must have exactly one book-config.json structure entry for ${QUICK_START.route}; found ${structureEntries.length}.`);
+  } else {
+    const [entry] = structureEntries;
+    if (entry.section !== 'introduction') {
+      addError('quickStart structure entry must be in book-config.json structure.introduction.');
+    }
+    if (entry.id !== QUICK_START.id) {
+      addError(`quickStart structure entry id must be ${JSON.stringify(QUICK_START.id)}.`);
+    }
+    assertEqual(entry.title, QUICK_START.title, 'quickStart structure title');
+    assertEqual(entry.path, QUICK_START.route, 'quickStart structure path');
+    const introductionEntries = config.structure && config.structure.introduction;
+    if (!Array.isArray(introductionEntries)
+      || !introductionEntries[1]
+      || introductionEntries[1].id !== entry.id
+      || introductionEntries[1].path !== entry.path) {
+      addError('quickStart must follow はじめに in book-config.json structure.introduction.');
+    }
+  }
+
+  if (navigationEntries.length !== 1) {
+    addError(`quickStart must have exactly one navigation entry for ${QUICK_START.route}; found ${navigationEntries.length}.`);
+  } else {
+    assertEqual(navigationEntries[0].title, QUICK_START.title, 'quickStart navigation title');
+    if ((nav.introduction || [])[1] !== navigationEntries[0]) {
+      addError('quickStart must follow はじめに in docs/_data/navigation.yml.');
+    }
+  }
+
+  if (!topLinkExists) {
+    addError('docs/index.md must contain a reader-facing link to /quick-start/.');
+  }
+
+  if (!quickStartPage) {
+    addError(`quickStart route ${QUICK_START.route} has no published page at ${QUICK_START.page}.`);
+    return;
+  }
+
+  const quickStartRelativePath = path.relative(repoRoot, quickStartPage);
+  if (quickStartRelativePath.split(path.sep).join('/') !== QUICK_START.page) {
+    addError(`quickStart route ${QUICK_START.route} must resolve to ${QUICK_START.page}; got ${quickStartRelativePath}.`);
+  }
+  const quickStartMarkdown = fs.readFileSync(quickStartPage, 'utf8');
+  const parsed = parseFrontMatter(quickStartMarkdown, quickStartRelativePath);
+  assertEqual(parsed.data.layout, 'book', `${QUICK_START.page} front matter layout`);
+  assertEqual(parsed.data.title, QUICK_START.title, `${QUICK_START.page} front matter title`);
+  assertEqual(parsed.data.permalink, QUICK_START.route, `${QUICK_START.page} front matter permalink`);
+  if (quickStartMarkdown.includes('{% include page-navigation.html %}')) {
+    addError(`${QUICK_START.page} must rely on the book layout navigation and must not include page-navigation.html directly.`);
+  }
+
+  const requiredContent = [
+    '20〜30 分',
+    'disposable',
+    '本番環境、共有サーバー',
+    '`sudo`',
+    'cat /etc/os-release',
+    'id',
+    'pwd',
+    'mktemp -d',
+    '期待結果',
+    '停止条件',
+    '失敗時の確認点',
+    'ps -p',
+    'ip -brief address show',
+    'getent ahosts',
+    '## クリーンアップ',
+    'rm -rf --',
+    'QUICK-START.md',
+    '../chapters/chapter-01-linux-overview.md',
+    '../chapters/chapter-05-process-and-signals.md',
+    '../chapters/chapter-07-tcp-ip.md',
+  ];
+  for (const marker of requiredContent) {
+    assertContains(quickStartMarkdown, marker, `${QUICK_START.page} reader contract`);
+  }
+}
+
 function validateMetadata(config, pkg, lock, docsConfig, indexFrontMatter, readme) {
   const repoSlug = canonicalRepoSlug(config.repository && config.repository.url);
   if (!repoSlug) {
@@ -430,6 +589,7 @@ function main() {
   validateMetadata(config, pkg, lock, docsConfig, index.data, readme);
   validateEntries(entries);
   validateNavigation(config, nav);
+  validateQuickStart(config, entries, nav, readText('docs/index.md'));
   validateRequiredAssets();
 
   if (errors.length > 0) {

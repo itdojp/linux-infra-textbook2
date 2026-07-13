@@ -1,6 +1,8 @@
 introduction:
   - title: はじめに
     path: /introduction/
+  - title: クイックスタート
+    path: /quick-start/
 chapters:
   - title: 第1章：ITインフラの全体像と Linux の位置づけ
     path: /chapters/chapter-01-linux-overview/

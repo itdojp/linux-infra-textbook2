@@ -16,6 +16,12 @@
         "title": "はじめに",
         "path": "/introduction/",
         "description": "本書の目的、対象読者、前提知識"
+      },
+      {
+        "id": "quick-start",
+        "title": "クイックスタート",
+        "path": "/quick-start/",
+        "description": "安全な検証環境で Linux の基本観察を体験する 20〜30 分の導入"
       }
     ],
     "chapters": [
@@ -135,7 +141,7 @@
   "ux": {
     "profile": "A",
     "modules": {
-      "quickStart": false,
+      "quickStart": true,
       "readingGuide": true,
       "checklistPack": false,
       "troubleshootingFlow": false,
