@@ -58,11 +58,18 @@ pwd
 以降の作業対象を専用ディレクトリに限定します。`mktemp` が作るディレクトリは現在のユーザーだけが扱える権限で作成されます。
 
 ```bash
-export QUICK_START_DIR="$(mktemp -d "${TMPDIR:-/tmp}/linux-infra-quick-start.XXXXXX")"
-cd "$QUICK_START_DIR"
+QUICK_START_DIR="$(mktemp -d "${TMPDIR:-/tmp}/linux-infra-quick-start.XXXXXX")" || {
+  printf '%s\n' '専用一時ディレクトリを作成できないため、シェルを終了します。' >&2
+  exit 1
+}
+export QUICK_START_DIR
+cd "$QUICK_START_DIR" || {
+  printf '%s\n' '専用一時ディレクトリへ移動できないため、シェルを終了します。' >&2
+  exit 1
+}
 if [ "$PWD" != "$QUICK_START_DIR" ]; then
-  printf '%s\n' '専用一時ディレクトリへ移動できないため、ここで停止します。' >&2
-  false
+  printf '%s\n' '作業場所を検証できないため、シェルを終了します。' >&2
+  exit 1
 fi
 printf '作業場所: %s\n' "$QUICK_START_DIR"
 printf '%s\n' '--- directory metadata ---'

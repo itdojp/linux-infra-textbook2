@@ -58,7 +58,7 @@ function expectFail(label, marker) {
   const result = runChecker();
   assert.notStrictEqual(result.status, 0, `${label} should fail`);
   const output = `${result.stdout}\n${result.stderr}`;
-  assert.match(output, new RegExp(marker), `${label} should mention ${marker}:\n${output}`);
+  assert.ok(output.includes(marker), `${label} should mention ${marker}:\n${output}`);
 }
 
 try {
