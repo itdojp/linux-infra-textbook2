@@ -20,7 +20,7 @@
     "check-links": "markdown-link-check docs/**/*.md",
     "help": "echo 'Available commands:\n  npm start - Start development server\n  npm run build - Build the book\n  npm run preview - Local preview\n  npm run deploy - Deploy to GitHub Pages'",
     "check:security": "npm audit",
-    "check:metadata": "node scripts/check-metadata-consistency.js",
+    "check:metadata": "node scripts/check-metadata-consistency.js && node scripts/check-metadata-consistency-regression.js",
     "check:docs-sanity": "bash scripts/check-docs-sanity.sh docs"
   },
   "devDependencies": {
