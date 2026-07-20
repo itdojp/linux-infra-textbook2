@@ -315,6 +315,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
       
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
@@ -553,6 +555,8 @@ EOF
 
 chmod +x import_existing_infra.sh
 ```
+
+このimport scriptもTerraform CLI 1.15.8を前提とする。実行前に`terraform version`で確認し、異なる場合はscriptを実行しない。
 
 注記: `terraform import` の直後は `terraform state list`、`terraform state show aws_instance.<name>`、`terraform plan` の順に確認し、state に取り込まれた実リソースとコード側の属性差分を切り分けてください。誤った ID や resource address を import した場合は、実リソースを消さずに `terraform state rm <address>` で state だけ巻き戻してからやり直す方が安全です。
 
