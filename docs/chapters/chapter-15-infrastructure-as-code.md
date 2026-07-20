@@ -388,7 +388,14 @@ git show a1b2c3d
 
 検証baseline（2026-07-21）: [Terraform v1.15.8](https://github.com/hashicorp/terraform/releases/tag/v1.15.8) / [AWS Provider v6.55.0](https://github.com/hashicorp/terraform-provider-aws/releases/tag/v6.55.0)。次のroot module例は検証版を正確に固定する。実プロジェクトでは`.terraform.lock.hcl`もversion管理し、更新時に`plan`を再確認する。
 
-`data_bucket_name`には一意な作成先を指定する。`access_log_bucket_name`には、同じAWS account/Regionにあり、`logging.s3.amazonaws.com`へ`s3:PutObject`を許可済みの既存bucketを指定する（[AWS公式の配信権限](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html)）。この例は配信先bucketとpolicyを作成しない。
+`data_bucket_name`には一意な作成先を指定する。`access_log_bucket_name`には、[AWS公式の配信条件](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html)を満たす既存bucketを指定する。
+
+- sourceと同じAWS account/Regionに置く
+- `logging.s3.amazonaws.com`へ`s3:PutObject`をbucket policyで許可する
+- Server access logging、Object Lock、default retention、Requester Paysを有効にしない
+- default encryptionにはSSE-S3を使用する
+
+この例は配信先bucketとpolicyを作成しない。
 
 ```hcl
 # ポリシーの強制
