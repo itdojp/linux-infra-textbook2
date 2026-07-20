@@ -640,7 +640,8 @@ variables:
 
 before_script:
   - cd ${TF_ROOT}
-  - terraform init
+  - >-
+    terraform init
     -backend-config="bucket=terraform-state-bucket"
     -backend-config="key=${TF_STATE_NAME}/terraform.tfstate"
     -backend-config="region=ap-northeast-1"
