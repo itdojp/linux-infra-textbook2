@@ -386,6 +386,8 @@ git show a1b2c3d
 
 検証baseline（2026-07-21）: [Terraform v1.15.8](https://github.com/hashicorp/terraform/releases/tag/v1.15.8) / [AWS Provider v6.55.0](https://github.com/hashicorp/terraform-provider-aws/releases/tag/v6.55.0)。次のroot module例は検証版を正確に固定する。実プロジェクトでは`.terraform.lock.hcl`もversion管理し、更新時に`plan`を再確認する。
 
+`data_bucket_name`には一意な作成先を指定する。`access_log_bucket_name`には、同じAWS account/Regionにあり、`logging.s3.amazonaws.com`へ`s3:PutObject`を許可済みの既存bucketを指定する（[AWS公式の配信権限](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html)）。この例は配信先bucketとpolicyを作成しない。
+
 ```hcl
 # ポリシーの強制
 terraform {
@@ -404,8 +406,18 @@ variable "environment" {
   type        = string
 }
 
+variable "data_bucket_name" {
+  description = "Globally unique name for the data bucket"
+  type        = string
+}
+
+variable "access_log_bucket_name" {
+  description = "Existing same-account and same-Region bucket configured for S3 log delivery"
+  type        = string
+}
+
 resource "aws_s3_bucket" "data" {
-  bucket = "company-sensitive-data"
+  bucket = var.data_bucket_name
 
   # タグによる管理
   tags = {
@@ -439,7 +451,7 @@ resource "aws_s3_bucket_versioning" "data" {
 # ロギングを有効化
 resource "aws_s3_bucket_logging" "data" {
   bucket        = aws_s3_bucket.data.id
-  target_bucket = "company-sensitive-data-access-logs"
+  target_bucket = var.access_log_bucket_name
   target_prefix = "s3-access-logs/"
 }
 
