@@ -315,6 +315,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8
       
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
@@ -384,39 +386,48 @@ git show a1b2c3d
 
 #### コンプライアンス対応
 
+検証baseline（2026-07-21）: [Terraform v1.15.8](https://github.com/hashicorp/terraform/releases/tag/v1.15.8) / [AWS Provider v6.55.0](https://github.com/hashicorp/terraform-provider-aws/releases/tag/v6.55.0)。次のroot module例は検証版を正確に固定する。実プロジェクトでは`.terraform.lock.hcl`もversion管理し、更新時に`plan`を再確認する。
+
+`data_bucket_name`には一意な作成先を指定する。`access_log_bucket_name`には、[AWS公式の配信条件](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html)を満たす既存bucketを指定する。
+
+- sourceと同じAWS account/Regionに置く
+- `logging.s3.amazonaws.com`へ`s3:PutObject`をbucket policyで許可する
+- Server access logging、Object Lock、default retention、Requester Paysを有効にしない
+- default encryptionにはSSE-S3を使用する
+
+この例は配信先bucketとpolicyを作成しない。
+
 ```hcl
 # ポリシーの強制
-resource "aws_s3_bucket" "data" {
-  bucket = "company-sensitive-data"
-  
-  # 暗号化を強制
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+terraform {
+  required_version = "= 1.15.8"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "= 6.55.0"
     }
   }
-  
-  # バージョニングを有効化
-  versioning {
-    enabled = true
-  }
-  
-  # ロギングを有効化
-  logging {
-    target_bucket = aws_s3_bucket.logs.id
-    target_prefix = "s3-access-logs/"
-  }
-  
-  # パブリックアクセスをブロック
-  public_access_block {
-    block_public_acls       = true
-    block_public_policy     = true
-    ignore_public_acls      = true
-    restrict_public_buckets = true
-  }
-  
+}
+
+variable "environment" {
+  description = "Deployment environment"
+  type        = string
+}
+
+variable "data_bucket_name" {
+  description = "Globally unique name for the data bucket"
+  type        = string
+}
+
+variable "access_log_bucket_name" {
+  description = "Existing same-account and same-Region bucket configured for S3 log delivery"
+  type        = string
+}
+
+resource "aws_s3_bucket" "data" {
+  bucket = var.data_bucket_name
+
   # タグによる管理
   tags = {
     Environment = var.environment
@@ -424,6 +435,43 @@ resource "aws_s3_bucket" "data" {
     Owner       = "DataTeam"
     CreatedBy   = "Terraform"
   }
+}
+
+# 暗号化を強制
+resource "aws_s3_bucket_server_side_encryption_configuration" "data" {
+  bucket = aws_s3_bucket.data.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+# バージョニングを有効化
+resource "aws_s3_bucket_versioning" "data" {
+  bucket = aws_s3_bucket.data.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# ロギングを有効化
+resource "aws_s3_bucket_logging" "data" {
+  bucket        = aws_s3_bucket.data.id
+  target_bucket = var.access_log_bucket_name
+  target_prefix = "s3-access-logs/"
+}
+
+# パブリックアクセスをブロック
+resource "aws_s3_bucket_public_access_block" "data" {
+  bucket = aws_s3_bucket.data.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 ```
 
@@ -476,10 +524,12 @@ instances=$(aws ec2 describe-instances \
 # 2. Terraformコードの生成
 cat > main.tf << 'TF'
 terraform {
+  required_version = "= 1.15.8"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "= 6.55.0"
     }
   }
 }
@@ -512,6 +562,8 @@ EOF
 
 chmod +x import_existing_infra.sh
 ```
+
+このimport scriptもTerraform CLI 1.15.8を前提とする。実行前に`terraform version`で確認し、異なる場合はscriptを実行しない。
 
 注記: `terraform import` の直後は `terraform state list`、`terraform state show aws_instance.<name>`、`terraform plan` の順に確認し、state に取り込まれた実リソースとコード側の属性差分を切り分けてください。誤った ID や resource address を import した場合は、実リソースを消さずに `terraform state rm <address>` で state だけ巻き戻してからやり直す方が安全です。
 
