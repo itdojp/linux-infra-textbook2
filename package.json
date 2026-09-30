@@ -46,12 +46,12 @@
   },
   "homepage": "https://itdojp.github.io/linux-infra-textbook2/",
   "overrides": {
-    "brace-expansion": "5.0.9",
-    "ip-address": "10.5.0",
+    "brace-expansion": "5.0.12",
+    "ip-address": "10.7.2",
     "js-yaml": "4.3.2",
-    "markdown-it": "14.2.0",
+    "markdown-it": "14.3.2",
     "linkify-it": "5.0.2",
-    "undici": "7.29.0",
+    "undici": "7.29.1",
     "smol-toml": "1.7.2"
   }
 }
