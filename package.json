@@ -14,7 +14,8 @@
     "preview": "npm run build && cd docs && npx http-server _site -p 8080 --silent",
     "deploy": "gh-pages -d docs/_site",
     "clean": "rm -rf docs/_site docs/.jekyll-cache",
-    "test": "npm run check:metadata && npm run check:docs-sanity && npm run lint && npm run check-links",
+    "test": "npm run check:dependency-compatibility && npm run check:metadata && npm run check:docs-sanity && npm run lint && npm run check-links",
+    "check:dependency-compatibility": "node --test scripts/check-dependency-compatibility.test.cjs",
     "lint": "markdownlint 'docs/**/*.md' --ignore node_modules",
     "lint:light": "markdownlint 'docs/**/*.md' --ignore node_modules",
     "check-links": "markdown-link-check docs/**/*.md",
@@ -46,11 +47,15 @@
   },
   "homepage": "https://itdojp.github.io/linux-infra-textbook2/",
   "overrides": {
-    "brace-expansion": "5.0.9",
-    "ip-address": "10.5.0",
-    "js-yaml": "4.3.1",
-    "markdown-it": "14.2.0",
+    "brace-expansion": "5.0.12",
+    "ip-address": "10.7.2",
+    "js-yaml": "4.3.2",
+    "markdown-it": "14.3.2",
     "linkify-it": "5.0.2",
-    "undici": "7.29.0"
+    "undici": "7.29.1",
+    "smol-toml": "1.7.2",
+    "get-uri": {
+      "basic-ftp": "6.2.1"
+    }
   }
 }
